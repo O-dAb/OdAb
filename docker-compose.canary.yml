@@ -1,0 +1,53 @@
+services:
+
+  client-canary:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: client-canary
+    ports:
+      - "3002:3000"
+    depends_on:
+      - server-canary
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_URL=/api
+    restart: always
+    networks:
+      - app-network
+
+  server-canary:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: server-canary
+    ports:
+      - "8082:8080"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - SPRING_DATASOURCE_URL=jdbc:mysql://my-db:3306/${MYSQL_DATABASE}?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_ACCESS_TOKEN_VALIDITY=${JWT_ACCESS_TOKEN_VALIDITY}
+      - JWT_REFRESH_TOKEN_VALIDITY=${JWT_REFRESH_TOKEN_VALIDITY}
+      - MY_DB=${MY_DB}
+      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST}
+      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT}
+      - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD}
+    depends_on:
+      my-db:
+        condition: service_healthy
+      my-cache-server:
+        condition: service_healthy
+    networks:
+      - app-network
+    restart: always
+
+networks:
+  app-network:
+    external: true
