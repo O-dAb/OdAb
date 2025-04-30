@@ -39,11 +39,11 @@ services:
       - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST}
       - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT}
       - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD}
-    depends_on:
-      my-db:
-        condition: service_healthy
-      my-cache-server:
-        condition: service_healthy
+    # depends_on:
+    #   my-db:
+    #     condition: service_healthy
+    #   my-cache-server:
+    #     condition: service_healthy
     networks:
       - app-network
     restart: always

@@ -39,7 +39,7 @@ logging.level:
     security: DEBUG
     web.socket: DEBUG
     messaging: DEBUG
-  com.b110.jjeonchongmu: DEBUG
+  com.ssafy.ddalggak: DEBUG
 
 paging:
   default-page-size: 10
