@@ -1,13 +1,13 @@
-package com.ssafy.server;
+package com.ssafy.odab;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ServerApplication {
+public class OdabApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ServerApplication.class, args);
+		SpringApplication.run(OdabApplication.class, args);
 	}
 
 }
