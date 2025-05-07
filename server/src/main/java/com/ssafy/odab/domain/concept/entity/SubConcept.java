@@ -28,17 +28,18 @@ public class SubConcept {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "sub_concept_id")
-  private Long id;
+  private Integer id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "major_concept_id")
   private MajorConcept majorConcept;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "grade_id")
+  private GradeLevel gradeLevel;
+
   @Column(name = "sub_concept_type", nullable = true)
   private String conceptType;
-
-  @Column(name = "grade", nullable = true)
-  private Integer grade;
 
   @Column(name = "concept_order", nullable = true)
   private Integer conceptOrder;
@@ -61,6 +62,18 @@ public class SubConcept {
 
     if (majorConcept != null) {
       majorConcept.getSubConcepts().add(this);
+    }
+  }
+
+  public void changeGrade(GradeLevel gradeLevel) {
+    if(this.gradeLevel != null) {
+      this.gradeLevel.getSubConcepts().remove(this);
+    }
+
+    this.gradeLevel = gradeLevel;
+
+    if(gradeLevel != null) {
+      gradeLevel.getSubConcepts().add(this);
     }
   }
 

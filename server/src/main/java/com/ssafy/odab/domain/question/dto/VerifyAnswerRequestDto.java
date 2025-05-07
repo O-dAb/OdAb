@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class VerifyAnswerRequestDto {
 
-  private final Long questionId;
+  private final Integer questionId;
   private final String answer;
 
 }

@@ -1,5 +1,6 @@
 package com.ssafy.odab.domain.question_result.controller;
 
+import com.ssafy.odab.domain.question_result.dto.WrongQuestionResponseDto;
 import com.ssafy.odab.domain.question_result.service.QuestionResultService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +16,18 @@ public class QuestionResultController {
 
   private final QuestionResultService questionResultService;
 
-  @GetMapping("{grade}")
-  public ResponseEntity<Void> findWrongAnswersByGrade(@PathVariable("grade") int grade) {
+  @GetMapping("{grade}/grade")
+  public ResponseEntity<WrongQuestionResponseDto> findGradeWrongAnswersByGrade(@PathVariable("grade") Byte grade) {
+    Integer userId = 1;
+    WrongQuestionResponseDto WrongQuestionResponseDto
+        = questionResultService.findWrongAnswersByGrade(grade, userId);
+    return ResponseEntity.ok(WrongQuestionResponseDto);
+  }
 
+  @GetMapping("{schoolLevel}")
+  public ResponseEntity<Void> findWrongAnswerBySchoolLevel(@PathVariable("schoolLevel") int schoolLevel) {
+    Integer userId = 1;
+    questionResultService.findWrongAnswersBySchoolLevel(schoolLevel, userId);
     return null;
   }
 

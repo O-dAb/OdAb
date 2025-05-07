@@ -3,7 +3,6 @@ package com.ssafy.odab.domain.user.entity;
 import com.ssafy.odab.domain.learning.entity.LastLearningDate;
 import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question_result.entity.QuestionResult;
-import com.ssafy.odab.domain.solution.entity.Solution;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -29,10 +28,10 @@ public class User {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "user_id")
-  private Long id;
+  private Integer id;
 
   @Column(name = "kakao_id", unique = true, nullable = false)
-  private Long kakaoId;
+  private Integer kakaoId;
 
   @Column(name = "profile_url", nullable = true)
   private String profileUrl;
@@ -54,8 +53,5 @@ public class User {
 
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   private List<Question> questions = new ArrayList<>();
-
-  @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-  private List<Solution> solutions = new ArrayList<>();
 
 }

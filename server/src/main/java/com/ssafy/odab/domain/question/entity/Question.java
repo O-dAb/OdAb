@@ -2,7 +2,6 @@ package com.ssafy.odab.domain.question.entity;
 
 import com.ssafy.odab.domain.concept.entity.SubConcept;
 import com.ssafy.odab.domain.question_result.entity.QuestionResult;
-import com.ssafy.odab.domain.solution.entity.Solution;
 import com.ssafy.odab.domain.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -31,7 +30,7 @@ public class Question {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "question_id")
-  private Long questionId;
+  private Integer id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
@@ -56,11 +55,8 @@ public class Question {
   @Column(name = "level", nullable = true)
   private Integer level;
 
-  @Column(name = "regit_at", nullable = true)
-  private LocalDate regitAt;
-
-  @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
-  private List<Solution> solutions = new ArrayList<>();
+  @Column(name = "regist_at", nullable = true)
+  private LocalDateTime registAt;
 
   @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
   private List<QuestionResult> questionResults = new ArrayList<>();
