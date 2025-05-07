@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Builder
 @RequiredArgsConstructor
 public class VerifyAnswerResponseDto {
+
   private final Boolean correct;
   private final String message;
 }

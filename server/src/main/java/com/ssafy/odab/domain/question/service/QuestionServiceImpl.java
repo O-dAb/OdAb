@@ -5,7 +5,7 @@ import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question.repository.QuestionRepository;
 import com.ssafy.odab.domain.question_result.entity.QuestionResult;
 import com.ssafy.odab.domain.question_result.repository.QuestionResultRepository;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,13 +24,12 @@ public class QuestionServiceImpl implements QuestionService {
         .orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
 
     // 정답결과 테이블에서 회원의 문제 조회
-//    QuestionResult questionResult = questionResultRepository.findByQuestionId(question.getQuestionId())
-    QuestionResult questionResult = questionResultRepository.findByQuestion_QuestionId(question.getQuestionId())
+    QuestionResult questionResult = questionResultRepository.findByQuestionId(question.getId())
         .orElseThrow(() -> new IllegalArgumentException("문제 결과를 찾을 수 없습니다."));
     Boolean isCorrect = question.getAnswer().equals(verifyAnswerRequestDto.getAnswer());
     // 정답이 맞으면 풀이일자 수정, 정답여부 true
     // 정답이 틀리면 풀이일자 수정, 정답여부 false
-    questionResult.changeVerifyAnswer(isCorrect, LocalDate.now());
+    questionResult.changeVerifyAnswer(isCorrect, LocalDateTime.now());
 
     // 정답이 맞으면 true
     // 정답이 틀리면 false를 리턴

@@ -22,9 +22,9 @@ public class QLastLearningDate extends EntityPathBase<LastLearningDate> {
 
     public static final QLastLearningDate lastLearningDate1 = new QLastLearningDate("lastLearningDate1");
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
-    public final DatePath<java.time.LocalDate> lastLearningDate = createDate("lastLearningDate", java.time.LocalDate.class);
+    public final DateTimePath<java.time.LocalDateTime> lastLearningDate = createDateTime("lastLearningDate", java.time.LocalDateTime.class);
 
     public final com.ssafy.odab.domain.concept.entity.QSubConcept subConcept;
 
