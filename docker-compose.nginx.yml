@@ -8,6 +8,8 @@ services:
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d        # 로컬 설정 파일을 컨테이너 내부로 마운트
       - /etc/letsencrypt:/etc/letsencrypt:ro    # SSL 인증서 마운트
+    environment:
+      - TZ=Asia/Seoul
     restart: always
     networks:
       - app-network
