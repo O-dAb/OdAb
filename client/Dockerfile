@@ -14,8 +14,8 @@ COPY --from=build /app/package*.json ./
 RUN npm ci --only=production
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
-# next.config.js가 없을 경우에도 실패하지 않음
-COPY --from=build /app/next.config.mjs ./
+
+COPY --from=build /app/next.config.* ./
 
 EXPOSE 3000
 CMD ["npm", "run", "start"]
