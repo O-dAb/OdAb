@@ -1,12 +1,68 @@
 spring:
+  # 데이터 소스 설정 (MySQL)
   datasource:
-    url: jdbc:mysql://localhost:3306/jpa
-    username: root
-    password: root
+    url: jdbc:mysql://${DB_HOST}:3306/${DB_SCHEMA}?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-  application:
-    name: server
-
 claude-api:
   api-key: api-key
   base-url: https://api.anthropic.com/v1/messages
+  # JPA 설정
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        default_batch_fetch_size: 100
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  # 레디스 설정
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+
+  # JSON 직렬화 설정
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    time-zone: Asia/Seoul
+    deserialization:
+      fail-on-unknown-properties: false
+
+  # 파일 업로드 설정
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 100MB
+
+  # 웹소켓 설정
+  websocket:
+    path: /ws
+    allowed-origins: "*"
+
+# 보안 설정
+security:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY}
+    refresh-token-validity: ${JWT_REFRESH_TOKEN_VALIDITY}
+
+# 로깅 설정
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.springframework.security: INFO
+    org.springframework.data.jpa: INFO
+    org.hibernate.SQL: DEBUG
+    com.ssafy.odab: DEBUG
+
+# 서버 설정
+server:
+  port: 8080
