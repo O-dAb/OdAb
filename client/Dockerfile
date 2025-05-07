@@ -2,7 +2,7 @@
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 COPY . .
 # 타입 검사 없이 빌드 실행
 RUN NEXT_IGNORE_TS_ERRORS=1 npm run build
@@ -11,7 +11,7 @@ RUN NEXT_IGNORE_TS_ERRORS=1 npm run build
 FROM node:20-alpine AS production
 WORKDIR /app
 COPY --from=build /app/package*.json ./
-RUN npm ci --only=production
+RUN npm ci --only=production --legacy-peer-deps
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
 
