@@ -28,9 +28,9 @@ public class QSubConcept extends EntityPathBase<SubConcept> {
 
     public final StringPath conceptType = createString("conceptType");
 
-    public final NumberPath<Integer> grade = createNumber("grade", Integer.class);
+    public final QGradeLevel gradeLevel;
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
     public final ListPath<com.ssafy.odab.domain.learning.entity.LastLearningDate, com.ssafy.odab.domain.learning.entity.QLastLearningDate> lastLearningDates = this.<com.ssafy.odab.domain.learning.entity.LastLearningDate, com.ssafy.odab.domain.learning.entity.QLastLearningDate>createList("lastLearningDates", com.ssafy.odab.domain.learning.entity.LastLearningDate.class, com.ssafy.odab.domain.learning.entity.QLastLearningDate.class, PathInits.DIRECT2);
 
@@ -56,7 +56,8 @@ public class QSubConcept extends EntityPathBase<SubConcept> {
 
     public QSubConcept(Class<? extends SubConcept> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.majorConcept = inits.isInitialized("majorConcept") ? new QMajorConcept(forProperty("majorConcept")) : null;
+        this.gradeLevel = inits.isInitialized("gradeLevel") ? new QGradeLevel(forProperty("gradeLevel")) : null;
+        this.majorConcept = inits.isInitialized("majorConcept") ? new QMajorConcept(forProperty("majorConcept"), inits.get("majorConcept")) : null;
     }
 
 }
