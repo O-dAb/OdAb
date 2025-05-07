@@ -43,27 +43,32 @@ public class QuestionResult {
   private Boolean isCorrect;
 
   public void changeQuestion(Question question) {
-    if(this.question != null) {
+    if (this.question != null) {
       this.question.getQuestionResults().remove(this);
     }
 
     this.question = question;
 
-    if(question != null) {
+    if (question != null) {
       question.getQuestionResults().add(this);
     }
   }
 
   public void changeUser(User user) {
-    if(this.user != null) {
+    if (this.user != null) {
       this.user.getQuestionResults().remove(this);
     }
 
     this.user = user;
 
-    if(user != null) {
+    if (user != null) {
       user.getQuestionResults().add(this);
     }
+  }
+
+  public void changeVerifyAnswer(Boolean isCorrect, LocalDate updatedAt) {
+    this.isCorrect = isCorrect;
+    this.solveDate = updatedAt;
   }
 
 }

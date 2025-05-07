@@ -1,14 +1,14 @@
 services:
 
-  client-stable:
+  client-canary:
     build:
       context: ./client
       dockerfile: Dockerfile
-    container_name: client-stable
+    container_name: client-canary
     ports:
-      - "3001:3000"
+      - "3002:3000"
     depends_on:
-      - server-stable
+      - server-canary
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=/api
@@ -16,13 +16,13 @@ services:
     networks:
       - app-network
 
-  server-stable:
+  server-canary:
     build:
       context: ./server
       dockerfile: Dockerfile
-    container_name: server-stable
+    container_name: server-canary
     ports:
-      - "8081:8080"
+      - "8082:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES}
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
@@ -39,53 +39,15 @@ services:
       - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST}
       - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT}
       - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD}
-    depends_on:
-      my-db:
-        condition: service_healthy
-      my-cache-server:
-        condition: service_healthy
+    # depends_on:
+    #   my-db:
+    #     condition: service_healthy
+    #   my-cache-server:
+    #     condition: service_healthy
     networks:
       - app-network
     restart: always
 
-  my-db:
-    image: mysql:8.0
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-    command: --default-authentication-plugin=mysql_native_password
-    volumes:
-      - mysql_data_volume:/var/lib/mysql
-      - ./mysql-init:/docker-entrypoint-initdb.d
-    ports:
-      - 3307:3306
-    networks:
-      - app-network
-    healthcheck:
-      test: [ "CMD", "mysqladmin", "ping" ]
-      interval: 5s
-      retries: 10
-
-  my-cache-server:
-    image: redis
-    ports:
-      - 6379:6379
-    command: redis-server --port 6379 --requirepass ${SPRING_DATA_REDIS_PASSWORD}
-    volumes:
-      - redis_data_volume:/data
-    networks:
-      - app-network
-    healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "${SPRING_DATA_REDIS_PASSWORD}", "ping" ]
-      interval: 5s
-      retries: 10
-
-volumes:
-  mysql_data_volume:
-  redis_data_volume:
-  
 networks:
   app-network:
     external: true
