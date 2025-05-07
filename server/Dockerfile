@@ -15,10 +15,10 @@ COPY ./gradle ./gradle
 RUN chmod +x ./gradlew
 
 # 5. Gradle 빌드 실행 (테스트 제외)
-# RUN ./gradlew build -x test --no-daemon
+RUN ./gradlew build -x test --no-daemon
 # 테스트용 RUN 코드
 # RUN ./gradlew bootJar -x test -PincludePackage=com.b110.jjeonchongmu.domain.test
-RUN ./gradlew bootJar -x test --no-daemon
+
 
 # 6. 런타임 이미지 생성
 FROM openjdk:17-jdk-alpine

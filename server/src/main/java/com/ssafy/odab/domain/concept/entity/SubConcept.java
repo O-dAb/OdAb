@@ -53,13 +53,13 @@ public class SubConcept {
   private List<Question> questions = new ArrayList<>();
 
   public void changeMajorConcept(MajorConcept majorConcept) {
-    if(this.majorConcept != null) {
+    if (this.majorConcept != null) {
       this.majorConcept.getSubConcepts().remove(this);
     }
 
     this.majorConcept = majorConcept;
 
-    if(majorConcept != null) {
+    if (majorConcept != null) {
       majorConcept.getSubConcepts().add(this);
     }
   }

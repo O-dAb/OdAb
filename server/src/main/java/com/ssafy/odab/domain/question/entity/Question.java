@@ -66,25 +66,25 @@ public class Question {
   private List<QuestionResult> questionResults = new ArrayList<>();
 
   public void changeUser(User user) {
-    if(this.user != null) {
+    if (this.user != null) {
       this.user.getQuestions().remove(this);
     }
 
     this.user = user;
 
-    if(user != null) {
+    if (user != null) {
       user.getQuestions().add(this);
     }
   }
 
   public void changeSubConcept(SubConcept subConcept) {
-    if(this.subConcept != null) {
+    if (this.subConcept != null) {
       this.subConcept.getQuestions().remove(this);
     }
 
     this.subConcept = subConcept;
 
-    if(subConcept != null) {
+    if (subConcept != null) {
       subConcept.getQuestions().add(this);
     }
   }
