@@ -24,7 +24,8 @@ public class QuestionServiceImpl implements QuestionService {
         .orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
 
     // 정답결과 테이블에서 회원의 문제 조회
-    QuestionResult questionResult = questionResultRepository.findByQuestionId(question.getQuestionId())
+//    QuestionResult questionResult = questionResultRepository.findByQuestionId(question.getQuestionId())
+    QuestionResult questionResult = questionResultRepository.findByQuestion_QuestionId(question.getQuestionId())
         .orElseThrow(() -> new IllegalArgumentException("문제 결과를 찾을 수 없습니다."));
     Boolean isCorrect = question.getAnswer().equals(verifyAnswerRequestDto.getAnswer());
     // 정답이 맞으면 풀이일자 수정, 정답여부 true

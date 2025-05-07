@@ -12,6 +12,7 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=/api
+      - TZ=Asia/Seoul
     restart: always
     networks:
       - app-network
@@ -39,11 +40,33 @@ services:
       - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST}
       - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT}
       - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD}
+      - TZ=Asia/Seoul
     # depends_on:
     #   my-db:
     #     condition: service_healthy
     #   my-cache-server:
     #     condition: service_healthy
+    networks:
+      - app-network
+    restart: always
+
+  python-canary:
+    build:
+      context: ./python-server
+      dockerfile: Dockerfile
+    container_name: python-canary
+    ports:
+      - "8020:8000"
+    environment:
+      - DEBUG=False
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - TZ=Asia/Seoul
+    volumes:
+      - ./python-server:/app
     networks:
       - app-network
     restart: always

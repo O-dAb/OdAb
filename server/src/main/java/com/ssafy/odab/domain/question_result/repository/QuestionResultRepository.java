@@ -8,4 +8,5 @@ import org.springframework.data.repository.query.Param;
 public interface QuestionResultRepository extends JpaRepository<QuestionResult, Long> {
 
   Optional<QuestionResult> findByQuestionId(@Param("questionId") Long questionId);
+Optional<QuestionResult> findByQuestion_QuestionId(@Param("questionId") Long questionId);
 }
