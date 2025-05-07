@@ -40,25 +40,25 @@ public class LastLearningDate {
   private LocalDate lastLearningDate;
 
   public void changeUser(User user) {
-    if(this.user != null) {
+    if (this.user != null) {
       this.user.getLastLearningDates().remove(this);
     }
 
     this.user = user;
 
-    if(user != null) {
+    if (user != null) {
       user.getLastLearningDates().add(this);
     }
   }
 
   public void changeSubConcept(SubConcept subConcept) {
-    if(this.subConcept != null) {
+    if (this.subConcept != null) {
       this.subConcept.getLastLearningDates().remove(this);
     }
 
     this.subConcept = subConcept;
 
-    if(subConcept != null) {
+    if (subConcept != null) {
       subConcept.getLastLearningDates().add(this);
     }
   }

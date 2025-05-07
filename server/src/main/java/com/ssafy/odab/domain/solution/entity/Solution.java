@@ -43,25 +43,25 @@ public class Solution {
   private LocalDateTime drawingLastModified;
 
   public void changeUser(User user) {
-    if(this.user != null) {
+    if (this.user != null) {
       this.user.getSolutions().remove(this);
     }
 
     this.user = user;
 
-    if(user != null) {
+    if (user != null) {
       user.getSolutions().add(this);
     }
   }
 
   public void changeQuestion(Question question) {
-    if(this.question != null) {
+    if (this.question != null) {
       this.question.getSolutions().remove(this);
     }
 
     this.question = question;
 
-    if(question != null) {
+    if (question != null) {
       question.getSolutions().add(this);
     }
   }
