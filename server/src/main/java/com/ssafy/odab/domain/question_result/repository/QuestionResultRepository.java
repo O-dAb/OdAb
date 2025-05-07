@@ -10,7 +10,8 @@ import org.springframework.data.repository.query.Param;
 
 public interface QuestionResultRepository extends JpaRepository<QuestionResult, Integer> {
 
-  Optional<QuestionResult> findByQuestionId(@Param("questionId") Integer questionId);
+//  Optional<QuestionResult> findByQuestionId(@Param("questionId") Integer questionId);
+  Optional<QuestionResult> findByQuestion_Id(@Param("questionId") Integer questionId);
 
 
   @Query("select distinct q from Question q join fetch q.questionResults qr where q.user.id = :userId and qr.isCorrect = false")
