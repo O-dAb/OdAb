@@ -12,6 +12,7 @@ services:
     environment:
       - NODE_ENV=production
       - NEXT_PUBLIC_API_URL=/api
+      - TZ=Asia/Seoul
     restart: always
     networks:
       - app-network
@@ -39,6 +40,7 @@ services:
       - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST}
       - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT}
       - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD}
+      - TZ=Asia/Seoul
     depends_on:
       my-db:
         condition: service_healthy
@@ -48,6 +50,30 @@ services:
       - app-network
     restart: always
 
+  python-stable:
+    build:
+      context: ./python-server
+      dockerfile: Dockerfile
+    container_name: python-stable
+    ports:
+      - "8010:8000"
+    environment:
+      - DEBUG=False
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - TZ=Asia/Seoul
+    volumes:
+      - ./python-server:/app
+    depends_on:
+      my-db:
+        condition: service_healthy
+    restart: always
+    networks:
+      - app-network
+
   my-db:
     image: mysql:8.0
     environment:
@@ -55,6 +81,7 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - TZ=Asia/Seoul
     command: --default-authentication-plugin=mysql_native_password
     volumes:
       - mysql_data_volume:/var/lib/mysql
@@ -73,6 +100,8 @@ services:
     ports:
       - 6379:6379
     command: redis-server --port 6379 --requirepass ${SPRING_DATA_REDIS_PASSWORD}
+    environment:
+      - TZ=Asia/Seoul 
     volumes:
       - redis_data_volume:/data
     networks:

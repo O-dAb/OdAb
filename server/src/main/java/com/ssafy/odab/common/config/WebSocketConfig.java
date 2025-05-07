@@ -19,7 +19,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
   public void registerStompEndpoints(StompEndpointRegistry registry) {
     registry.addEndpoint("/ws")
         .setAllowedOriginPatterns(
-            "https://j12b103.p.ssafy.io",
+            "https://k12b103.p.ssafy.io",
             "http://localhost:3000")
         .withSockJS();
   }
