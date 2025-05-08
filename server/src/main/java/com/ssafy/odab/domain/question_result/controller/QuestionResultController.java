@@ -17,18 +17,21 @@ public class QuestionResultController {
   private final QuestionResultService questionResultService;
 
   @GetMapping("{grade}/grade")
-  public ResponseEntity<WrongQuestionResponseDto> findGradeWrongAnswersByGrade(@PathVariable("grade") Byte grade) {
+  public ResponseEntity<WrongQuestionResponseDto> findGradeWrongAnswersByGrade(
+      @PathVariable("grade") Byte grade) {
     Integer userId = 1;
-    WrongQuestionResponseDto WrongQuestionResponseDto
+    WrongQuestionResponseDto wrongQuestionResponseDto
         = questionResultService.findWrongAnswersByGrade(grade, userId);
-    return ResponseEntity.ok(WrongQuestionResponseDto);
+    return ResponseEntity.ok(wrongQuestionResponseDto);
   }
 
   @GetMapping("{schoolLevel}")
-  public ResponseEntity<Void> findWrongAnswerBySchoolLevel(@PathVariable("schoolLevel") int schoolLevel) {
+  public ResponseEntity<WrongQuestionResponseDto> findWrongAnswerBySchoolLevel(
+      @PathVariable("schoolLevel") String schoolLevel) {
     Integer userId = 1;
-    questionResultService.findWrongAnswersBySchoolLevel(schoolLevel, userId);
-    return null;
+    WrongQuestionResponseDto wrongQuestionResponseDto =
+        questionResultService.findWrongAnswersBySchoolLevel(schoolLevel, userId);
+    return ResponseEntity.ok(wrongQuestionResponseDto);
   }
 
 }

@@ -1,11 +1,14 @@
 package com.ssafy.odab.domain.question.controller;
 
+import com.ssafy.odab.domain.question.dto.RetryQuestionResponseDto;
 import com.ssafy.odab.domain.question.dto.VerifyAnswerRequestDto;
 import com.ssafy.odab.domain.question.dto.VerifyAnswerResponseDto;
 import com.ssafy.odab.domain.question.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +31,13 @@ public class QuestionController {
         .message(message)
         .build();
     return ResponseEntity.ok(verifyAnswerResponseDto);
+  }
+
+  @GetMapping("/{questionId}/retry")
+  public ResponseEntity<RetryQuestionResponseDto> findRetryQuestion(@PathVariable("questionId") Integer questionId) {
+
+    //
+    return null;
   }
 
 }
