@@ -11,7 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,7 +26,7 @@ public class LastLearningDate {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "last_learning_date_id")
-  private Long id;
+  private Integer id;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "user_id", nullable = false)
@@ -37,28 +37,28 @@ public class LastLearningDate {
   private SubConcept subConcept;
 
   @Column(name = "last_learning_date", nullable = true)
-  private LocalDate lastLearningDate;
+  private LocalDateTime lastLearningDate;
 
   public void changeUser(User user) {
-    if(this.user != null) {
+    if (this.user != null) {
       this.user.getLastLearningDates().remove(this);
     }
 
     this.user = user;
 
-    if(user != null) {
+    if (user != null) {
       user.getLastLearningDates().add(this);
     }
   }
 
   public void changeSubConcept(SubConcept subConcept) {
-    if(this.subConcept != null) {
+    if (this.subConcept != null) {
       this.subConcept.getLastLearningDates().remove(this);
     }
 
     this.subConcept = subConcept;
 
-    if(subConcept != null) {
+    if (subConcept != null) {
       subConcept.getLastLearningDates().add(this);
     }
   }

@@ -24,9 +24,9 @@ public class QQuestion extends EntityPathBase<Question> {
 
     public final StringPath answer = createString("answer");
 
-    public final NumberPath<Integer> level = createNumber("level", Integer.class);
+    public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
-    public final NumberPath<Long> questionId = createNumber("questionId", Long.class);
+    public final NumberPath<Integer> level = createNumber("level", Integer.class);
 
     public final StringPath questionImg = createString("questionImg");
 
@@ -36,9 +36,7 @@ public class QQuestion extends EntityPathBase<Question> {
 
     public final StringPath questionText = createString("questionText");
 
-    public final DatePath<java.time.LocalDate> regitAt = createDate("regitAt", java.time.LocalDate.class);
-
-    public final ListPath<com.ssafy.odab.domain.solution.entity.Solution, com.ssafy.odab.domain.solution.entity.QSolution> solutions = this.<com.ssafy.odab.domain.solution.entity.Solution, com.ssafy.odab.domain.solution.entity.QSolution>createList("solutions", com.ssafy.odab.domain.solution.entity.Solution.class, com.ssafy.odab.domain.solution.entity.QSolution.class, PathInits.DIRECT2);
+    public final DateTimePath<java.time.LocalDateTime> registAt = createDateTime("registAt", java.time.LocalDateTime.class);
 
     public final com.ssafy.odab.domain.concept.entity.QSubConcept subConcept;
 
