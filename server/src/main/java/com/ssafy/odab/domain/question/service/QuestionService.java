@@ -1,9 +1,10 @@
 package com.ssafy.odab.domain.question.service;
 
+import com.ssafy.odab.domain.question.dto.RetryQuestionResponseDto;
 import com.ssafy.odab.domain.question.dto.VerifyAnswerRequestDto;
 
 public interface QuestionService {
 
-  public Boolean verifyAnswer(VerifyAnswerRequestDto verifyAnswerRequestDto);
-
+  Boolean verifyAnswer(VerifyAnswerRequestDto verifyAnswerRequestDto);
+  RetryQuestionResponseDto findRetryQuestionByQuestionId(Integer questionId);
 }

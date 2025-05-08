@@ -17,15 +17,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "last_learning_date")
+@Table(name = "last_learning_time")
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class LastLearningDate {
+public class LastLearningTime {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "last_learning_date_id")
+  @Column(name = "last_learning_time_id")
   private Integer id;
 
   @ManyToOne(fetch = FetchType.LAZY)
@@ -36,30 +36,30 @@ public class LastLearningDate {
   @JoinColumn(name = "sub_concept_id", nullable = false)
   private SubConcept subConcept;
 
-  @Column(name = "last_learning_date", nullable = true)
+  @Column(name = "last_learning_time", nullable = true)
   private LocalDateTime lastLearningDate;
 
   public void changeUser(User user) {
     if (this.user != null) {
-      this.user.getLastLearningDates().remove(this);
+      this.user.getLastLearningTimes().remove(this);
     }
 
     this.user = user;
 
     if (user != null) {
-      user.getLastLearningDates().add(this);
+      user.getLastLearningTimes().add(this);
     }
   }
 
   public void changeSubConcept(SubConcept subConcept) {
     if (this.subConcept != null) {
-      this.subConcept.getLastLearningDates().remove(this);
+      this.subConcept.getLastLearningTimes().remove(this);
     }
 
     this.subConcept = subConcept;
 
     if (subConcept != null) {
-      subConcept.getLastLearningDates().add(this);
+      subConcept.getLastLearningTimes().add(this);
     }
   }
 
