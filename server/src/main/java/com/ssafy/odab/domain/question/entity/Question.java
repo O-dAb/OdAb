@@ -1,5 +1,6 @@
 package com.ssafy.odab.domain.question.entity;
 
+import com.ssafy.odab.domain.concept.entity.QuestionConcept;
 import com.ssafy.odab.domain.concept.entity.SubConcept;
 import com.ssafy.odab.domain.question_result.entity.QuestionResult;
 import com.ssafy.odab.domain.user.entity.User;
@@ -52,14 +53,14 @@ public class Question {
   @Column(name = "answer", nullable = true)
   private String answer;
 
-  @Column(name = "level", nullable = true)
-  private Integer level;
-
-  @Column(name = "regist_at", nullable = true)
+  @Column(name = "registed_at", nullable = true)
   private LocalDateTime registAt;
 
   @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
   private List<QuestionResult> questionResults = new ArrayList<>();
+
+  @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+  private List<QuestionConcept> questionConcepts = new ArrayList<>();
 
   public void changeUser(User user) {
     if (this.user != null) {
