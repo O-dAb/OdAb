@@ -16,12 +16,18 @@ RUN chmod +x ./gradlew
 
 # 5. Gradle 빌드 실행 (테스트 제외)
 RUN ./gradlew build -x test --no-daemon
-# 테스트용 RUN 코드
-# RUN ./gradlew bootJar -x test -PincludePackage=com.b110.jjeonchongmu.domain.test
-
 
 # 6. 런타임 이미지 생성
 FROM openjdk:17-jdk-alpine
+
+# 타임존 설정 추가
+RUN apk add --no-cache tzdata && \
+    ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime && \
+    echo "Asia/Seoul" > /etc/timezone
+
+# Java 애플리케이션 타임존 설정
+ENV JAVA_OPTS="-Duser.timezone=Asia/Seoul"
+
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 
