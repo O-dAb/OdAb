@@ -50,7 +50,7 @@ public class ClaudeRequestApiDto {
     @Builder
     public static class Message {
         private String role;
-        // TextContent 또는 ImageContent 또는 ToolResultContent
+        // TextContent 또는 ImageContent 또는 ToolUseContent 또는 ToolResultContent
         private List<Object> content;
     }
     @Data

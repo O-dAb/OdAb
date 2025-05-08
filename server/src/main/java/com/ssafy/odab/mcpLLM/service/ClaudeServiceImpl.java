@@ -25,7 +25,7 @@ public class ClaudeServiceImpl implements ClaudeService{
     private final ToolUtil toolUtil;
     private static final Logger logger = LoggerFactory.getLogger(ClaudeServiceImpl.class);
     private final ClaudeConfig claudeConfig;
-    private String modelVersion = "claude-3-5-sonnet-20241022";	//사용할 모델명
+    private String modelVersion = "claude-3-5-sonnet-20240620";	//사용할 모델명
 //    private String modelVersion = "claude-3-7-sonnet-20250219";	//사용할 모델명
     private int maxTokens = 4000;					//최대 사용 가능한 토큰 수
     private final int MAX_DEPTH = 20;
@@ -90,7 +90,7 @@ public class ClaudeServiceImpl implements ClaudeService{
                 .tools(tools)
                 .messages(sendMessages)
                 .build();
-        return sendClaudeApi(request, sendMessages, 0);
+        return sendClaudeApi(request, sendMessages, 0, false);
     }
 
     /**
@@ -100,8 +100,7 @@ public class ClaudeServiceImpl implements ClaudeService{
     private Mono<ClaudeResponseApiDto> sendClaudeApi(
             ClaudeRequestApiDto request,
             List<ClaudeRequestApiDto.Message> sendMessages,
-            int depth) {
-
+            int depth, Boolean finalRequest) {
         ArrayDeque<Integer> toolUseIndexQueue = new ArrayDeque<>();
 
         System.out.println("request = " + request.getMessages());
@@ -149,9 +148,57 @@ public class ClaudeServiceImpl implements ClaudeService{
                     if (depth > MAX_DEPTH) return Mono.just(response);
                     // 메시지 개수 설정
                     if (isToolUse && sendMessages.size() < 40) {
-                        return sendClaudeApi(request, sendMessages, depth + 1);
+                        return sendClaudeApi(request, sendMessages, depth + 1, false);
                     } else {
-                        // 여기 자동완성인데 이렇게 쓰면 어떻게 돼?
+                        // toolUse가 없을 때 마지막으로 요청을 한 번 더 보내 총 정리를 수행
+                        if (!finalRequest) {
+                            // 총 정리를 위한 새로운 메시지 생성
+                            List<Object> summaryContents = new ArrayList<>();
+                            summaryContents.add(ClaudeRequestApiDto.TextContent.builder()
+                                    .type("text")
+                                    .text("""
+                                            아래에 맞춰 답변해줘.
+                                            1. 지금까지의 대화 내용을 바탕으로 정리해줘.
+                                            2. [] 안의 내용은 너가 채워 넣어야하는 부분이야.
+                                            3. step 은 최대한 10개 이내로 만들어줘.
+                                            4. concept 은 사용된 수학 개념을 적어줘. 수학개념은 아래에서 가장 적절한 개념을 최대 5개 골라서 사용해줘. 적절한 것이 없을경우 "없음" 을 넣어줘.
+                                                4-1. 덧셈
+                                                4-2. 뺄셈
+                                                4-3. 곱셈
+                                                4-4. 나눗셈
+                                                4-5. 외접
+                                                4-6. 내접
+                                                4-7. 적분
+                                            5. 아래 형식에 맞춰서 정리해주고 형식 이외의 대답은 넣지마.
+                                            step
+                                            :::
+                                            [step1의 대한 내용]
+                                            !!!!!step end!!!!!
+                                            step
+                                            :::
+                                            [step2의 대한 내용]
+                                            !!!!!step end!!!!!
+                                            step
+                                            :::
+                                            [step3의 대한 내용]
+                                            !!!!!step end!!!!!
+                                            concept
+                                            :::
+                                            [사용된 수학 개념1]
+                                            [사용된 수학 개념2]
+                                            !!!!!concept!!!!!
+                                            """)
+                                    .build());
+                            
+                            ClaudeRequestApiDto.Message summaryMessage = ClaudeRequestApiDto.Message.builder()
+                                    .role("user")
+                                    .content(summaryContents)
+                                    .build();
+                            
+                            sendMessages.add(summaryMessage);
+                            return sendClaudeApi(request, sendMessages, depth + 1, true);
+                        }
+                        String resultText = response.getContent().get(0).getText();
                         return Mono.just(response);
                     }
                 })

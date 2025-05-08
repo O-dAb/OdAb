@@ -1,3 +1,6 @@
+claude-api:
+  api-key: ${CLAUDE_APIKEY}
+  base-url: https://api.anthropic.com/v1/messages
 spring:
   # 데이터 소스 설정 (MySQL)
   datasource:
@@ -5,9 +8,7 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
-claude-api:
-  api-key: api-key
-  base-url: https://api.anthropic.com/v1/messages
+
   # JPA 설정
   jpa:
     database: mysql
