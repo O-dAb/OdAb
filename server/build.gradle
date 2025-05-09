@@ -28,6 +28,7 @@ dependencies {
 
 
 
+
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	// spring boot starter
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -69,6 +70,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	// gson
+	implementation 'com.google.code.gson:gson:2.10.1'
 
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
 }

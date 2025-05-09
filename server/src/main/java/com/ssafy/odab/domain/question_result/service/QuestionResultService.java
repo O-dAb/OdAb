@@ -6,5 +6,5 @@ public interface QuestionResultService {
 
   WrongQuestionResponseDto findWrongAnswersByGrade(Byte grade, Integer userId);
   WrongQuestionResponseDto findWrongAnswersBySchoolLevel(String schoolLevel, Integer userId);
-
+  Void findWrongAnswersBySubConcept(Integer subConceptId, Integer userId);
 }

@@ -17,14 +17,13 @@ public interface QuestionResultRepository extends JpaRepository<QuestionResult, 
   @Query("select distinct q from Question q join fetch q.questionResults qr where q.user.id = :userId")
   List<Question> findWrongQuestionsByUserId(@Param("userId") Integer userId);
 
-  @Query("select distinct q from Question q join fetch q.questionResults qr where q.user.id = :userId and q.subConcept.gradeLevel.grade in (:grades)")
-  List<Question> findWrongQuestionsByUserIdAndSchoolLevel(@Param("userId") Integer userId, @Param("grades") List<Integer> grades);
-
-  @Query(value = "select new com.ssafy.odab.question.dto.RetryQuestionResponseDto("
-      + " q.questionId, q.questionImg, q.questionText, q.questionSolution, q.answer, q.level, q.registDate, "
+  @Query(value = "select new com.ssafy.odab.domain.question.dto.RetryQuestionResponseDto("
+      + " q.id, q.questionImg, q.questionText, q.answer, q.registedAt, "
       + " qr.isCorrect, qr.times, qr.solvedAt) "
-      + " from Question q join q.questionResult qr "
-      + " where q.questionId = :questionId order by qr.solvedAt desc limit 1", nativeQuery = true)
-  RetryQuestionResponseDto findRecentQuestionResultByQuestionId(@Param("questionId") Integer questionId);
+      + " from Question q join q.questionResults qr "
+      + " where q.id = :questionId order by qr.solvedAt desc")
+  List<RetryQuestionResponseDto> findRecentQuestionResultByQuestionId(@Param("questionId") Integer questionId);
 
+  @Query("select q from Question q join fetch q.questionConcepts qc join fetch qc.subConcept sc where q.user.id = :userId and sc.gradeLevel.grade in (:grades)")
+  List<Question> findWrongQuestionsByUserIdAndSchoolLevel(@Param("userId") Integer userId, @Param("grades") List<Integer> grades);
 }
