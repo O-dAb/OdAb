@@ -39,7 +39,7 @@ logging.level:
     security: DEBUG
     web.socket: DEBUG
     messaging: DEBUG
-  com.ssafy.ddalggak: DEBUG
+  com.ssafy.odab: DEBUG
 
 paging:
   default-page-size: 10
@@ -69,8 +69,8 @@ cloud:
     region:
       static: ap-northeast-2
     credentials:
-      access-key: ${AWS_ACCESS_KEY}
-      secret-key: ${AWS_SECRET_KEY}
+      access-key: ${CLOUD_AWS_CREDENTIALS_ACCESS_KEY}
+      secret-key: ${CLOUD_AWS_CREDENTIALS_SECRET_KEY}
 
 
 app:
