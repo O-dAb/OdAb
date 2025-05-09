@@ -42,6 +42,12 @@ public class QuestionResult {
   @Column(name = "is_correct", nullable = true)
   private Boolean isCorrect;
 
+  @Column(name = "solution_image", nullable = true)
+  private String solutionImage;
+
+  @Column(name = "times", nullable = true)
+  private Integer times;
+
   public void changeQuestion(Question question) {
     if (this.question != null) {
       this.question.getQuestionResults().remove(this);

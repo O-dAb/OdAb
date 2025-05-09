@@ -26,7 +26,7 @@ public class QQuestion extends EntityPathBase<Question> {
 
     public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
-    public final NumberPath<Integer> level = createNumber("level", Integer.class);
+    public final ListPath<com.ssafy.odab.domain.concept.entity.QuestionConcept, com.ssafy.odab.domain.concept.entity.QQuestionConcept> questionConcepts = this.<com.ssafy.odab.domain.concept.entity.QuestionConcept, com.ssafy.odab.domain.concept.entity.QQuestionConcept>createList("questionConcepts", com.ssafy.odab.domain.concept.entity.QuestionConcept.class, com.ssafy.odab.domain.concept.entity.QQuestionConcept.class, PathInits.DIRECT2);
 
     public final StringPath questionImg = createString("questionImg");
 

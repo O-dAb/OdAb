@@ -4,7 +4,7 @@ spring:
   jackson:
     time-zone: Asia/Seoul
   datasource:
-    url: jdbc:mysql://${MY_DB}:3306/${MYSQL_DATABASE}?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://${MY_DB}:3307/${MYSQL_DATABASE}?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     username: ${MYSQL_USER}
     password: ${MYSQL_PASSWORD}
     # password: ${MYSQL_ROOT_PASSWORD}
@@ -14,7 +14,7 @@ spring:
   jpa:
     generate-ddl: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: create-drop
     # show-sql: true
     properties:
       hibernate:
@@ -59,3 +59,21 @@ jwt:
 
 server:
   port: 8080
+
+# S3
+cloud:
+  aws:
+    s3:
+      bucket: ${CLOUD_AWS_S3_BUCKET}
+    stack:
+      auto: false
+    region:
+      static: ap-northeast-2
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+
+
+app:
+  health-controller:
+    enabled: true

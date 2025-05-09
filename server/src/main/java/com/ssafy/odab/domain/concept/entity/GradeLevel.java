@@ -23,7 +23,7 @@ public class GradeLevel {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "grade_id")
+  @Column(name = "grade_level_id")
   private Integer id;
 
   @Column(name = "grade", nullable = true)
