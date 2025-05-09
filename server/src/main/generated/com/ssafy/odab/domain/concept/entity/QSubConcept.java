@@ -38,8 +38,6 @@ public class QSubConcept extends EntityPathBase<SubConcept> {
 
     public final ListPath<QuestionConcept, QQuestionConcept> questionConcepts = this.<QuestionConcept, QQuestionConcept>createList("questionConcepts", QuestionConcept.class, QQuestionConcept.class, PathInits.DIRECT2);
 
-    public final ListPath<com.ssafy.odab.domain.question.entity.Question, com.ssafy.odab.domain.question.entity.QQuestion> questions = this.<com.ssafy.odab.domain.question.entity.Question, com.ssafy.odab.domain.question.entity.QQuestion>createList("questions", com.ssafy.odab.domain.question.entity.Question.class, com.ssafy.odab.domain.question.entity.QQuestion.class, PathInits.DIRECT2);
-
     public QSubConcept(String variable) {
         this(SubConcept.class, forVariable(variable), INITS);
     }

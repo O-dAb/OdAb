@@ -1,7 +1,6 @@
 package com.ssafy.odab.domain.question.entity;
 
 import com.ssafy.odab.domain.concept.entity.QuestionConcept;
-import com.ssafy.odab.domain.concept.entity.SubConcept;
 import com.ssafy.odab.domain.question_result.entity.QuestionResult;
 import com.ssafy.odab.domain.user.entity.User;
 import jakarta.persistence.Column;
@@ -37,30 +36,26 @@ public class Question {
   @JoinColumn(name = "user_id", nullable = false)
   private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "sub_concept_id", nullable = false)
-  private SubConcept subConcept;
-
   @Column(name = "question_img", nullable = true)
   private String questionImg;
 
   @Column(name = "question_text", nullable = true)
   private String questionText;
 
-  @Column(name = "question_solution", nullable = true)
-  private String questionSolution;
-
   @Column(name = "answer", nullable = true)
   private String answer;
 
   @Column(name = "registed_at", nullable = true)
-  private LocalDateTime registAt;
+  private LocalDateTime registedAt;
 
   @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
   private List<QuestionResult> questionResults = new ArrayList<>();
 
   @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
   private List<QuestionConcept> questionConcepts = new ArrayList<>();
+
+  @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+  private List<QuestionSolution> questionSolutions = new ArrayList<>();
 
   public void changeUser(User user) {
     if (this.user != null) {
@@ -74,15 +69,4 @@ public class Question {
     }
   }
 
-  public void changeSubConcept(SubConcept subConcept) {
-    if (this.subConcept != null) {
-      this.subConcept.getQuestions().remove(this);
-    }
-
-    this.subConcept = subConcept;
-
-    if (subConcept != null) {
-      subConcept.getQuestions().add(this);
-    }
-  }
 }
