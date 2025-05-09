@@ -13,7 +13,7 @@ spring:
   jpa:
     generate-ddl: false
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
       show-sql: true
     properties:
       hibernate:
@@ -39,7 +39,7 @@ logging.level:
     security: DEBUG
     web.socket: DEBUG
     messaging: DEBUG
-  com.ssafy.ddalggak: DEBUG
+  com.ssafy.odab: DEBUG
 
 paging:
   default-page-size: 10
