@@ -1,7 +1,6 @@
 package com.ssafy.odab.domain.concept.entity;
 
 import com.ssafy.odab.domain.learning.entity.LastLearningTime;
-import com.ssafy.odab.domain.question.entity.Question;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -49,9 +48,6 @@ public class SubConcept {
 
   @OneToMany(mappedBy = "subConcept", fetch = FetchType.LAZY)
   private List<LastLearningTime> lastLearningTimes = new ArrayList<>();
-
-  @OneToMany(mappedBy = "subConcept", fetch = FetchType.LAZY)
-  private List<Question> questions = new ArrayList<>();
 
   @OneToMany(mappedBy = "subConcept", fetch = FetchType.LAZY)
   private List<QuestionConcept> questionConcepts = new ArrayList<>();

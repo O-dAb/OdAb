@@ -3,6 +3,7 @@ package com.ssafy.odab.domain.question.service;
 import com.ssafy.odab.domain.concept.entity.SubConcept;
 import com.ssafy.odab.domain.concept.repository.SubConceptRepository;
 import com.ssafy.odab.domain.question.dto.RetryQuestionResponseDto;
+import com.ssafy.odab.domain.question.dto.RetryQuestionResponseDto.RetryQuestionSolutionDto;
 import com.ssafy.odab.domain.question.dto.RetryQuestionResponseDto.RetryQuestionSubConceptDto;
 import com.ssafy.odab.domain.question.dto.VerifyAnswerRequestDto;
 import com.ssafy.odab.domain.question.entity.Question;
@@ -50,16 +51,17 @@ public class QuestionServiceImpl implements QuestionService {
     Question question = questionRepository.findById(questionId)
         .orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
     // 문제별 정답 여부에서 가장 최근 정답기록 찾아오기
-    RetryQuestionResponseDto retryQuestionResponseDto = questionResultRepository.findRecentQuestionResultByQuestionId(
+    List<RetryQuestionResponseDto> retryQuestionResponseDtos = questionResultRepository.findRecentQuestionResultByQuestionId(
         questionId);
-
+    RetryQuestionResponseDto retryQuestionResponseDto = retryQuestionResponseDtos.get(0);
     List<SubConcept> subConcepts = subConceptRepository.findByQuestionId(questionId);
-
     Set<RetryQuestionSubConceptDto> retryQuestionSubConceptDtoSet = subConcepts.stream()
         .map(RetryQuestionSubConceptDto::from).collect(
             Collectors.toSet());
-    retryQuestionResponseDto.getSubConcepts().addAll(retryQuestionSubConceptDtoSet);
-
+    List<RetryQuestionSolutionDto> retryQuestionSolutionDtos = question.getQuestionSolutions()
+        .stream().map(RetryQuestionSolutionDto::from).toList();
+    retryQuestionResponseDto.getRetryQuestionSubConceptDtos().addAll(retryQuestionSubConceptDtoSet);
+    retryQuestionResponseDto.getRetryQuestionSolutionDtos().addAll(retryQuestionSolutionDtos);
     return retryQuestionResponseDto;
   }
 }
