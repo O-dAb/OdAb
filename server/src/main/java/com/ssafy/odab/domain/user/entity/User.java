@@ -61,4 +61,8 @@ public class User {
     this.profileUrl = profileUrl;
   }
 
+  public void updateGrade(Integer grade) {
+    this.grade = grade;
+  }
+
 }
