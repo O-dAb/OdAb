@@ -11,7 +11,8 @@ public class WebConfig implements WebMvcConfigurer {
     registry.addMapping("/**")
         .allowedOrigins(
             "https://k12b103.p.ssafy.io",
-            "http://localhost:3000"
+            "http://localhost:3000",
+                "http://localhost"
         )
         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH")
         .allowedHeaders("*")

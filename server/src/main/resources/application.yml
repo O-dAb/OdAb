@@ -13,7 +13,7 @@ spring:
   jpa:
     generate-ddl: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
       show-sql: true
     properties:
       hibernate:
@@ -58,3 +58,21 @@ jwt:
 
 server:
   port: 8080
+
+# S3
+cloud:
+  aws:
+    s3:
+      bucket: ${CLOUD_AWS_S3_BUCKET}
+    stack:
+      auto: false
+    region:
+      static: ap-northeast-2
+    credentials:
+      access-key: ${CLOUD_AWS_CREDENTIALS_ACCESS_KEY}
+      secret-key: ${CLOUD_AWS_CREDENTIALS_SECRET_KEY}
+
+
+app:
+  health-controller:
+    enabled: true

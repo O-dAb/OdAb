@@ -57,4 +57,8 @@ public class User {
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   private List<Question> questions = new ArrayList<>();
 
+  public void updateProfileUrl(String profileUrl) {
+    this.profileUrl = profileUrl;
+  }
+
 }
