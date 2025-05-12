@@ -146,7 +146,7 @@ public class ClaudeServiceImpl implements ClaudeService {
                         QuestionSolution questionSolution = QuestionSolution.builder()
                                 .question(question)
                                 .step(i)
-                                .solution(step)
+                                .solutionContent(step)
                                 .build();
                         solutions.add(questionSolution);
                         i++;
