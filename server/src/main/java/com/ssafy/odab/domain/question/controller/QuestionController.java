@@ -1,5 +1,6 @@
 package com.ssafy.odab.domain.question.controller;
 
+import com.ssafy.odab.domain.question.dto.ConceptResponseDto;
 import com.ssafy.odab.domain.question.dto.RetryQuestionResponseDto;
 import com.ssafy.odab.domain.question.dto.VerifyAnswerRequestDto;
 import com.ssafy.odab.domain.question.dto.VerifyAnswerResponseDto;
@@ -12,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,5 +40,12 @@ public class QuestionController {
   public ResponseEntity<RetryQuestionResponseDto> findRetryQuestion(@PathVariable("questionId") Integer questionId) {
     return ResponseEntity.ok(questionService.findRetryQuestionByQuestionId(questionId));
   }
+
+  //개념선택 - 수학개념 목록 조회 
+  @GetMapping("/concept")
+  public ResponseEntity<ConceptResponseDto> findConceptList() {
+    return ResponseEntity.ok(questionService.findConceptList());
+  } 
+
 
 }

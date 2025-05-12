@@ -1,6 +1,7 @@
 package com.ssafy.odab.common.controller;
 
 import com.ssafy.odab.common.service.CommonService;
+import com.ssafy.odab.domain.question.dto.ConceptQuestionResponseDto;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -30,20 +31,7 @@ public class CommonController {
     
     //개념별 문제 조회
     @GetMapping("{subConceptId}/concept")
-    public ResponseEntity<?> getConceptQuestionList(@PathVariable("subConceptId") Integer subConceptId) {
-        Integer userId = 1; // TODO: 실제 로그인 유저로 교체
-        try {
-            var data = commonService.getConceptQuestionList(subConceptId, userId);
-            Map<String, Object> response = new HashMap<>();
-            response.put("httpStatus", 200);
-            response.put("message", "개념별 문제 조회 성공");
-            response.put("data", data);
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            Map<String, Object> response = new HashMap<>();
-            response.put("httpStatus", 500);
-            response.put("message", "개념별 문제 조회 실패: " + e.getMessage());
-            return ResponseEntity.status(500).body(response);
-        }
+    public ResponseEntity<ConceptQuestionResponseDto> getConceptQuestionList(@PathVariable("subConceptId") Integer subConceptId) {
+        return ResponseEntity.ok(commonService.getConceptQuestionList(subConceptId));
     }
 } 

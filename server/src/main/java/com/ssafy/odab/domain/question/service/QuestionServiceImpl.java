@@ -10,6 +10,7 @@ import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question.repository.QuestionRepository;
 import com.ssafy.odab.domain.question_result.entity.QuestionResult;
 import com.ssafy.odab.domain.question_result.repository.QuestionResultRepository;
+import com.ssafy.odab.domain.question.dto.ConceptResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
@@ -63,5 +64,15 @@ public class QuestionServiceImpl implements QuestionService {
     retryQuestionResponseDto.getRetryQuestionSubConceptDtos().addAll(retryQuestionSubConceptDtoSet);
     retryQuestionResponseDto.getRetryQuestionSolutionDtos().addAll(retryQuestionSolutionDtos);
     return retryQuestionResponseDto;
+  }
+
+  @Override //개념선택 - 수학개념 선택
+  public ConceptResponseDto findConceptList() {
+    List<ConceptResponseDto.SubConceptSimpleDto> subConceptList = subConceptRepository.findAll().stream()
+        .map(sc -> new ConceptResponseDto.SubConceptSimpleDto(sc.getId(), sc.getConceptType()))
+        .collect(Collectors.toList());
+    return ConceptResponseDto.builder()
+            .data(new ConceptResponseDto.Data(subConceptList))
+            .build();
   }
 }

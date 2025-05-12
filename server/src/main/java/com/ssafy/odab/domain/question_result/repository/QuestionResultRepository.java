@@ -26,4 +26,20 @@ public interface QuestionResultRepository extends JpaRepository<QuestionResult, 
 
   @Query("select q from Question q join fetch q.questionConcepts qc join fetch qc.subConcept sc where q.user.id = :userId and sc.gradeLevel.grade in (:grades)")
   List<Question> findWrongQuestionsByUserIdAndSchoolLevel(@Param("userId") Integer userId, @Param("grades") List<Integer> grades);
+
+  // JPQL에서 날짜 변환(CAST, DATE 등)이 DB 방언에 따라 동작하지 않아 네이티브 쿼리로 변경함
+  @Query(value = "SELECT sc.id AS subConceptId, sc.concept_type AS subConceptType, MIN(DATE(qr.solved_at)) AS lastLearningDate " +
+          "FROM question_result qr " +
+          "JOIN question q ON qr.question_id = q.id " +
+          "JOIN question_concept qc ON q.id = qc.question_id " +
+          "JOIN sub_concept sc ON qc.sub_concept_id = sc.id " +
+          "WHERE qr.user_id = :userId " +
+          "AND qr.is_correct = false " +
+          "AND DATE(qr.solved_at) IN (:dates) " +
+          "GROUP BY sc.id, sc.concept_type",
+          nativeQuery = true)
+  List<Object[]> findReviewDtosByUserIdAndDatesWithFirstWrong(
+      @Param("userId") Integer userId,
+      @Param("dates") List<java.time.LocalDate> dates
+  );
 }
