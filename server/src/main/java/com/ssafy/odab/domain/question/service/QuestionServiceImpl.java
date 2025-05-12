@@ -11,6 +11,7 @@ import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question.repository.QuestionRepository;
 import com.ssafy.odab.domain.question_result.entity.QuestionResult;
 import com.ssafy.odab.domain.question_result.repository.QuestionResultRepository;
+   import com.ssafy.odab.domain.question.dto.ConceptResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -87,5 +88,20 @@ public class QuestionServiceImpl implements QuestionService {
         Page<Question> questions = questionRepository.findSubConceptRelatedQuestionBySubConceptId(subConceptId, pageable);
 
         return questions.map(SubConceptRelatedQuestionResponseDto::from);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ConceptResponseDto findConceptList() {
+        List<SubConcept> subConcepts = subConceptRepository.findAll();
+        List<ConceptResponseDto.SubConceptSimpleDto> subConceptList = subConcepts.stream()
+                .map(sc -> new ConceptResponseDto.SubConceptSimpleDto(sc.getId(), sc.getConceptType()))
+                .toList();
+        ConceptResponseDto.Data data = ConceptResponseDto.Data.builder()
+                .subConceptList(subConceptList)
+                .build();
+        return ConceptResponseDto.builder()
+                .data(data)
+                .build();
     }
 }
