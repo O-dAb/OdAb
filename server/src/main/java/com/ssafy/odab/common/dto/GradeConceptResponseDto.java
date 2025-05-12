@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
@@ -32,6 +31,6 @@ public class GradeConceptResponseDto { //학년별 개념 조회
     public static class SubConceptDto {
         private Integer subConceptId;
         private String subConceptType;
-      
-    }   
+
+    }
 }

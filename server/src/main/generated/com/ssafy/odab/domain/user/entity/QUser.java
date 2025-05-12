@@ -26,7 +26,7 @@ public class QUser extends EntityPathBase<User> {
 
     public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
-    public final NumberPath<Integer> kakaoId = createNumber("kakaoId", Integer.class);
+    public final NumberPath<Long> kakaoId = createNumber("kakaoId", Long.class);
 
     public final ListPath<com.ssafy.odab.domain.learning.entity.LastLearningTime, com.ssafy.odab.domain.learning.entity.QLastLearningTime> lastLearningTimes = this.<com.ssafy.odab.domain.learning.entity.LastLearningTime, com.ssafy.odab.domain.learning.entity.QLastLearningTime>createList("lastLearningTimes", com.ssafy.odab.domain.learning.entity.LastLearningTime.class, com.ssafy.odab.domain.learning.entity.QLastLearningTime.class, PathInits.DIRECT2);
 
