@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
      * 사용자의 프로필 이미지를 저장하는 메서드
      *
      * @param userId 프로필 이미지를 저장할 사용자 ID
-     * @param file 업로드된 이미지 파일
+     * @param file   업로드된 이미지 파일
      * @return 저장된 이미지의 URL
      * @throws RuntimeException 이미지 저장 과정에서 발생한 모든 예외
      */
@@ -88,7 +88,6 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("프로필 이미지 저장 중 오류 발생: " + e.getMessage(), e);
         }
     }
-
 
 
     @Override

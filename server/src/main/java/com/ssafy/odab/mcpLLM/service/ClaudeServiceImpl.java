@@ -56,8 +56,6 @@ public class ClaudeServiceImpl implements ClaudeService {
 
     @Transactional
     public Mono<ClaudeResponseApiDto> sendMathProblem(ApiRequestDto apiRequestDto) {
-
-
         List<Object> contents = new ArrayList<>();
         if (apiRequestDto.getUserAsk() != null) {
             String userAsk = apiRequestDto.getUserAsk();

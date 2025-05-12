@@ -1,21 +1,13 @@
 package com.ssafy.odab.domain.concept.entity;
 
 import com.ssafy.odab.domain.learning.entity.LastLearningTime;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "sub_concept")
@@ -24,56 +16,56 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SubConcept {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "sub_concept_id")
-  private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "sub_concept_id")
+    private Integer id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "major_concept_id")
-  private MajorConcept majorConcept;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "major_concept_id")
+    private MajorConcept majorConcept;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "grade_id")
-  private GradeLevel gradeLevel;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "grade_id")
+    private GradeLevel gradeLevel;
 
-  @Column(name = "sub_concept_type", nullable = true)
-  private String conceptType;
+    @Column(name = "sub_concept_type", nullable = true)
+    private String conceptType;
 
-  @Column(name = "concept_order", nullable = true)
-  private Integer conceptOrder;
+    @Column(name = "concept_order", nullable = true)
+    private Integer conceptOrder;
 
-  @Column(name = "concept_content", nullable = true)
-  private String conceptContent;
+    @Column(name = "concept_content", nullable = true)
+    private String conceptContent;
 
-  @OneToMany(mappedBy = "subConcept", fetch = FetchType.LAZY)
-  private List<LastLearningTime> lastLearningTimes = new ArrayList<>();
+    @OneToMany(mappedBy = "subConcept", fetch = FetchType.LAZY)
+    private List<LastLearningTime> lastLearningTimes = new ArrayList<>();
 
-  @OneToMany(mappedBy = "subConcept", fetch = FetchType.LAZY)
-  private List<QuestionConcept> questionConcepts = new ArrayList<>();
+    @OneToMany(mappedBy = "subConcept", fetch = FetchType.LAZY)
+    private List<QuestionConcept> questionConcepts = new ArrayList<>();
 
-  public void changeMajorConcept(MajorConcept majorConcept) {
-    if (this.majorConcept != null) {
-      this.majorConcept.getSubConcepts().remove(this);
+    public void changeMajorConcept(MajorConcept majorConcept) {
+        if (this.majorConcept != null) {
+            this.majorConcept.getSubConcepts().remove(this);
+        }
+
+        this.majorConcept = majorConcept;
+
+        if (majorConcept != null) {
+            majorConcept.getSubConcepts().add(this);
+        }
     }
 
-    this.majorConcept = majorConcept;
+    public void changeGrade(GradeLevel gradeLevel) {
+        if (this.gradeLevel != null) {
+            this.gradeLevel.getSubConcepts().remove(this);
+        }
 
-    if (majorConcept != null) {
-      majorConcept.getSubConcepts().add(this);
+        this.gradeLevel = gradeLevel;
+
+        if (gradeLevel != null) {
+            gradeLevel.getSubConcepts().add(this);
+        }
     }
-  }
-
-  public void changeGrade(GradeLevel gradeLevel) {
-    if(this.gradeLevel != null) {
-      this.gradeLevel.getSubConcepts().remove(this);
-    }
-
-    this.gradeLevel = gradeLevel;
-
-    if(gradeLevel != null) {
-      gradeLevel.getSubConcepts().add(this);
-    }
-  }
 
 }
