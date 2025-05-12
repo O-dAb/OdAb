@@ -51,12 +51,15 @@ public class User {
   private Boolean status;
 
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+  @Builder.Default
   private List<LastLearningTime> lastLearningTimes = new ArrayList<>();
 
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+  @Builder.Default
   private List<QuestionResult> questionResults = new ArrayList<>();
 
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+  @Builder.Default
   private List<Question> questions = new ArrayList<>();
 
   public void updateKakaoId(Long kakaoId) {
