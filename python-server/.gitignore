@@ -26,6 +26,8 @@ var/
 # Virtual Environment
 venv/
 ENV/
+venv_old/
+venv_new/
 
 # IDE
 .idea/
@@ -34,3 +36,4 @@ ENV/
 *.swo 
 
 qdrant_data/
+node_modules/
