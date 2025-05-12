@@ -25,9 +25,6 @@ public class QuestionSolution {
     @Column(name = "question_solution_id")
     private Integer id;
 
-    @Column(name = "solution", nullable = true)
-    private String solution;
-
     @Column(name = "step", nullable = true)
     private Byte step;
 

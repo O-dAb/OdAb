@@ -13,6 +13,5 @@ public interface QuestionService {
   RetryQuestionResponseDto findRetryQuestionByQuestionId(Integer questionId);
   ConceptResponseDto findConceptList(); //개념선택 - 수학개념선택
 
-
   Page<SubConceptRelatedQuestionResponseDto> findSubConceptRelatedQuestionBySubConceptId(Integer subConceptId, Pageable pageable);
 }

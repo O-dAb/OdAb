@@ -11,11 +11,11 @@ import java.time.LocalDate;
 
 public interface LastLearningDateRepository extends JpaRepository<LastLearningTime, Integer> {
 
-    @Query(value = "SELECT sc.id AS subConceptId, sc.concept_type AS subConceptType, MAX(DATE(llt.last_learning_date)) AS lastLearningDate " +
+    @Query(value = "SELECT sc.sub_concept_id AS subConceptId, sc.sub_concept_type AS subConceptType, MAX(DATE(llt.last_learning_time)) AS lastLearningDate " +
             "FROM last_learning_time llt " +
-            "JOIN sub_concept sc ON llt.sub_concept_id = sc.id " +
+            "JOIN sub_concept sc ON llt.sub_concept_id = sc.sub_concept_id " +
             "WHERE llt.user_id = :userId " +
-            "GROUP BY sc.id, sc.concept_type",
+            "GROUP BY sc.sub_concept_id, sc.sub_concept_type",
             nativeQuery = true)
     List<Object[]> findLastLearningByUserId(@Param("userId") Integer userId);
 
