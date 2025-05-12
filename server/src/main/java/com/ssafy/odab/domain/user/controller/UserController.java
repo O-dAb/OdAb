@@ -23,34 +23,34 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
 
-  private final KakaoService kakaoService;
-  private final UserService userService;
-  private final JwtService jwtService;
+    private final KakaoService kakaoService;
+    private final UserService userService;
+    private final JwtService jwtService;
 
-  /**
-   * 토큰에서 사용자 ID를 추출합니다.
-   */
-  private Integer getUserIdFromToken(HttpServletRequest request) {
-    String authHeader = request.getHeader("Authorization");
-    System.out.println("Authorization 헤더: " + authHeader); // 디버깅용 로그
+    /**
+     * 토큰에서 사용자 ID를 추출합니다.
+     */
+    private Integer getUserIdFromToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        System.out.println("Authorization 헤더: " + authHeader); // 디버깅용 로그
 
-    if (authHeader != null && authHeader.startsWith("Bearer ")) {
-      String token = authHeader.substring(7);
-      System.out.println("추출된 토큰: " + token); // 디버깅용 로그
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            System.out.println("추출된 토큰: " + token); // 디버깅용 로그
 
-      // 토큰 유효성 검증 추가
-      if (jwtService.validateToken(token)) {
-        Integer userId = jwtService.getUserIdFromToken(token);
-        System.out.println("추출된 사용자 ID: " + userId); // 디버깅용 로그
-        return userId;
-      } else {
-        System.out.println("토큰 유효성 검증 실패"); // 디버깅용 로그
-      }
-    } else {
-      System.out.println("Authorization 헤더가 없거나 Bearer 형식이 아님"); // 디버깅용 로그
+            // 토큰 유효성 검증 추가
+            if (jwtService.validateToken(token)) {
+                Integer userId = jwtService.getUserIdFromToken(token);
+                System.out.println("추출된 사용자 ID: " + userId); // 디버깅용 로그
+                return userId;
+            } else {
+                System.out.println("토큰 유효성 검증 실패"); // 디버깅용 로그
+            }
+        } else {
+            System.out.println("Authorization 헤더가 없거나 Bearer 형식이 아님"); // 디버깅용 로그
+        }
+        throw new RuntimeException("유효한 인증 토큰이 없습니다.");
     }
-    throw new RuntimeException("유효한 인증 토큰이 없습니다.");
-  }
 
 
     @GetMapping("/login/oauth2/code/kakao")
@@ -89,25 +89,26 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-  @PostMapping("/api/v1/login")
-  public ResponseEntity<String> doLogin() {
-    System.out.println("[로그인] /api/v1/login 요청 들어옴");
-    String message = "서버 되는거지 데브툴스도 된다.";
-    System.out.println("[로그인] 응답 메시지: " + message);
-    return ResponseEntity.ok(message);
-  }
+    @PostMapping("/api/v1/login")
+    public ResponseEntity<String> doLogin() {
+        System.out.println("[로그인] /api/v1/login 요청 들어옴");
+        String message = "서버 되는거지 데브툴스도 된다.";
+        System.out.println("[로그인] 응답 메시지: " + message);
+        return ResponseEntity.ok(message);
+    }
 
-  /**
-   * 사용자의 프로필 이미지를 업로드하고 저장합니다.
-   *
-   * @param file 업로드할 이미지 파일
-   * @return 저장된 이미지 URL을 포함한 응답
-   */
-  @PutMapping("/api/v1/profile_img")
-  public ResponseEntity<ProfileImageResponse> saveProfileImg(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
-    try {
-      // 토큰에서 사용자 ID추출
-      Integer userId = getUserIdFromToken(request);
+    /**
+     * 사용자의 프로필 이미지를 업로드하고 저장합니다.
+     *
+     * @param file 업로드할 이미지 파일
+     * @return 저장된 이미지 URL을 포함한 응답
+     */
+    @PutMapping("/api/v1/profile_img")
+    public ResponseEntity<ProfileImageResponse> saveProfileImg(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+        try {
+            // 토큰에서 사용자 ID추출
+//      Integer userId = getUserIdFromToken(request);
+            Integer userId = 1;
 
             String imageUrl = userService.saveProfileImg(userId, file);
             return ResponseEntity.ok(new ProfileImageResponse(imageUrl));
@@ -117,18 +118,19 @@ public class UserController {
         }
     }
 
-  /**
-   * 사용자의 학년 정보를 업데이트합니다.
-   *
-   * @param gradeMap 업데이트할 학년 정보를 포함한 맵 (key: "grade", value: 학년값)
-   * @return 업데이트 결과 메시지를 포함한 응답
-   */
-  @PutMapping("/api/v1/profile_grade")
-  public ResponseEntity<?> updateGrade(@RequestBody Map<String, Integer> gradeMap, HttpServletRequest request) {
-    try{
-      // 토큰에서 사용자 ID추출
-      Integer userId = getUserIdFromToken(request);
-      Integer grade = gradeMap.get("grade");
+    /**
+     * 사용자의 학년 정보를 업데이트합니다.
+     *
+     * @param gradeMap 업데이트할 학년 정보를 포함한 맵 (key: "grade", value: 학년값)
+     * @return 업데이트 결과 메시지를 포함한 응답
+     */
+    @PutMapping("/api/v1/profile_grade")
+    public ResponseEntity<?> updateGrade(@RequestBody Map<String, Integer> gradeMap, HttpServletRequest request) {
+        try {
+            // 토큰에서 사용자 ID추출
+//      Integer userId = getUserIdFromToken(request);
+            Integer userId = 1;
+            Integer grade = gradeMap.get("grade");
 
             // 유효성 검사: 학년 정보가 제공되지 않은 경우
             if (grade == null) {
@@ -148,5 +150,4 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "학년 업데이트 중 오류가 발생했습니다."));
         }
     }
-
 }
