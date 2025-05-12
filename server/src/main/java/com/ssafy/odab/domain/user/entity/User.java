@@ -33,7 +33,7 @@ public class User {
   private Integer id;
 
   @Column(name = "kakao_id", unique = true, nullable = false)
-  private Integer kakaoId;
+  private Long kakaoId;
 
   @Column(name = "profile_url", nullable = true)
   private String profileUrl;
@@ -59,7 +59,7 @@ public class User {
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   private List<Question> questions = new ArrayList<>();
 
-  public void updateKakaoId(Integer kakaoId) {
+  public void updateKakaoId(Long kakaoId) {
     this.kakaoId = kakaoId;
   }
 

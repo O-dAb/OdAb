@@ -67,7 +67,9 @@ public class KakaoService {
         );
 
         JsonElement element = JsonParser.parseString(response.getBody());
-        return element.getAsJsonObject().get("access_token").getAsString();
+        String accessToken = element.getAsJsonObject().get("access_token").getAsString();
+        System.out.println("[KakaoService] accessToken: " + accessToken);
+        return accessToken;
     }
 
     /**
@@ -92,9 +94,10 @@ public class KakaoService {
         JsonObject kakaoAccount = element.getAsJsonObject().get("kakao_account").getAsJsonObject();
         JsonObject profile = kakaoAccount.getAsJsonObject("profile");
 
-        Integer id = element.getAsJsonObject().get("id").getAsInt();
+        Long id = element.getAsJsonObject().get("id").getAsLong();
         String nickname = profile.has("nickname") ? profile.get("nickname").getAsString() : null;
         KakaoUserInfo userInfo = new KakaoUserInfo(id, nickname);
+        System.out.println("[KakaoService] userInfo: id=" + id + ", nickname=" + nickname);
         return userInfo;
     }
 
@@ -112,7 +115,7 @@ public class KakaoService {
         if (existingUser.isPresent()) {
             // 기존 사용자라면 정보 업데이트 (필요한 경우)
             user = existingUser.get();
-            // 필요시 업데이트 로직 추가
+            System.out.println("[KakaoService] 기존 사용자: userId=" + user.getId() + ", kakaoId=" + user.getKakaoId());
         } else {
             // 신규 사용자라면 회원가입
             user = new User();
@@ -124,10 +127,12 @@ public class KakaoService {
 
             userRepository.save(user);
             isNewUser = true;
+            System.out.println("[KakaoService] 신규 사용자 회원가입: kakaoId=" + user.getKakaoId() + ", userName=" + user.getUserName());
         }
 
         // JWT 토큰 생성
         String token = jwtService.createToken(user);
+        System.out.println("[KakaoService] JWT token: " + token);
 
         // 응답 데이터 구성
         Map<String, Object> response = new HashMap<>();

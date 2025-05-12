@@ -7,55 +7,56 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
 import java.io.IOException;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class UserController {
 
   private final KakaoService kakaoService;
 
-  @GetMapping("/auth/kakao/callback")
-  public void kakaoCallback(@RequestParam String code, HttpServletResponse response) throws IOException {
-    // 1. 인증 코드로 액세스 토큰 받기
+  @GetMapping("/login/oauth2/code/kakao")
+  public void kakaoOauth2Callback(@RequestParam String code, HttpServletResponse response) throws IOException {
+    System.out.println("[카카오 콜백] code: " + code);
     String accessToken = kakaoService.getKakaoAccessToken(code);
-
-    // 2. 액세스 토큰으로 사용자 정보 가져오기
+    System.out.println("[카카오 콜백] accessToken: " + accessToken);
     KakaoUserInfo userInfo = kakaoService.getKakaoUserInfo(accessToken);
-
-    // 3. 사용자 정보로 로그인 또는 회원가입 진행
+    System.out.println("[카카오 콜백] userInfo: id=" + userInfo.getId() + ", nickname=" + userInfo.getNickname());
     Map<String, Object> responseData = kakaoService.loginOrSignup(userInfo);
-
-    // 4. 필요한 데이터를 쿼리 파라미터로 전달
     String token = (String) responseData.get("token");
     Integer userId = (Integer) responseData.get("userId");
+    String nickname = userInfo.getNickname();
+    if (nickname == null) {
+        nickname = "";
+    }
+    System.out.println("[카카오 콜백] JWT token: " + token);
+    System.out.println("[카카오 콜백] userId: " + userId);
+    System.out.println("[카카오 콜백] nickname: " + nickname);
     String redirectUrl = String.format(
-            "http://localhost:5173?token=%s&userId=%d",
-            token, userId
+        "http://localhost:5173?token=%s&userId=%d&nickname=%s",
+        token, userId, java.net.URLEncoder.encode(nickname, "UTF-8")
     );
-
-    // 5. 프론트엔드로 리다이렉트
+    System.out.println("[카카오 콜백] redirectUrl: " + redirectUrl);
     response.sendRedirect(redirectUrl);
   }
 
-
-  @PostMapping("/login")
-  public ResponseEntity<String> doLogin() {
-    return ResponseEntity.ok("서버 되는거지 데브툴스도 된다.");
-  }
-
-  // 카카오 로그인 페이지로 리다이렉트하는 URL 제공
-  @GetMapping("/auth/kakao")
+  @GetMapping("/api/v1/auth/kakao")
   public ResponseEntity<Map<String, String>> getKakaoAuthUrl() {
-    String kakaoUrl = "https://kauth.kakao.com/oauth/authorize" +
+    String kakaoUrl = "http://kauth.kakao.com/oauth/authorize" +
             "?client_id=" + kakaoService.getClientId() +
             "&redirect_uri=" + kakaoService.getRedirectUri() +
             "&response_type=code";
-
+    System.out.println("[getKakaoAuthUrl] kakaoUrl 카카오 : " + kakaoUrl);
     Map<String, String> response = Map.of("url", kakaoUrl);
     return ResponseEntity.ok(response);
+  }
+
+  @PostMapping("/api/v1/login")
+  public ResponseEntity<String> doLogin() {
+    System.out.println("[로그인] /api/v1/login 요청 들어옴");
+    String message = "서버 되는거지 데브툴스도 된다.";
+    System.out.println("[로그인] 응답 메시지: " + message);
+    return ResponseEntity.ok(message);
   }
 }
