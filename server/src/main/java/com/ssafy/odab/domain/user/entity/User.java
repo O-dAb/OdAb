@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,6 +24,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class User {
 
   @Id
@@ -31,7 +33,7 @@ public class User {
   private Integer id;
 
   @Column(name = "kakao_id", unique = true, nullable = false)
-  private Integer kakaoId;
+  private Long kakaoId;
 
   @Column(name = "profile_url", nullable = true)
   private String profileUrl;
@@ -57,12 +59,28 @@ public class User {
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   private List<Question> questions = new ArrayList<>();
 
+  public void updateKakaoId(Long kakaoId) {
+    this.kakaoId = kakaoId;
+  }
+
+  public void updateUserName(String userName) {
+    this.userName = userName;
+  }
+
   public void updateProfileUrl(String profileUrl) {
     this.profileUrl = profileUrl;
   }
 
+  public void updateCreatedAt(LocalDateTime createdAt) {
+    this.createdAt = createdAt;
+  }
+
   public void updateGrade(Integer grade) {
     this.grade = grade;
+  }
+
+  public void updateStatus(Boolean status) {
+    this.status = status;
   }
 
 }
