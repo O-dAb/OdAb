@@ -79,15 +79,8 @@ public class User {
     this.grade = grade;
   }
 
-
   public void updateStatus(Boolean status) {
     this.status = status;
   }
-
-
-
-
-
-
 
 }
