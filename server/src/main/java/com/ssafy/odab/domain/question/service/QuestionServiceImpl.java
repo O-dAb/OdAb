@@ -70,34 +70,4 @@ public class QuestionServiceImpl implements QuestionService {
         return retryQuestionResponseDto;
     }
 
-    @Override
-    public Boolean createQuestion(MultipartFile file, String questionText) {
-        return isCorrect;
-    }
-
-    private void saveQuestionImage(Question question, MultipartFile file) {
-        // 배포할때는 위로 바꿔야 함
-        String uploadDir = "/images/question";
-        //        String uploadDir = "c:/images/portfolio";
-        if (file != null) {
-            // 변수들
-            String oriname = file.getOriginalFilename();
-            String systemName = UUID.randomUUID().toString() + "_" + oriname;
-
-            String imagePath = uploadDir + "/" + systemName;
-            // 저장폴더 생성
-            File dir = new File(uploadDir);
-            boolean a = dir.mkdirs();
-            // 실제 파일객체 생성
-            File destFile = new File(imagePath);
-            try {
-                // 파일 저장
-                file.transferTo(destFile);
-                //파일 저장되면 객체 변경해서
-                question.updateQuestionImg(imagePath);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-    }
 }

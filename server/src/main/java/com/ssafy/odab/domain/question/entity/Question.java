@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,6 +26,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Question {
 
   @Id
@@ -71,5 +73,13 @@ public class Question {
 
     public void updateQuestionImg(String questionImg) {
         this.questionImg = questionImg;
+    }
+
+    public void updateQuestionText(String questionText) {
+        this.questionText = questionText;
+    }
+
+    public void updateAnswer(String answer) {
+        this.answer = answer;
     }
 }

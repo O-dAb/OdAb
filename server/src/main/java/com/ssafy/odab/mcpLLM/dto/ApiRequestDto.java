@@ -1,14 +1,12 @@
 package com.ssafy.odab.mcpLLM.dto;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-
-@Builder
-@Data
+@Getter
+@Setter
 public class ApiRequestDto {
     private String userAsk;
-    private List<String> imagePaths;
+    private MultipartFile imageData;
 }
