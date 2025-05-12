@@ -1,18 +1,56 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Upload, BookOpen, GraduationCap, ArrowRight, Eye, ThumbsUp, ThumbsDown, HelpCircle } from "lucide-react"
+import { Upload, BookOpen, Eye, ArrowRight, ThumbsUp, ThumbsDown, HelpCircle, CheckCircle, AlertCircle, Search, Star } from "lucide-react"
 import { ProblemUploader } from "@/components/problem-uploader"
-import type { EducationLevel, Grade } from "@/components/user-profile"
-import { getCurriculumTopics, getAllCurriculumTopics } from "@/lib/curriculum-data"
+import type { EducationLevel, Grade } from "@/components/profile/user-profile"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { Input } from "@/components/ui/input"
+import axios from "axios"
+import { InlineMath, BlockMath } from "react-katex"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
+import { ClipLoader } from 'react-spinners'
+
+// MathRenderer 컴포넌트 - 수학 표현식을 적절하게 렌더링
+function MathRenderer({ math, isBlock = false }: { math: string; isBlock?: boolean }) {
+  try {
+    return isBlock ? <BlockMath math={math} /> : <InlineMath math={math} />
+  } catch (error) {
+    console.error("Math rendering error:", error)
+    return <span className="text-red-500">{math}</span>
+  }
+}
+
+// 수학 내용이 포함된 텍스트를 파싱하여 렌더링하는 컴포넌트
+function MathText({ text }: { text: string }) {
+  if (!text) return null;
+  // $로 둘러싸인 수식을 찾아 렌더링
+  const parts = text.split(/(\$.*?\$)/g)
+  return (
+    <>
+      {parts.map((part, index) => {
+        if (part.startsWith('$') && part.endsWith('$')) {
+          // $ 기호 제거 후 수식 렌더링
+          const mathContent = part.slice(1, -1)
+          return <MathRenderer key={index} math={mathContent} />
+        }
+        // 일반 텍스트는 줄바꿈도 <br />로 변환
+        return part.split(/\n|\r\n?/g).map((line, i, arr) => (
+          <span key={i}>
+            {line}
+            {i < arr.length - 1 && <br />}
+          </span>
+        ))
+      })}
+    </>
+  )
+}
 
 /**
  * 문제 풀이 컴포넌트
@@ -23,389 +61,244 @@ interface ProblemSolverProps {
   grade: Grade
 }
 
+// API 응답 타입 정의
+interface UploadResponse {
+  problem_id: string
+  detected_text: string
+  latex?: string
+  problem_type?: string
+  image_url?: string
+}
+
+interface SolveResponse {
+  problem_id: string
+  problem_text: string
+  solution_steps: string[]
+  final_answer: string
+  confidence: number
+  related_concepts?: string[]
+  elapsed_time?: number
+  similar_problems_found?: number
+  detected_concepts?: string[]
+}
+
+interface SimilarProblem {
+  id: string
+  problem_text: string
+  problem_type: string
+  solution_summary: string
+  concepts: string[]
+  similarity: number
+}
+
 // 문제 해결 단계 타입 정의
-interface SolutionStep {
-  title: string
-  content: string
-  hint?: string
-  userInput?: string
-  isCorrect?: boolean
+interface StepInfo {
+  content: string;
+  keyPoints?: string[];
+  formulas?: string[];
 }
 
 export function ProblemSolver({ educationLevel, grade }: ProblemSolverProps) {
   // 상태 관리
   const [problemText, setProblemText] = useState("")
+  const [correctedText, setCorrectedText] = useState("")
+  const [problemId, setProblemId] = useState<string | null>(null)
   const [problemType, setProblemType] = useState("")
-  const [solutionSteps, setSolutionSteps] = useState<SolutionStep[]>([])
+  const [solutionSteps, setSolutionSteps] = useState<string[]>([])
+  const [formattedSteps, setFormattedSteps] = useState<StepInfo[]>([])
+  const [finalAnswer, setFinalAnswer] = useState("")
   const [currentStep, setCurrentStep] = useState(0)
   const [showAllSteps, setShowAllSteps] = useState(false)
-  const [showAllGrades, setShowAllGrades] = useState(false)
   const [selectedGrade, setSelectedGrade] = useState<Grade>(grade)
   const [userAnswer, setUserAnswer] = useState("")
   const [isInputMode, setIsInputMode] = useState(false)
-  const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium")
   const [viewMode, setViewMode] = useState<"step" | "all">("step")
   const [userSolution, setUserSolution] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [isCorrectingText, setIsCorrectingText] = useState(false)
+  const [similarProblems, setSimilarProblems] = useState<SimilarProblem[]>([])
+  const [detectedConcepts, setDetectedConcepts] = useState<string[]>([])
+  const [confidence, setConfidence] = useState(0)
+  const [userFeedback, setUserFeedback] = useState("")
+  const [isFeedbackLoading, setIsFeedbackLoading] = useState(false)
+  const [feedbackError, setFeedbackError] = useState<string | null>(null)
+  const [feedbackResult, setFeedbackResult] = useState("")
+  const [originalText, setOriginalText] = useState("")
+  const [feedbackHistory, setFeedbackHistory] = useState<string[]>([])
+  const [imageUrl, setImageUrl] = useState<string | null>(null)
   const { toast } = useToast()
+  const [revealedSteps, setRevealedSteps] = useState<number[]>([0]);
+  const handleReveal = (idx: number) => {
+    setRevealedSteps(prev => prev.includes(idx) ? prev : [...prev, idx]);
+  };
 
-  // 교육과정에 맞는 주제 가져오기
-  const topics = showAllGrades
-    ? getAllCurriculumTopics(educationLevel)
-    : getCurriculumTopics(educationLevel, selectedGrade)
+  // 솔루션 스텝을 구조화된 형식으로 변환
+  useEffect(() => {
+    if (solutionSteps.length > 0) {
+      const steps: StepInfo[] = solutionSteps.map(step => {
+        // 기본적인 형식의 스텝 생성
+        return {
+          content: step,
+          // 핵심 개념과 공식을 추출하는 로직 (실제로는 백엔드에서 받아오는 것이 좋음)
+          keyPoints: extractKeyPoints(step),
+          formulas: extractFormulas(step)
+        };
+      });
+      setFormattedSteps(steps);
+    }
+  }, [solutionSteps]);
 
-  // 예시 문제 데이터 - 실제로는 백엔드에서 받아올 것
-  const exampleProblems = {
-    이차방정식: [
-      {
-        text: "다음 이차방정식을 풀어라: x² - 5x + 6 = 0",
-        difficulty: "easy",
-        steps: [
-          {
-            title: "문제 이해하기",
-            content: "이 문제는 이차방정식 x² - 5x + 6 = 0을 풀어 x의 값을 구하는 문제입니다.",
-            hint: "이차방정식의 표준형은 ax² + bx + c = 0 입니다. 여기서 a = 1, b = -5, c = 6 입니다.",
-          },
-          {
-            title: "해결 방법 선택하기",
-            content: "이차방정식을 풀기 위한 여러 방법 중 인수분해를 사용해 보겠습니다.",
-            hint: "인수분해는 (x-p)(x-q) = 0 형태로 만들어 x = p 또는 x = q 라는 해를 구하는 방법입니다.",
-          },
-          {
-            title: "인수분해 적용하기",
-            content: "x² - 5x + 6을 인수분해하면 (x-2)(x-3) = 0 입니다.",
-            hint: "두 수 p, q가 있을 때, p + q = -b/a = 5, p × q = c/a = 6이 되어야 합니다. p = 2, q = 3이 조건을 만족합니다.",
-          },
-          {
-            title: "해 구하기",
-            content: "(x-2)(x-3) = 0이므로, x-2 = 0 또는 x-3 = 0입니다. 따라서 x = 2 또는 x = 3입니다.",
-            hint: "인수가 0이 되는 경우를 각각 계산하면 됩니다.",
-          },
-          {
-            title: "검산하기",
-            content:
-              "x = 2를 대입하면, 2² - 5×2 + 6 = 4 - 10 + 6 = 0 ✓\nx = 3을 대입하면, 3² - 5×3 + 6 = 9 - 15 + 6 = 0 ✓",
-            hint: "구한 해를 원래 방정식에 대입하여 좌변이 0이 되는지 확인합니다.",
-          },
-        ],
-      },
-      {
-        text: "다음 이차방정식을 풀어라: 2x² - 7x + 3 = 0",
-        difficulty: "medium",
-        steps: [
-          {
-            title: "문제 이해하기",
-            content: "이 문제는 이차방정식 2x² - 7x + 3 = 0을 풀어 x의 값을 구하는 문제입니다.",
-            hint: "이차방정식의 표준형은 ax² + bx + c = 0 입니다. 여기서 a = 2, b = -7, c = 3 입니다.",
-          },
-          {
-            title: "해결 방법 선택하기",
-            content: "이 방정식은 인수분해가 쉽지 않아 보입니다. 근의 공식을 사용해 보겠습니다.",
-            hint: "근의 공식은 x = (-b ± √(b² - 4ac)) / 2a 입니다.",
-          },
-          {
-            title: "판별식 계산하기",
-            content: "판별식 D = b² - 4ac = (-7)² - 4×2×3 = 49 - 24 = 25",
-            hint: "판별식이 양수이므로 서로 다른 두 실근을 가집니다.",
-          },
-          {
-            title: "근의 공식 적용하기",
-            content: "x = (-b ± √D) / 2a = (7 ± √25) / 4 = (7 ± 5) / 4",
-            hint: "√25 = 5 입니다.",
-          },
-          {
-            title: "해 구하기",
-            content: "x = (7 + 5) / 4 = 12 / 4 = 3 또는 x = (7 - 5) / 4 = 2 / 4 = 1/2",
-            hint: "분수 형태의 답도 정확히 계산해야 합니다.",
-          },
-          {
-            title: "검산하기",
-            content:
-              "x = 3을 대입: 2×3² - 7×3 + 3 = 2×9 - 21 + 3 = 18 - 21 + 3 = 0 ✓\nx = 1/2를 대입: 2×(1/2)² - 7×(1/2) + 3 = 2×(1/4) - 7/2 + 3 = 1/2 - 7/2 + 3 = 0 ✓",
-            hint: "구한 해를 원래 방정식에 대입하여 좌변이 0이 되는지 확인합니다.",
-          },
-        ],
-      },
-    ],
-    미분법: [
-      {
-        text: "함수 f(x) = x³ - 3x² + 2의 도함수를 구하시오.",
-        difficulty: "medium",
-        steps: [
-          {
-            title: "문제 이해하기",
-            content: "이 문제는 함수 f(x) = x³ - 3x² + 2의 도함수 f'(x)를 구하는 문제입니다.",
-            hint: "도함수는 함수의 순간 변화율을 나타내며, 미분을 통해 구할 수 있습니다.",
-          },
-          {
-            title: "미분 법칙 적용하기",
-            content: "각 항을 개별적으로 미분한 후 더합니다. 다항함수의 미분 공식을 사용합니다.",
-            hint: "x^n의 미분은 nx^(n-1)입니다. 상수항의 미분은 0입니다.",
-          },
-          {
-            title: "x³ 항 미분하기",
-            content: "x³의 미분은 3x²입니다.",
-            hint: "x^n → nx^(n-1) 공식 적용: x³ → 3x²",
-          },
-          {
-            title: "-3x² 항 미분하기",
-            content: "-3x²의 미분은 -3 × 2x = -6x입니다.",
-            hint: "-3x^2 → -3 × 2x^1 = -6x",
-          },
-          {
-            title: "상수항 미분하기",
-            content: "상수항 2의 미분은 0입니다.",
-            hint: "상수의 미분은 항상 0입니다.",
-          },
-          {
-            title: "결과 정리하기",
-            content: "따라서 f'(x) = 3x² - 6x + 0 = 3x² - 6x 입니다.",
-            hint: "각 항의 미분 결과를 모두 더합니다.",
-          },
-        ],
-      },
-    ],
-    적분법: [
-      {
-        text: "∫(2x + 3)dx를 계산하시오.",
-        difficulty: "easy",
-        steps: [
-          {
-            title: "문제 이해하기",
-            content: "이 문제는 함수 2x + 3의 부정적분 ∫(2x + 3)dx를 구하는 문제입니다.",
-            hint: "부정적분은 미분의 역과정으로, 주어진 함수를 미분하면 원래 함수가 나오는 함수를 찾는 것입니다.",
-          },
-          {
-            title: "적분 법칙 적용하기",
-            content: "각 항을 개별적으로 적분한 후 더합니다. 다항함수의 적분 공식을 사용합니다.",
-            hint: "∫x^n dx = x^(n+1)/(n+1) + C (단, n ≠ -1). 상수항 a의 적분은 ax + C입니다.",
-          },
-          {
-            title: "2x 항 적분하기",
-            content: "∫2x dx = 2∫x dx = 2(x²/2) = x²",
-            hint: "∫x dx = x²/2 공식 적용",
-          },
-          {
-            title: "3 항 적분하기",
-            content: "∫3 dx = 3x",
-            hint: "∫a dx = ax 공식 적용",
-          },
-          {
-            title: "결과 정리하기",
-            content: "따라서 ∫(2x + 3)dx = x² + 3x + C 입니다. (C는 적분상수)",
-            hint: "각 항의 적분 결과를 모두 더하고, 적분상수 C를 추가합니다.",
-          },
-        ],
-      },
-    ],
-    삼각함수: [
-      {
-        text: "sin²θ + cos²θ = 1임을 증명하시오.",
-        difficulty: "medium",
-        steps: [
-          {
-            title: "문제 이해하기",
-            content: "이 문제는 삼각함수의 기본 항등식 sin²θ + cos²θ = 1을 증명하는 문제입니다.",
-            hint: "삼각함수의 기본 정의와 피타고라스 정리를 활용할 수 있습니다.",
-          },
-          {
-            title: "접근 방법 선택하기",
-            content: "단위원(반지름이 1인 원)에서 삼각함수의 정의를 활용하여 증명해 보겠습니다.",
-            hint: "단위원에서 점 (cosθ, sinθ)는 원 위의 점입니다.",
-          },
-          {
-            title: "단위원 적용하기",
-            content: "단위원에서 점 (x, y) = (cosθ, sinθ)는 원 위의 점입니다. 단위원의 방정식은 x² + y² = 1입니다.",
-            hint: "단위원은 원점을 중심으로 하고 반지름이 1인 원입니다.",
-          },
-          {
-            title: "대입하기",
-            content: "x = cosθ, y = sinθ를 단위원 방정식 x² + y² = 1에 대입하면, cos²θ + sin²θ = 1이 됩니다.",
-            hint: "단위원 위의 모든 점은 x² + y² = 1을 만족합니다.",
-          },
-          {
-            title: "결론 도출하기",
-            content: "따라서 sin²θ + cos²θ = 1이 증명되었습니다.",
-            hint: "이 항등식은 삼각함수의 가장 기본적인 성질 중 하나입니다.",
-          },
-        ],
-      },
-    ],
-    "수와 연산": [
-      {
-        text: "다음 분수를 소수로 바꾸시오: 3/8",
-        difficulty: "easy",
-        steps: [
-          {
-            title: "문제 이해하기",
-            content: "이 문제는 분수 3/8을 소수로 변환하는 문제입니다.",
-            hint: "분수를 소수로 변환하려면 분자를 분모로 나누면 됩니다.",
-          },
-          {
-            title: "나눗셈 수행하기",
-            content: "3 ÷ 8 = 0.375",
-            hint: "나눗셈을 수행할 때 자리 올림에 주의하세요.",
-          },
-          {
-            title: "결과 확인하기",
-            content: "따라서 3/8 = 0.375 입니다.",
-            hint: "소수로 표현했을 때 0.375는 유한소수입니다.",
-          },
-        ],
-      },
-    ],
-    "변화와 관계": [
-      {
-        text: "일차방정식 2x + 5 = 11을 풀어라.",
-        difficulty: "easy",
-        steps: [
-          {
-            title: "문제 이해하기",
-            content: "이 문제는 일차방정식 2x + 5 = 11을 풀어 x의 값을 구하는 문제입니다.",
-            hint: "일차방정식을 풀기 위해서는 x를 한쪽으로 이항하여 값을 구합니다.",
-          },
-          {
-            title: "방정식 정리하기",
-            content: "2x + 5 = 11\n2x = 11 - 5\n2x = 6",
-            hint: "등식의 양변에서 같은 수를 빼면 등식이 유지됩니다.",
-          },
-          {
-            title: "x의 값 구하기",
-            content: "2x = 6\nx = 6 ÷ 2\nx = 3",
-            hint: "등식의 양변을 같은 수로 나누면 등식이 유지됩니다.",
-          },
-          {
-            title: "검산하기",
-            content: "x = 3을 원래 방정식에 대입하면,\n2(3) + 5 = 6 + 5 = 11 ✓",
-            hint: "구한 해를 원래 방정식에 대입하여 좌변이 우변과 같은지 확인합니다.",
-          },
-        ],
-      },
-    ],
-    "도형과 측정": [
-      {
-        text: "삼각형의 넓이를 구하는 공식을 이용하여 밑변이 6cm, 높이가 4cm인 삼각형의 넓이를 구하시오.",
-        difficulty: "easy",
-        steps: [
-          {
-            title: "문제 이해하기",
-            content: "이 문제는 밑변이 6cm, 높이가 4cm인 삼각형의 넓이를 구하는 문제입니다.",
-            hint: "삼각형의 넓이 공식은 (밑변 × 높이) ÷ 2 입니다.",
-          },
-          {
-            title: "공식 적용하기",
-            content: "삼각형의 넓이 = (밑변 × 높이) ÷ 2\n= (6cm × 4cm) ÷ 2\n= 24cm² ÷ 2\n= 12cm²",
-            hint: "단위에 주의하세요. 넓이의 단위는 cm²입니다.",
-          },
-          {
-            title: "결과 확인하기",
-            content: "따라서 삼각형의 넓이는 12cm²입니다.",
-            hint: "삼각형의 넓이는 항상 양수입니다.",
-          },
-        ],
-      },
-    ],
-    "자료와 가능성": [
-      {
-        text: "주사위를 한 번 던질 때, 짝수가 나올 확률을 구하시오.",
-        difficulty: "easy",
-        steps: [
-          {
-            title: "문제 이해하기",
-            content: "이 문제는 주사위를 한 번 던질 때 짝수가 나올 확률을 구하는 문제입니다.",
-            hint: "확률은 (사건이 일어나는 경우의 수) ÷ (전체 경우의 수)로 구합니다.",
-          },
-          {
-            title: "전체 경우의 수 구하기",
-            content: "주사위를 한 번 던질 때 나올 수 있는 숫자는 1, 2, 3, 4, 5, 6으로 총 6가지입니다.",
-            hint: "주사위는 1부터 6까지의 숫자가 하나씩 적혀 있습니다.",
-          },
-          {
-            title: "사건이 일어나는 경우의 수 구하기",
-            content: "짝수는 2, 4, 6으로 총 3가지입니다.",
-            hint: "짝수는 2로 나누어 떨어지는 수입니다.",
-          },
-          {
-            title: "확률 계산하기",
-            content: "짝수가 나올 확률 = 사건이 일어나는 경우의 수 ÷ 전체 경우의 수\n= 3 ÷ 6\n= 1/2",
-            hint: "분수는 가능한 약분하여 표현합니다.",
-          },
-          {
-            title: "결과 확인하기",
-            content: "따라서 주사위를 한 번 던질 때 짝수가 나올 확률은 1/2입니다.",
-            hint: "확률은 0에서 1 사이의 값을 가집니다.",
-          },
-        ],
-      },
-    ],
+  // 문자열에서 핵심 개념을 추출하는 함수 (간단한 구현)
+  const extractKeyPoints = (text: string): string[] => {
+    // 여기서는 간단하게 구현, 실제로는 더 정교한 분석 필요
+    const keywords = ["함수", "적분", "미분", "방정식", "인수분해", "공식", "삼각함수", "좌표", "벡터"];
+    return keywords.filter(word => text.includes(word));
+  };
+
+  // 문자열에서 수식을 추출하는 함수
+  const extractFormulas = (text: string): string[] => {
+    // '$' 기호로 둘러싸인 수식 찾기
+    const matches = text.match(/\$(.*?)\$/g) || [];
+    return matches;
+  };
+
+  // 사용자가 문제 인식 텍스트를 수정할 수 있도록 하는 함수
+  const handleTextCorrection = () => {
+    setIsCorrectingText(true)
+    setCorrectedText(problemText)
   }
 
-  const handleProblemRecognized = (text: string) => {
-    setProblemText(text)
+  // 수정된 텍스트로 문제 해결
+  const handleSolveWithCorrectedText = async () => {
+    if (!problemId || !correctedText) {
+      toast({
+        title: "오류",
+        description: "문제 ID 또는 수정된 텍스트가 없습니다.",
+        variant: "destructive",
+      })
+      return
+    }
 
-    // 실제로는 백엔드에서 문제 유형을 분석하고 단계별 풀이를 받아올 것입니다
-    // 여기서는 예시로 이차방정식 유형으로 가정합니다
-    const detectedType = "이차방정식"
-    setProblemType(detectedType)
+    setIsLoading(true)
+    try {
+      const response = await axios.post<SolveResponse>("http://localhost:8000/api/math/solve-problem", {
+        problem_id: problemId,
+        detected_text: problemText,
+        corrected_text: correctedText,
+        problem_type: problemType || "OTHER"
+      })
 
-    // 백엔드에서 받아온 단계별 풀이 데이터를 설정합니다
-    // 문제마다 단계 수가 다를 수 있습니다
-    const problemsOfType = exampleProblems[detectedType as keyof typeof exampleProblems] || []
-    const selectedProblem = problemsOfType.find((p) => p.difficulty === difficulty) || problemsOfType[0]
+      // 응답 데이터 처리
+      setSolutionSteps(response.data.solution_steps)
+      setFinalAnswer(response.data.final_answer)
+      setConfidence(response.data.confidence)
+      setDetectedConcepts(response.data.detected_concepts || [])
+      
+      // 유사 문제 검색 (추가적인 API 호출)
+      try {
+        const similarResponse = await axios.get<SimilarProblem[]>("http://localhost:8000/api/math/similar-problems", {
+          params: {
+            query: correctedText,
+            problem_type: problemType,
+            top_k: 3
+          }
+        })
+        setSimilarProblems(similarResponse.data)
+      } catch (error) {
+        console.error("유사 문제 검색 오류:", error)
+        setSimilarProblems([])
+      }
 
-    if (selectedProblem) {
-      setSolutionSteps(selectedProblem.steps)
+      setIsCorrectingText(false)
       setCurrentStep(0)
       setShowAllSteps(false)
       setIsInputMode(false)
-    } else {
-      // 예시 문제가 없는 경우 기본 단계 생성
-      const defaultSteps: SolutionStep[] = [
+      setViewMode("step")
+      
+      toast({
+        title: "문제 해결 완료",
+        description: "단계별 풀이가 준비되었습니다.",
+      })
+    } catch (error) {
+      console.error("문제 해결 오류:", error)
+      toast({
+        title: "문제 해결 오류",
+        description: "서버에서 문제를 해결하는 중 오류가 발생했습니다.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  // 이미지 업로드 후 OCR 결과 처리
+  const handleProblemRecognized = async (text: string, imageFile?: File) => {
+    if (!imageFile) {
+      setProblemText(text)
+      setCorrectedText(text)
+      setOriginalText(text)
+      setImageUrl(null)
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      // 이미지 파일 업로드를 위한 FormData 생성
+      const formData = new FormData()
+      formData.append("file", imageFile)
+      if (problemType) {
+        formData.append("problem_type", problemType)
+      }
+
+      // 이미지 업로드 API 호출
+      const response = await axios.post<UploadResponse>(
+        "http://localhost:8000/api/math/upload-problem", 
+        formData,
         {
-          title: "문제 이해하기",
-          content: `이 문제는 ${detectedType} 유형의 문제입니다. 주어진 조건을 분석해 봅시다.`,
-          hint: "문제에서 주어진 정보를 정리해보세요.",
-        },
-        {
-          title: "해결 방법 선택하기",
-          content: `${detectedType} 문제를 해결하기 위한 적절한 방법을 선택합니다.`,
-          hint: "이 유형의 문제에 적용할 수 있는 공식이나 접근법을 생각해보세요.",
-        },
-        {
-          title: "단계적 해결",
-          content: "선택한 방법을 단계적으로 적용합니다.",
-          hint: "한 단계씩 차근차근 계산해보세요.",
-        },
-        {
-          title: "정답 도출하기",
-          content: "계산 결과를 정리하여 최종 답을 구합니다.",
-          hint: "구한 결과가 문제의 요구사항을 만족하는지 확인하세요.",
-        },
-        {
-          title: "검산하기",
-          content: "구한 답이 맞는지 검산해봅니다.",
-          hint: "구한 답을 원래 문제에 대입하여 확인해보세요.",
-        },
-      ]
-      setSolutionSteps(defaultSteps)
-      setCurrentStep(0)
-      setShowAllSteps(false)
-      setIsInputMode(false)
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      )
+
+      // 인식된 텍스트 설정
+      setProblemText(response.data.detected_text)
+      setCorrectedText(response.data.detected_text)
+      setOriginalText(response.data.detected_text)
+      setProblemId(response.data.problem_id)
+      setProblemType(response.data.problem_type || "")
+      // 이미지 URL 저장 (서버에서 반환하도록 수정 필요)
+      if (response.data.image_url) {
+        setImageUrl(response.data.image_url)
+      } else {
+        setImageUrl(null)
+      }
+
+      // 기본적으로 문제+정답구하기 화면이 보이도록
+      setIsCorrectingText(false)
+      setFeedbackHistory([])
+      
+      toast({
+        title: "이미지 인식 완료",
+        description: "인식된 텍스트를 확인하고 필요시 수정해주세요.",
+      })
+    } catch (error) {
+      console.error("이미지 처리 오류:", error)
+      toast({
+        title: "이미지 처리 오류",
+        description: "이미지에서 텍스트를 인식하는 중 오류가 발생했습니다.",
+        variant: "destructive",
+      })
+    } finally {
+      setIsLoading(false)
     }
   }
 
   const handleNextStep = () => {
     if (isInputMode) {
       // 사용자 입력 모드인 경우, 답변 확인 후 다음 단계로
-      const currentStepData = { ...solutionSteps[currentStep] }
-      currentStepData.userInput = userAnswer
-
       // 간단한 정답 체크 (실제로는 더 복잡한 로직 필요)
       const isCorrect = userAnswer.trim().length > 0
-      currentStepData.isCorrect = isCorrect
-
-      const updatedSteps = [...solutionSteps]
-      updatedSteps[currentStep] = currentStepData
-      setSolutionSteps(updatedSteps)
 
       if (isCorrect) {
         toast({
@@ -438,45 +331,8 @@ export function ProblemSolver({ educationLevel, grade }: ProblemSolverProps) {
     setSelectedGrade(value as Grade)
   }
 
-  const handleTopicSelect = (topic: string) => {
-    setProblemType(topic)
-
-    // 선택한 주제에 맞는 예시 문제 가져오기
-    const problemsOfType = exampleProblems[topic as keyof typeof exampleProblems]
-    if (problemsOfType && problemsOfType.length > 0) {
-      const selectedProblem = problemsOfType.find((p) => p.difficulty === difficulty) || problemsOfType[0]
-      setProblemText(selectedProblem.text)
-      setSolutionSteps(selectedProblem.steps)
-      setCurrentStep(0)
-      setShowAllSteps(false)
-      setIsInputMode(false)
-      setViewMode("step")
-    } else {
-      setProblemText("")
-      setSolutionSteps([])
-    }
-  }
-
   const toggleInputMode = () => {
     setIsInputMode(!isInputMode)
-  }
-
-  const handleDifficultyChange = (value: string) => {
-    setDifficulty(value as "easy" | "medium" | "hard")
-
-    // 난이도 변경 시 현재 주제에 맞는 문제 다시 로드
-    if (problemType) {
-      const problemsOfType = exampleProblems[problemType as keyof typeof exampleProblems]
-      if (problemsOfType && problemsOfType.length > 0) {
-        const selectedProblem = problemsOfType.find((p) => p.difficulty === value) || problemsOfType[0]
-        setProblemText(selectedProblem.text)
-        setSolutionSteps(selectedProblem.steps)
-        setCurrentStep(0)
-        setShowAllSteps(false)
-        setIsInputMode(false)
-        setViewMode("step")
-      }
-    }
   }
 
   const handleViewModeChange = (mode: "step" | "all") => {
@@ -488,34 +344,136 @@ export function ProblemSolver({ educationLevel, grade }: ProblemSolverProps) {
     }
   }
 
+  // 피드백 제공 함수
+  const provideFeedback = async (rating: number, feedbackText?: string) => {
+    if (!problemId) return
+    
+    try {
+      await axios.post("http://localhost:8000/api/math/feedback", {
+        problem_id: problemId,
+        rating,
+        feedback_text: feedbackText
+      })
+      
+      toast({
+        title: "피드백 전송 완료",
+        description: "풀이에 대한 피드백을 보내주셔서 감사합니다.",
+      })
+    } catch (error) {
+      console.error("피드백 전송 오류:", error)
+      toast({
+        title: "피드백 전송 오류",
+        description: "피드백을 전송하는 중 오류가 발생했습니다.",
+        variant: "destructive",
+      })
+    }
+  }
+
+  const handleNaturalFeedbackSubmit = async () => {
+    if (!problemId || !userFeedback.trim()) return
+
+    setIsFeedbackLoading(true)
+    setFeedbackError(null)
+    setFeedbackResult("")
+
+    try {
+      const response = await axios.post("http://localhost:8000/api/math/natural-feedback", {
+        problem_id: problemId,
+        original_text: originalText,
+        current_text: correctedText,
+        feedback_history: feedbackHistory,
+        new_feedback: userFeedback,
+        image_url: imageUrl
+      })
+
+      setFeedbackResult(response.data.problem_text)
+      setIsCorrectingText(false)
+      setCurrentStep(0)
+      setShowAllSteps(false)
+      setIsInputMode(false)
+      setViewMode("step")
+      setFeedbackHistory(prev => [...prev, userFeedback])
+      setCorrectedText(response.data.problem_text)
+      setUserFeedback("")
+      
+      toast({
+        title: "피드백 전송 완료",
+        description: "피드백이 반영되었습니다.",
+      })
+    } catch (error) {
+      console.error("피드백 전송 오류:", error)
+      setFeedbackError("피드백을 전송하는 중 오류가 발생했습니다.")
+    } finally {
+      setIsFeedbackLoading(false)
+    }
+  }
+
+  const handleAcceptFeedbackResult = () => {
+    setCorrectedText(feedbackResult)
+    setIsCorrectingText(false)
+    setCurrentStep(0)
+    setShowAllSteps(false)
+    setIsInputMode(false)
+    setViewMode("step")
+    setFeedbackResult("")
+  }
+
+  const handleRetrySolution = async () => {
+    // 기존 풀이 상태 초기화
+    setSolutionSteps([])
+    setFormattedSteps([])
+    setFinalAnswer("")
+    setCurrentStep(0)
+    setShowAllSteps(false)
+    setIsInputMode(false)
+    setViewMode("step")
+    setConfidence(0)
+    setDetectedConcepts([])
+    setSimilarProblems([])
+    setIsLoading(true)
+    try {
+      // 마지막 userFeedback 또는 새 피드백으로 재풀이 요청
+      await handleNaturalFeedbackSubmit()
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleCompactFeedback = async () => {
+    if (!problemId || !originalText || !finalAnswer) return;
+    try {
+      await axios.post("http://localhost:8000/api/math/compact-feedback", {
+        problem_id: problemId,
+        original_text: originalText,
+        image_url: imageUrl,
+        final_answer: finalAnswer
+      });
+      toast({
+        title: "정답이 저장되었습니다!",
+        description: "AI의 풀이가 벡터DB에 저장되었습니다.",
+      });
+    } catch (error) {
+      toast({
+        title: "저장 오류",
+        description: "정답 저장 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    }
+  }
+
+  // 로딩 메시지 분기
+  let loadingMessage = "AI가 문제를 푸는 중입니다...";
+  if (isLoading && !problemText) {
+    loadingMessage = "AI가 문제를 인식하고 있는 중입니다...";
+  } else if (isFeedbackLoading) {
+    loadingMessage = "AI가 문제를 수정하고 있는 중입니다...";
+  }
+
   return (
     <div className="space-y-6">
       {/* 상단 필터 영역 */}
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          <Select value={difficulty} onValueChange={handleDifficultyChange}>
-            <SelectTrigger className="w-[120px] bg-blue-50 border-blue-200">
-              <SelectValue placeholder="난이도 선택" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="easy">쉬움</SelectItem>
-              <SelectItem value="medium">보통</SelectItem>
-              <SelectItem value="hard">어려움</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="flex items-center gap-2">
-          <Button
-            variant={showAllGrades ? "default" : "outline"}
-            size="sm"
-            onClick={() => setShowAllGrades(true)}
-            className="flex items-center gap-1 bg-blue-400 hover:bg-blue-500"
-          >
-            <GraduationCap className="h-4 w-4" />
-            <span>전체 학년</span>
-          </Button>
-          {!showAllGrades && (
             <Select value={selectedGrade} onValueChange={handleGradeChange}>
               <SelectTrigger className="w-[100px] bg-blue-50 border-blue-200">
                 <SelectValue placeholder="학년 선택" />
@@ -526,20 +484,6 @@ export function ProblemSolver({ educationLevel, grade }: ProblemSolverProps) {
                 <SelectItem value="3">3학년</SelectItem>
               </SelectContent>
             </Select>
-          )}
-          {showAllGrades && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setShowAllGrades(false)
-                setSelectedGrade(grade)
-              }}
-              className="border-blue-200 text-blue-600 hover:bg-blue-50"
-            >
-              내 학년으로
-            </Button>
-          )}
         </div>
       </div>
 
@@ -573,20 +517,26 @@ export function ProblemSolver({ educationLevel, grade }: ProblemSolverProps) {
             </CardHeader>
             <CardContent className="pt-6">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {topics.map((topic) => (
+                {detectedConcepts.length > 0 ? (
+                  detectedConcepts.map((concept) => (
                   <Button
-                    key={topic}
-                    variant={problemType === topic ? "default" : "outline"}
+                      key={concept}
+                      variant={problemType === concept ? "default" : "outline"}
                     className={`h-auto py-3 ${
-                      problemType === topic
+                        problemType === concept
                         ? "bg-yellow-400 hover:bg-yellow-500 text-white"
                         : "border-yellow-200 text-yellow-600 hover:bg-yellow-50"
                     }`}
-                    onClick={() => handleTopicSelect(topic)}
+                      onClick={() => setProblemType(concept)}
                   >
-                    {topic}
+                      {concept}
                   </Button>
-                ))}
+                  ))
+                ) : (
+                  <div className="col-span-3 text-center py-4 text-gray-500">
+                    문제를 업로드하면 관련 개념이 여기에 표시됩니다.
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -594,211 +544,218 @@ export function ProblemSolver({ educationLevel, grade }: ProblemSolverProps) {
       </Tabs>
 
       {/* 문제 표시 영역 */}
-      {problemText && (
+      {problemText && !isCorrectingText && (
         <Card className="border-blue-200">
           <CardHeader className="bg-blue-50 border-b border-blue-200">
             <CardTitle>문제</CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
-            <div className="bg-blue-50/50 p-4 rounded-md border border-blue-100">{problemText}</div>
+            <div className="bg-blue-50/50 p-4 rounded-md border border-blue-100 text-lg font-medium">
+              <MathText text={correctedText} />
+            </div>
             {problemType && (
               <div className="mt-2 text-sm text-gray-500 flex items-center justify-between">
                 <div>
-                  문제 유형: <span className="font-medium text-blue-600">{problemType}</span>
+                  문제 유형: <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 ml-1">{problemType}</Badge>
                 </div>
-                <Badge
-                  variant={difficulty === "easy" ? "outline" : difficulty === "medium" ? "secondary" : "destructive"}
-                  className={
-                    difficulty === "easy"
-                      ? "border-green-300 text-green-600 bg-green-50"
-                      : difficulty === "medium"
-                        ? "bg-yellow-400 text-white"
-                        : "bg-red-400"
-                  }
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleTextCorrection}
+                  className="border-blue-200 text-blue-600"
                 >
-                  {difficulty === "easy" ? "쉬움" : difficulty === "medium" ? "보통" : "어려움"}
-                </Badge>
+                  문제 텍스트 수정
+                </Button>
               </div>
             )}
+            {/* 정답 구하기 버튼을 문제 아래에 항상 노출 */}
+            <div className="flex justify-end mt-4">
+              <Button 
+                onClick={handleSolveWithCorrectedText} 
+                disabled={isLoading}
+                className="bg-blue-500 hover:bg-blue-600"
+              >
+                {isLoading ? "처리중..." : "정답 구하기"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
 
-      {/* 문제 풀이 공간 */}
-      {problemText && (
-        <Card className="border-gray-200">
-          <CardHeader className="bg-gray-50 border-b border-gray-200">
-            <CardTitle>문제 풀이</CardTitle>
+      {/* 문제 인식 결과 수정 모드 */}
+      {isCorrectingText && (
+        <Card className="border-blue-200">
+          <CardHeader className="bg-blue-50 border-b border-blue-200">
+            <CardTitle>인식된 문제 확인</CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
-            <Textarea
-              placeholder="여기에 풀이 과정을 작성하세요..."
-              className="min-h-[150px] bg-white border-gray-200"
-              value={userSolution}
-              onChange={(e) => setUserSolution(e.target.value)}
-            />
-          </CardContent>
-          <CardFooter className="flex justify-end">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">정답:</span>
-              <Input
-                className="w-[150px] bg-white border-gray-200"
-                placeholder="정답 입력"
-                value={userAnswer}
-                onChange={(e) => setUserAnswer(e.target.value)}
-              />
-              <Button className="bg-blue-400 hover:bg-blue-500">제출</Button>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">인식된 텍스트:</label>
+                <div className="bg-blue-50 border border-blue-100 rounded-md p-3 text-base mb-2">
+                  <MathText text={correctedText} />
+                </div>
+              </div>
+              <div className="text-sm text-gray-500 mb-2">
+                * 인식 결과가 잘못되었나요? 아래에서 수정 요청을 해주세요.<br />
+                예시: "AB가 아니라 AC가 4cm입니다.", "각 B가 아니라 각 C가 30도입니다.", "BC=5cm로 바꿔주세요."
+              </div>
+              <div className="flex gap-2 items-end">
+                <Textarea
+                  value={userFeedback}
+                  onChange={e => setUserFeedback(e.target.value)}
+                  className="min-h-[40px] bg-white border-blue-200 flex-1"
+                  placeholder="자연어로 수정 요청을 입력하세요."
+                />
+                <Button
+                  className="bg-blue-400 hover:bg-blue-500 whitespace-nowrap"
+                  onClick={handleNaturalFeedbackSubmit}
+                  disabled={isLoading || !userFeedback.trim()}
+                >
+                  수정 요청
+                </Button>
+              </div>
+              {isFeedbackLoading && (
+                <div className="text-blue-500 text-sm mt-2">AI가 문제를 수정 중입니다...</div>
+              )}
+              {feedbackError && (
+                <div className="text-red-500 text-sm mt-2">{feedbackError}</div>
+              )}
+              {feedbackResult && (
+                <div className="bg-green-50 border border-green-200 rounded-md p-3 mt-2">
+                  <div className="font-semibold mb-1">수정된 결과:</div>
+                  <div className="mb-2"><MathText text={feedbackResult} /></div>
+                  <div className="flex gap-2">
+                    <Button size="sm" className="bg-green-500 hover:bg-green-600" onClick={() => handleAcceptFeedbackResult()}>이대로 진행</Button>
+                    <Button size="sm" variant="outline" className="border-green-200 text-green-700" onClick={() => setFeedbackResult('')}>다시 수정 요청</Button>
+                  </div>
+                </div>
+              )}
             </div>
+          </CardContent>
+          <CardFooter className="flex justify-end gap-2">
+            <Button 
+              variant="outline" 
+              onClick={() => setIsCorrectingText(false)}
+              className="border-blue-200"
+            >
+              취소
+            </Button>
           </CardFooter>
         </Card>
       )}
 
       {/* 해설 영역 */}
-      {solutionSteps.length > 0 && (
-        <Card className="border-green-200">
-          <CardHeader className="bg-green-50 border-b border-green-200">
-            <CardTitle className="flex justify-between items-center">
-              <span>해설</span>
-              <div className="flex items-center gap-2">
-                <Tabs
-                  value={viewMode}
-                  onValueChange={(v) => handleViewModeChange(v as "step" | "all")}
-                  className="w-[200px]"
-                >
-                  <TabsList className="bg-green-100">
-                    <TabsTrigger
-                      value="step"
-                      className="data-[state=active]:bg-green-500 data-[state=active]:text-white"
-                    >
-                      단계별로 보기
-                    </TabsTrigger>
-                    <TabsTrigger
-                      value="all"
-                      className="data-[state=active]:bg-green-500 data-[state=active]:text-white"
-                    >
-                      한번에 보기
-                    </TabsTrigger>
-                  </TabsList>
-                </Tabs>
-              </div>
-            </CardTitle>
+      {finalAnswer && !isCorrectingText && (
+        <Card className="border-green-100 bg-green-50/50">
+          <CardHeader className="bg-green-50 border-b border-green-100">
+            <CardTitle className="text-2xl font-bold text-green-900">해설</CardTitle>
+            <div className="flex gap-2 mt-2 justify-end">
+              {/* 단계별/한번에 보기 토글 등 추가 가능 */}
+            </div>
           </CardHeader>
           <CardContent className="pt-6">
-            <div className="space-y-4">
-              {viewMode === "all"
-                ? solutionSteps.map((step, index) => (
-                    <div key={index} className="bg-green-50/50 p-4 rounded-md border border-green-100">
-                      <div className="font-medium text-sm text-green-600 mb-1">
-                        {index + 1}단계: {step.title}
-                      </div>
-                      <div>{step.content}</div>
-                      {step.hint && (
-                        <div className="mt-2 text-sm text-gray-600 border-l-2 border-green-300 pl-3">
-                          <span className="font-medium">힌트:</span> {step.hint}
-                        </div>
-                      )}
-                      {step.userInput && (
-                        <div className="mt-2 p-2 bg-green-100/50 rounded">
-                          <div className="text-sm font-medium">내 답변:</div>
-                          <div className="flex items-center gap-2">
-                            {step.userInput}
-                            {step.isCorrect !== undefined &&
-                              (step.isCorrect ? (
-                                <ThumbsUp className="h-4 w-4 text-green-500" />
-                              ) : (
-                                <ThumbsDown className="h-4 w-4 text-red-500" />
-                              ))}
+            {(() => {
+              let stepsJson: any[] | null = null;
+              try {
+                let answerStr = finalAnswer;
+                if (typeof answerStr !== "string") {
+                  answerStr = JSON.stringify(answerStr);
+                }
+                // 코드블록(````json ... ````) 제거
+                answerStr = answerStr.replace(/```json[\s\S]*?```/gi, (block) => {
+                  const match = block.match(/\[[\s\S]*\]/);
+                  return match ? match[0] : '';
+                });
+                // 코드블록(```` ... ````) 제거 (일반)
+                answerStr = answerStr.replace(/```[\s\S]*?```/g, (block) => {
+                  const match = block.match(/\[[\s\S]*\]/);
+                  return match ? match[0] : '';
+                });
+                // 앞뒤 설명/마크다운 제거, JSON 배열만 추출
+                const jsonMatch = answerStr.match(/\[[\s\S]*\]/);
+                if (jsonMatch) {
+                  stepsJson = JSON.parse(jsonMatch[0]);
+                }
+              } catch (e) {
+                console.error("최종 해설 JSON 파싱 오류:", e, finalAnswer);
+                stepsJson = null;
+              }
+              if (!stepsJson) {
+                return <div className="text-red-500">AI 해설 파싱에 실패했습니다. 관리자에게 문의해 주세요.</div>;
+              }
+              if (stepsJson && Array.isArray(stepsJson)) {
+                return (
+                  <div className="space-y-4">
+                    {stepsJson.map((step, i) => {
+                      const isFinal = i === stepsJson.length - 1;
+                      const cardBorder = isFinal ? "border-green-200" : "border-green-200";
+                      const cardBg = "bg-white";
+                      const icon = isFinal ? <Star className="text-yellow-500" /> : i === 0 ? <Search className="text-green-500" /> : <BookOpen className="text-green-400" />;
+                      const isRevealed = revealedSteps.includes(i);
+                      return (
+                        <div
+                          key={i}
+                          className={`flex flex-col ${cardBg} ${cardBorder} border rounded-xl p-6 shadow-md mb-4 transition-all cursor-pointer ${!isRevealed ? 'blur-sm relative' : ''}`}
+                          onClick={() => !isRevealed && handleReveal(i)}
+                        >
+                          <div className="flex items-center gap-3 mb-2">
+                            {icon}
+                            <span className={`font-bold text-lg ${isFinal ? "text-yellow-700" : "text-green-700"}`}>{i + 1}단계: {step.title}</span>
                           </div>
-                        </div>
-                      )}
-                    </div>
-                  ))
-                : solutionSteps.slice(0, currentStep + 1).map((step, index) => (
-                    <div key={index} className="bg-green-50/50 p-4 rounded-md border border-green-100">
-                      <div className="font-medium text-sm text-green-600 mb-1">
-                        {index + 1}단계: {step.title}
-                      </div>
-                      {index < currentStep || !isInputMode ? (
-                        <>
-                          <div>{step.content}</div>
-                          {!isInputMode && step.hint && (
-                            <div className="mt-2 text-sm text-gray-600 border-l-2 border-green-300 pl-3">
-                              <span className="font-medium">힌트:</span> {step.hint}
-                            </div>
-                          )}
-                          {step.userInput && (
-                            <div className="mt-2 p-2 bg-green-100/50 rounded">
-                              <div className="text-sm font-medium">내 답변:</div>
-                              <div className="flex items-center gap-2">
-                                {step.userInput}
-                                {step.isCorrect !== undefined &&
-                                  (step.isCorrect ? (
-                                    <ThumbsUp className="h-4 w-4 text-green-500" />
-                                  ) : (
-                                    <ThumbsDown className="h-4 w-4 text-red-500" />
-                                  ))}
+                          {isRevealed ? (
+                            <>
+                              <div className="text-base text-gray-900 mb-2">
+                                <MathText text={step.content} />
                               </div>
+                              {step.hint && (
+                                <details className="mt-2">
+                                  <summary className="text-green-600 cursor-pointer select-none">힌트 보기</summary>
+                                  <div className="text-sm text-green-700 border-l-2 border-green-200 pl-3 mt-1">
+                                    <MathText text={step.hint} />
+                                  </div>
+                                </details>
+                              )}
+                            </>
+                          ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                              <span className="text-gray-400 text-base font-semibold">클릭하여 {i + 1}단계 확인</span>
                             </div>
                           )}
-                        </>
-                      ) : (
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                const updatedSteps = [...solutionSteps]
-                                updatedSteps[index].hint = step.hint
-                                setSolutionSteps(updatedSteps)
-                              }}
-                              className="flex items-center gap-1 border-green-200 text-green-600 hover:bg-green-50"
-                            >
-                              <HelpCircle className="h-4 w-4" />
-                              <span>힌트 보기</span>
-                            </Button>
-                          </div>
-
-                          {step.hint && (
-                            <div className="mt-2 text-sm text-gray-600 border-l-2 border-green-300 pl-3">
-                              <span className="font-medium">힌트:</span> {step.hint}
-                            </div>
-                          )}
-
-                          <div>
-                            <div className="text-sm font-medium mb-1">내 답변:</div>
-                            <Textarea
-                              value={userAnswer}
-                              onChange={(e) => setUserAnswer(e.target.value)}
-                              placeholder="이 단계의 해결 방법을 입력하세요..."
-                              className="min-h-[100px] border-green-200 focus-visible:ring-green-500"
-                            />
-                          </div>
                         </div>
-                      )}
-                    </div>
-                  ))}
-            </div>
+                      );
+                    })}
+                  </div>
+                );
+              }
+            })()}
           </CardContent>
-          <CardFooter className="flex justify-between">
-            {viewMode === "step" && currentStep < solutionSteps.length - 1 && (
-              <Button onClick={handleNextStep} className="flex items-center gap-2 bg-blue-400 hover:bg-blue-500">
-                {isInputMode ? "답변 제출하기" : "다음 단계"}
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            )}
-            {viewMode === "step" && currentStep === solutionSteps.length - 1 && (
-              <Button
-                variant="default"
-                onClick={() => handleViewModeChange("all")}
-                className="flex items-center gap-2 bg-blue-400 hover:bg-blue-500"
-              >
-                풀이 완료
-                <Eye className="h-4 w-4" />
-              </Button>
-            )}
+          <CardFooter className="flex justify-end gap-2">
+            <Button
+              variant="outline"
+              onClick={handleCompactFeedback}
+              className="border-green-200 text-green-600 hover:bg-green-50"
+            >
+              <ThumbsUp className="h-4 w-4 mr-1" /> 도움됨
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleRetrySolution}
+              className="border-red-200 text-red-600 hover:bg-red-50"
+            >
+              <HelpCircle className="h-4 w-4 mr-1" /> 다시 풀이하기
+            </Button>
           </CardFooter>
         </Card>
+      )}
+
+      {(isLoading || isFeedbackLoading) && (
+        <div className="fixed inset-0 flex flex-col items-center justify-center bg-white/60 z-50">
+          <ClipLoader color="#36d7b7" size={60} />
+          <div className="mt-4 text-lg font-semibold text-blue-500">
+            {loadingMessage}
+          </div>
+        </div>
       )}
     </div>
   )
