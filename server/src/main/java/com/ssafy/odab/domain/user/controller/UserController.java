@@ -72,7 +72,7 @@ public class UserController {
    * @param file 업로드할 이미지 파일
    * @return 저장된 이미지 URL을 포함한 응답
    */
-  @PutMapping("/profile_img")
+  @PutMapping("/api/v1/profile_img")
   public ResponseEntity<ProfileImageResponse> saveProfileImg(@RequestParam("file") MultipartFile file) {
     try {
       // 개발 단계에서는 임시로 고정된 사용자 ID 사용
@@ -92,7 +92,7 @@ public class UserController {
    * @param gradeMap 업데이트할 학년 정보를 포함한 맵 (key: "grade", value: 학년값)
    * @return 업데이트 결과 메시지를 포함한 응답
    */
-  @PutMapping("/profile_grade")
+  @PutMapping("/api/v1/profile_grade")
   public ResponseEntity<?> updateGrade(@RequestBody Map<String, Integer> gradeMap) {
     try{
       // 개발 단계에서는 임시로 고정된 사용자 ID 사용
