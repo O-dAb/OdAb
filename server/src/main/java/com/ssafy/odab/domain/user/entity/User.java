@@ -85,5 +85,4 @@ public class User {
   public void updateStatus(Boolean status) {
     this.status = status;
   }
-
 }

@@ -1,7 +1,10 @@
 package com.ssafy.odab.domain.user.controller;
 
 import com.ssafy.odab.domain.user.dto.KakaoUserInfo;
+import com.ssafy.odab.domain.user.entity.User;
+import com.ssafy.odab.domain.user.service.JwtService;
 import com.ssafy.odab.domain.user.service.KakaoService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ssafy.odab.domain.user.dto.ProfileImageResponse;
 import com.ssafy.odab.domain.user.service.UserService;
@@ -20,6 +23,34 @@ import java.util.Map;
 public class UserController {
 
   private final KakaoService kakaoService;
+  private final UserService userService;
+  private final JwtService jwtService;
+
+  /**
+   * 토큰에서 사용자 ID를 추출합니다.
+   */
+  private Integer getUserIdFromToken(HttpServletRequest request) {
+    String authHeader = request.getHeader("Authorization");
+    System.out.println("Authorization 헤더: " + authHeader); // 디버깅용 로그
+
+    if (authHeader != null && authHeader.startsWith("Bearer ")) {
+      String token = authHeader.substring(7);
+      System.out.println("추출된 토큰: " + token); // 디버깅용 로그
+
+      // 토큰 유효성 검증 추가
+      if (jwtService.validateToken(token)) {
+        Integer userId = jwtService.getUserIdFromToken(token);
+        System.out.println("추출된 사용자 ID: " + userId); // 디버깅용 로그
+        return userId;
+      } else {
+        System.out.println("토큰 유효성 검증 실패"); // 디버깅용 로그
+      }
+    } else {
+      System.out.println("Authorization 헤더가 없거나 Bearer 형식이 아님"); // 디버깅용 로그
+    }
+    throw new RuntimeException("유효한 인증 토큰이 없습니다.");
+  }
+
 
   @GetMapping("/login/oauth2/code/kakao")
   public void kakaoOauth2Callback(@RequestParam String code, HttpServletResponse response) throws IOException {
@@ -64,7 +95,6 @@ public class UserController {
     System.out.println("[로그인] 응답 메시지: " + message);
     return ResponseEntity.ok(message);
   }
-  private final UserService userService;
 
   /**
    * 사용자의 프로필 이미지를 업로드하고 저장합니다.
@@ -73,10 +103,10 @@ public class UserController {
    * @return 저장된 이미지 URL을 포함한 응답
    */
   @PutMapping("/api/v1/profile_img")
-  public ResponseEntity<ProfileImageResponse> saveProfileImg(@RequestParam("file") MultipartFile file) {
+  public ResponseEntity<ProfileImageResponse> saveProfileImg(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
     try {
-      // 개발 단계에서는 임시로 고정된 사용자 ID 사용
-      Integer userId = 1; // 테스트용 사용자 ID
+      // 토큰에서 사용자 ID추출
+      Integer userId = getUserIdFromToken(request);
 
       String imageUrl = userService.saveProfileImg(userId, file);
       return ResponseEntity.ok(new ProfileImageResponse(imageUrl));
@@ -93,10 +123,10 @@ public class UserController {
    * @return 업데이트 결과 메시지를 포함한 응답
    */
   @PutMapping("/api/v1/profile_grade")
-  public ResponseEntity<?> updateGrade(@RequestBody Map<String, Integer> gradeMap) {
+  public ResponseEntity<?> updateGrade(@RequestBody Map<String, Integer> gradeMap, HttpServletRequest request) {
     try{
-      // 개발 단계에서는 임시로 고정된 사용자 ID 사용
-      Integer userId = 1;
+      // 토큰에서 사용자 ID추출
+      Integer userId = getUserIdFromToken(request);
       Integer grade = gradeMap.get("grade");
 
       // 유효성 검사: 학년 정보가 제공되지 않은 경우
