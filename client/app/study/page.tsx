@@ -1,3 +1,4 @@
+import React from 'react'
 import { MainDashboard } from "@/components/main-dashboard"
 
 export default function StudyPage() {
