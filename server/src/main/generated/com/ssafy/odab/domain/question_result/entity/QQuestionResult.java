@@ -28,7 +28,11 @@ public class QQuestionResult extends EntityPathBase<QuestionResult> {
 
     public final com.ssafy.odab.domain.question.entity.QQuestion question;
 
+    public final StringPath solutionImage = createString("solutionImage");
+
     public final DateTimePath<java.time.LocalDateTime> solvedAt = createDateTime("solvedAt", java.time.LocalDateTime.class);
+
+    public final NumberPath<Integer> times = createNumber("times", Integer.class);
 
     public final com.ssafy.odab.domain.user.entity.QUser user;
 

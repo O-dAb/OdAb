@@ -1,6 +1,6 @@
 package com.ssafy.odab.domain.user.entity;
 
-import com.ssafy.odab.domain.learning.entity.LastLearningDate;
+import com.ssafy.odab.domain.learning.entity.LastLearningTime;
 import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question_result.entity.QuestionResult;
 import jakarta.persistence.Column;
@@ -45,13 +45,24 @@ public class User {
   @Column(name = "grade", nullable = true)
   private Integer grade;
 
+  @Column(name = "status", nullable = true)
+  private Boolean status;
+
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-  private List<LastLearningDate> lastLearningDates = new ArrayList<>();
+  private List<LastLearningTime> lastLearningTimes = new ArrayList<>();
 
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   private List<QuestionResult> questionResults = new ArrayList<>();
 
   @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
   private List<Question> questions = new ArrayList<>();
+
+  public void updateProfileUrl(String profileUrl) {
+    this.profileUrl = profileUrl;
+  }
+
+  public void updateGrade(Integer grade) {
+    this.grade = grade;
+  }
 
 }
