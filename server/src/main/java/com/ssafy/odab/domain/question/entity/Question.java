@@ -84,4 +84,8 @@ public class Question {
       subConcept.getQuestions().add(this);
     }
   }
+
+  public void updateQuestionImg(String questionImg) {
+    this.questionImg = questionImg;
+  }
 }
