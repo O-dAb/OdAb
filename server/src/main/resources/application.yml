@@ -1,3 +1,6 @@
+claude-api:
+  api-key: ${CLAUDE_APIKEY}
+  base-url: https://api.anthropic.com/v1/messages
 spring:
   application:
     name: server
