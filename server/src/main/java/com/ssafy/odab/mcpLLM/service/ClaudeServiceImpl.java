@@ -3,6 +3,10 @@ package com.ssafy.odab.mcpLLM.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.odab.common.service.S3ServiceImpl;
+import com.ssafy.odab.domain.concept.entity.QuestionConcept;
+import com.ssafy.odab.domain.concept.entity.SubConcept;
+import com.ssafy.odab.domain.concept.repository.QuestionConceptRepository;
+import com.ssafy.odab.domain.concept.repository.SubConceptRepository;
 import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question.entity.QuestionSolution;
 import com.ssafy.odab.domain.question.repository.QuestionRepository;
@@ -10,10 +14,7 @@ import com.ssafy.odab.domain.question.repository.QuestionSolutionRepository;
 import com.ssafy.odab.domain.user.entity.User;
 import com.ssafy.odab.domain.user.repository.UserRepository;
 import com.ssafy.odab.mcpLLM.config.ClaudeConfig;
-import com.ssafy.odab.mcpLLM.dto.ApiRequestDto;
-import com.ssafy.odab.mcpLLM.dto.ClaudeRequestApiDto;
-import com.ssafy.odab.mcpLLM.dto.ClaudeResponseApiDto;
-import com.ssafy.odab.mcpLLM.dto.QuestionJsonDto;
+import com.ssafy.odab.mcpLLM.dto.*;
 import com.ssafy.odab.mcpLLM.image.ImageEncode;
 import com.ssafy.odab.mcpLLM.toolFactory.SequentialThinkingFactory;
 import com.ssafy.odab.mcpLLM.toolFactory.ToolUtil;
@@ -43,6 +44,8 @@ public class ClaudeServiceImpl implements ClaudeService {
     private final UserRepository userRepository;
     private final S3ServiceImpl s3ServiceImpl;
     private final QuestionSolutionRepository questionSolutionRepository;
+    private final SubConceptRepository subConceptRepository;
+    private final QuestionConceptRepository questionConceptRepository;
     private String modelVersion = "claude-3-5-sonnet-20240620";    //사용할 모델명
     //    private String modelVersion = "claude-3-7-sonnet-20250219";	//사용할 모델명
     private int maxTokens = 4000;                    //최대 사용 가능한 토큰 수
@@ -55,7 +58,7 @@ public class ClaudeServiceImpl implements ClaudeService {
      */
 
     @Transactional
-    public Mono<ClaudeResponseApiDto> sendMathProblem(ApiRequestDto apiRequestDto) {
+    public Mono<ApiResponseDto> sendMathProblem(ApiRequestDto apiRequestDto) {
         List<Object> contents = new ArrayList<>();
         if (apiRequestDto.getUserAsk() != null) {
             String userAsk = apiRequestDto.getUserAsk();
@@ -136,8 +139,10 @@ public class ClaudeServiceImpl implements ClaudeService {
                     question = questionRepository.save(question); // 저장 후 반환된 엔티티를 받음
                     // QuestionSolution 생성 및 리스트에 추가
                     List<QuestionSolution> solutions = new ArrayList<>();
+                    List<String> solutionsForDto  = new ArrayList<>();
                     Byte i = 1;
                     for (String step : questionJsonDto.getSteps()) {
+                        solutionsForDto.add(step);
                         QuestionSolution questionSolution = QuestionSolution.builder()
                                 .question(question)
                                 .step(i)
@@ -149,7 +154,28 @@ public class ClaudeServiceImpl implements ClaudeService {
                     // 한 번에 모든 QuestionSolution 저장
                     questionSolutionRepository.saveAll(solutions);
 
-                    return Mono.just(response);
+                    List<QuestionConcept> concepts = new ArrayList<>();
+                    List<String> conceptsForDto  = new ArrayList<>();
+                    for (Integer concept : questionJsonDto.getConcept()) {
+                        SubConcept subConcept = subConceptRepository.findById(concept).orElseThrow(
+                                () -> new RuntimeException("Sub concept not found")
+                        );
+                        conceptsForDto.add(subConcept.getConceptType());
+                        QuestionConcept questionConcept = QuestionConcept.builder()
+                                .question(question)
+                                .subConcept(subConcept)
+                                .build();
+                        concepts.add(questionConcept);
+                    }
+                    questionConceptRepository.saveAll(concepts);
+                    ApiResponseDto apiResponseDto = ApiResponseDto.builder()
+                            .questionText(questionJsonDto.getQuestion())
+                            .answer(questionJsonDto.getAnswer())
+                            .imageUrl(imageUrl)
+                            .questionSolution(solutionsForDto)
+                            .concepts(conceptsForDto)
+                            .build();
+                    return Mono.just(apiResponseDto);
                 });
     }
 
@@ -163,15 +189,7 @@ public class ClaudeServiceImpl implements ClaudeService {
             List<ClaudeRequestApiDto.Message> sendMessages,
             int depth) {
         ArrayDeque<Integer> toolUseIndexQueue = new ArrayDeque<>();
-
         System.out.println("request = " + request.getMessages());
-        //POST 요청하고 답변받기
-        // 답변받은 내용 저장
-        // 답변받은 내용 저장 끝
-        // 최대 왔다갔다 설정
-        // 메시지 개수 설정
-        // toolUse가 없을 때 마지막으로 요청을 한 번 더 보내 총 정리를 수행
-        //에러날 시 error 답변 받기
         return claudeConfig.getWebClient().post()
                 .bodyValue(request)
                 .retrieve()
@@ -254,14 +272,14 @@ public class ClaudeServiceImpl implements ClaudeService {
                         2. [[]] 안의 내용은 너가 채워 넣어야하는 부분이야.
                         3. question 은 문제야.
                         3. step 은 너가 문제 푼 내용이야. step10 이내로 만들어줘.
-                        4. concept 은 사용된 수학 개념을 적어줘. 수학개념은 아래에서 가장 적절한 개념을 최대 5개 골라서 사용해줘. 적절한 것이 없을경우 "없음" 을 넣어줘.
-                            4-1. 덧셈
-                            4-2. 뺄셈
-                            4-3. 곱셈
-                            4-4. 나눗셈
-                            4-5. 외접
-                            4-6. 내접
-                            4-7. 적분
+                        4. concept 은 사용된 수학 개념을 적어줘. 수학개념은 아래에서 가장 적절한 개념을 최대 5개 골라서 사용해줘. 적절한 것이 없을경우 빈배열로 반환해줘. 각 개념에 맞는 숫자로 반환해줘.
+                            4-1. 덧셈 = 1
+                            4-2. 뺄셈 = 2
+                            4-3. 곱셈 = 3
+                            4-4. 나눗셈 = 4
+                            4-5. 외접 = 5
+                            4-6. 내접 = 6
+                            4-7. 적분 = 7
                         5. 아래 형식에 맞춰서 정리해주고 형식 이외의 대답은 넣지마.
                         {
                           "question":"[[문제 내용]]",
@@ -272,8 +290,8 @@ public class ClaudeServiceImpl implements ClaudeService {
                           ],
                           "answer":"[[정답]]"
                           "concept": [
-                            "[[사용된 수학 개념1]]",
-                            "[[사용된 수학 개념2]]"
+                            "[[사용된 수학 개념1. ex) 1]]",
+                            "[[사용된 수학 개념2. ex) 2]]"
                           ]
                         }
                         """)

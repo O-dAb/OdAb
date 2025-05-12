@@ -19,5 +19,5 @@ public class QuestionJsonDto {
     private String question;
     private String answer;
     private List<String> steps;
-    private List<String> concept;
+    private List<Integer> concept;
 }
