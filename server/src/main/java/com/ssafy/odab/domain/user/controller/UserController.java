@@ -3,19 +3,20 @@ package com.ssafy.odab.domain.user.controller;
 import com.ssafy.odab.domain.user.dto.KakaoUserInfo;
 import com.ssafy.odab.domain.user.entity.User;
 import com.ssafy.odab.domain.user.service.JwtService;
+import com.ssafy.odab.domain.user.dto.ProfileImageResponse;
 import com.ssafy.odab.domain.user.service.KakaoService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import com.ssafy.odab.domain.user.dto.ProfileImageResponse;
 import com.ssafy.odab.domain.user.service.UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -52,41 +53,41 @@ public class UserController {
   }
 
 
-  @GetMapping("/login/oauth2/code/kakao")
-  public void kakaoOauth2Callback(@RequestParam String code, HttpServletResponse response) throws IOException {
-    System.out.println("[카카오 콜백] code: " + code);
-    String accessToken = kakaoService.getKakaoAccessToken(code);
-    System.out.println("[카카오 콜백] accessToken: " + accessToken);
-    KakaoUserInfo userInfo = kakaoService.getKakaoUserInfo(accessToken);
-    System.out.println("[카카오 콜백] userInfo: id=" + userInfo.getId() + ", nickname=" + userInfo.getNickname());
-    Map<String, Object> responseData = kakaoService.loginOrSignup(userInfo);
-    String token = (String) responseData.get("token");
-    Integer userId = (Integer) responseData.get("userId");
-    String nickname = userInfo.getNickname();
-    if (nickname == null) {
-        nickname = "";
+    @GetMapping("/login/oauth2/code/kakao")
+    public void kakaoOauth2Callback(@RequestParam String code, HttpServletResponse response) throws IOException {
+        System.out.println("[카카오 콜백] code: " + code);
+        String accessToken = kakaoService.getKakaoAccessToken(code);
+        System.out.println("[카카오 콜백] accessToken: " + accessToken);
+        KakaoUserInfo userInfo = kakaoService.getKakaoUserInfo(accessToken);
+        System.out.println("[카카오 콜백] userInfo: id=" + userInfo.getId() + ", nickname=" + userInfo.getNickname());
+        Map<String, Object> responseData = kakaoService.loginOrSignup(userInfo);
+        String token = (String) responseData.get("token");
+        Integer userId = (Integer) responseData.get("userId");
+        String nickname = userInfo.getNickname();
+        if (nickname == null) {
+            nickname = "";
+        }
+        System.out.println("[카카오 콜백] JWT token: " + token);
+        System.out.println("[카카오 콜백] userId: " + userId);
+        System.out.println("[카카오 콜백] nickname: " + nickname);
+        String redirectUrl = String.format(
+                "http://localhost:5173?token=%s&userId=%d&nickname=%s",
+                token, userId, java.net.URLEncoder.encode(nickname, "UTF-8")
+        );
+        System.out.println("[카카오 콜백] redirectUrl: " + redirectUrl);
+        response.sendRedirect(redirectUrl);
     }
-    System.out.println("[카카오 콜백] JWT token: " + token);
-    System.out.println("[카카오 콜백] userId: " + userId);
-    System.out.println("[카카오 콜백] nickname: " + nickname);
-    String redirectUrl = String.format(
-        "http://localhost:5173?token=%s&userId=%d&nickname=%s",
-        token, userId, java.net.URLEncoder.encode(nickname, "UTF-8")
-    );
-    System.out.println("[카카오 콜백] redirectUrl: " + redirectUrl);
-    response.sendRedirect(redirectUrl);
-  }
 
-  @GetMapping("/api/v1/auth/kakao")
-  public ResponseEntity<Map<String, String>> getKakaoAuthUrl() {
-    String kakaoUrl = "http://kauth.kakao.com/oauth/authorize" +
-            "?client_id=" + kakaoService.getClientId() +
-            "&redirect_uri=" + kakaoService.getRedirectUri() +
-            "&response_type=code";
-    System.out.println("[getKakaoAuthUrl] kakaoUrl 카카오 : " + kakaoUrl);
-    Map<String, String> response = Map.of("url", kakaoUrl);
-    return ResponseEntity.ok(response);
-  }
+    @GetMapping("/api/v1/auth/kakao")
+    public ResponseEntity<Map<String, String>> getKakaoAuthUrl() {
+        String kakaoUrl = "http://kauth.kakao.com/oauth/authorize" +
+                "?client_id=" + kakaoService.getClientId() +
+                "&redirect_uri=" + kakaoService.getRedirectUri() +
+                "&response_type=code";
+        System.out.println("[getKakaoAuthUrl] kakaoUrl 카카오 : " + kakaoUrl);
+        Map<String, String> response = Map.of("url", kakaoUrl);
+        return ResponseEntity.ok(response);
+    }
 
   @PostMapping("/api/v1/login")
   public ResponseEntity<String> doLogin() {
@@ -108,13 +109,13 @@ public class UserController {
       // 토큰에서 사용자 ID추출
       Integer userId = getUserIdFromToken(request);
 
-      String imageUrl = userService.saveProfileImg(userId, file);
-      return ResponseEntity.ok(new ProfileImageResponse(imageUrl));
-    } catch (Exception e) {
-      e.printStackTrace();
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            String imageUrl = userService.saveProfileImg(userId, file);
+            return ResponseEntity.ok(new ProfileImageResponse(imageUrl));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
-  }
 
   /**
    * 사용자의 학년 정보를 업데이트합니다.
@@ -129,23 +130,23 @@ public class UserController {
       Integer userId = getUserIdFromToken(request);
       Integer grade = gradeMap.get("grade");
 
-      // 유효성 검사: 학년 정보가 제공되지 않은 경우
-      if (grade == null) {
-        return ResponseEntity.badRequest()
-                .body(Map.of("message", "학년 정보가 제공되지 않았습니다."));
-      }
+            // 유효성 검사: 학년 정보가 제공되지 않은 경우
+            if (grade == null) {
+                return ResponseEntity.badRequest()
+                        .body(Map.of("message", "학년 정보가 제공되지 않았습니다."));
+            }
 
-      // 서비스 호출하여 학년 정보 업데이트
-      userService.updateGrade(userId, grade);
-      // 성공 응답 반환
-      Map<String, Object> response = Map.of(
-              "message", "학년이 성공적으로 업데이트 되었습니다."
-      );
-      return ResponseEntity.ok(response);
-    } catch (Exception e) {
-      e.printStackTrace();
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message","학년 업데이트 중 오류가 발생했습니다."));
+            // 서비스 호출하여 학년 정보 업데이트
+            userService.updateGrade(userId, grade);
+            // 성공 응답 반환
+            Map<String, Object> response = Map.of(
+                    "message", "학년이 성공적으로 업데이트 되었습니다."
+            );
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "학년 업데이트 중 오류가 발생했습니다."));
+        }
     }
-  }
 
 }

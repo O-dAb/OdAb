@@ -1,14 +1,15 @@
 package com.ssafy.odab.common.controller;
 
 import com.ssafy.odab.common.service.CommonService;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,7 +28,7 @@ public class CommonController {
         response.put("data", data);
         return ResponseEntity.ok(response);
     }
-    
+
     //개념별 문제 조회
     @GetMapping("{subConceptId}/concept")
     public ResponseEntity<?> getConceptQuestionList(@PathVariable("subConceptId") Integer subConceptId) {
