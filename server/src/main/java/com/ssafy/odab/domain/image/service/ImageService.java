@@ -71,6 +71,46 @@ public class ImageService {
     }
 
     /**
+     * 단일 MultipartFile을 S3에 업로드하는 메서드
+     * 로컬 디스크에 파일을 저장하지 않고 메모리에서 직접 S3로 업로드합니다.
+     *
+     * @param file 업로드할 MultipartFile 객체
+     * @return S3에 저장된 이미지의 URL
+     * @throws IOException 파일 처리 중 오류 발생 시
+     */
+    public String uploadSingleImage(MultipartFile file) throws IOException {
+        // 1. 파일 이름 및 확장자 추출
+        String fileName = file.getOriginalFilename();
+        String ext = fileName.substring(fileName.lastIndexOf("."));
+
+        // 2. 고유 식별자 생성 (중복 방지)
+        String uuid = UUID.randomUUID() + ext;
+
+        // 3. S3에 저장될 전체 경로 설정
+        String s3Key = "profile/" + uuid;
+
+        // 4. 메타데이터 설정 (파일 크기, 타입 등)
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentLength(file.getSize());
+        metadata.setContentType(file.getContentType());
+
+        // 5. 메모리에서 직접 S3로 파일 업로드
+        s3Config.amazonS3().putObject(
+                new PutObjectRequest(
+                        bucket,
+                        s3Key,
+                        file.getInputStream(), // 입력 스트림을 직접 전달 (로컬 파일 생성 없음)
+                        metadata
+                ).withCannedAcl(CannedAccessControlList.PublicRead) // 공개 읽기 권한 설정
+        );
+
+        // 6. S3 이미지 URL 생성 및 반환
+        String s3Url = s3Config.amazonS3().getUrl(bucket, s3Key).toString();
+
+        return s3Url;
+    }
+
+    /**
      * 로컬 저장소 경유 S3 이미지 업로드 메소드 (현재 사용하지 않음)
      * 이미지를 로컬 디스크에 임시 저장한 후 S3에 업로드하고 로컬 파일을 삭제합니다.
      *
