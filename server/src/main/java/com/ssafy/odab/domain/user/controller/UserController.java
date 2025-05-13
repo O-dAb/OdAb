@@ -56,45 +56,41 @@ public class UserController {
         throw new RuntimeException("유효한 인증 토큰이 없습니다.");
     }
 
-
-
-
-  @GetMapping("/login/oauth2/code/kakao")
-  public void kakaoOauth2Callback(@RequestParam String code, HttpServletResponse response) throws IOException {
-    String accessToken = kakaoService.getKakaoAccessToken(code);
-    KakaoUserInfo userInfo = kakaoService.getKakaoUserInfo(accessToken);
-    System.out.println("[카카오 콜백] code: " + code);
-    System.out.println("[카카오 콜백] accessToken: " + accessToken);
-    System.out.println("[카카오 콜백] userInfo: id=" + userInfo.getId() + ", nickname=" + userInfo.getNickname());
-    Map<String, Object> responseData = kakaoService.loginOrSignup(userInfo);
-    String uuid = (String) responseData.get("auth_code");
-    String redirectUrl = String.format("http://localhost:3000/?auth_code=%s", uuid);
-    response.sendRedirect(redirectUrl);
-  }
-
-  @GetMapping("/api/v1/auth/kakao")
-  public ResponseEntity<Map<String, String>> getKakaoAuthUrl() {
-    String kakaoUrl = "https://kauth.kakao.com/oauth/authorize" +
-            "?client_id=" + kakaoService.getClientId() +
-            "&redirect_uri=" + kakaoService.getRedirectUri() +
-            "&response_type=code";
-    System.out.println("[getKakaoAuthUrl] kakaoUrl 카카오 : " + kakaoUrl);
-    Map<String, String> response = Map.of("url", kakaoUrl);
-    return ResponseEntity.ok(response);
-  }
-
-  // 프론트가 uuid로 토큰/유저정보 요청
-  @GetMapping("/api/auth/result")
-  public ResponseEntity<?> getAuthResult(@RequestParam("auth_code") String authCode) throws IOException {
-    String redisValue = redisTemplate.opsForValue().get(authCode);
-    if (redisValue == null) {
-        return ResponseEntity.status(HttpStatus.GONE).body("만료되었거나 잘못된 인증 코드입니다.");
+    @GetMapping("/login/oauth2/code/kakao")
+    public void kakaoOauth2Callback(@RequestParam String code, HttpServletResponse response) throws IOException {
+        String accessToken = kakaoService.getKakaoAccessToken(code);
+        KakaoUserInfo userInfo = kakaoService.getKakaoUserInfo(accessToken);
+        System.out.println("[카카오 콜백] code: " + code);
+        System.out.println("[카카오 콜백] accessToken: " + accessToken);
+        System.out.println("[카카오 콜백] userInfo: id=" + userInfo.getId() + ", nickname=" + userInfo.getNickname());
+        Map<String, Object> responseData = kakaoService.loginOrSignup(userInfo);
+        String uuid = (String) responseData.get("auth_code");
+        String redirectUrl = String.format("http://localhost:3000/?auth_code=%s", uuid);
+        response.sendRedirect(redirectUrl);
     }
-    ObjectMapper objectMapper = new ObjectMapper();
-    Map<String, Object> result = objectMapper.readValue(redisValue, Map.class);
-    return ResponseEntity.ok(result);
-  }
 
+    @GetMapping("/api/v1/auth/kakao")
+    public ResponseEntity<Map<String, String>> getKakaoAuthUrl() {
+        String kakaoUrl = "https://kauth.kakao.com/oauth/authorize" +
+                "?client_id=" + kakaoService.getClientId() +
+                "&redirect_uri=" + kakaoService.getRedirectUri() +
+                "&response_type=code";
+        System.out.println("[getKakaoAuthUrl] kakaoUrl 카카오 : " + kakaoUrl);
+        Map<String, String> response = Map.of("url", kakaoUrl);
+        return ResponseEntity.ok(response);
+    }
+
+    // 프론트가 uuid로 토큰/유저정보 요청
+    @GetMapping("/api/auth/result")
+    public ResponseEntity<?> getAuthResult(@RequestParam("auth_code") String authCode) throws IOException {
+        String redisValue = redisTemplate.opsForValue().get(authCode);
+        if (redisValue == null) {
+            return ResponseEntity.status(HttpStatus.GONE).body("만료되었거나 잘못된 인증 코드입니다.");
+        }
+        ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, Object> result = objectMapper.readValue(redisValue, Map.class);
+        return ResponseEntity.ok(result);
+    }
 
     /**
      * 사용자의 프로필 이미지를 업로드하고 저장합니다.
@@ -149,4 +145,10 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "학년 업데이트 중 오류가 발생했습니다."));
         }
     }
-  }
+
+    @GetMapping("/api/auth/user-id")
+    public ResponseEntity<Integer> getUserIdFromToken(@RequestParam("token") String token) {
+        Integer userId = jwtService.getUserIdFromToken(token);
+        return ResponseEntity.ok(userId);
+    }
+}
