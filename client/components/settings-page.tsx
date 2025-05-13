@@ -11,6 +11,15 @@ import { useToast } from "@/hooks/use-toast"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Camera } from "lucide-react"
 import type { EducationLevel, Grade } from "@/components/user-profile"
+// Dialog 컴포넌트 추가
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription, 
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog"
 
 interface SettingsPageProps {
   educationLevel: EducationLevel
@@ -34,7 +43,8 @@ export function SettingsPage({
   const [isUploading, setIsUploading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
-
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  
   // 추가된 useEffect: 컴포넌트 마운트 시 localStorage에서 이미지 URL 불러오기
   useEffect(() => {
     if (profileImageUrl) {
@@ -53,16 +63,42 @@ export function SettingsPage({
     }
   }, [profileImageUrl, onProfileImageUpdate]);
 
-  const handleSaveProfile = () => {
-    // 프로필 저장
-    localStorage.setItem("userProfile", JSON.stringify({ level, grade: selectedGrade }))
-    onProfileUpdate(level, selectedGrade)
-
-    toast({
-      title: "프로필이 저장되었습니다",
-      description: `${level === "middle" ? "중학교" : "고등학교"} ${selectedGrade}학년으로 설정되었습니다.`,
-    })
-  }
+  const handleSaveProfile = async () => {
+    try {
+      // 백엔드 API 호출
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/profile_grade`, {
+        method: "PUT",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}` // 토큰 추가
+        },
+        body: JSON.stringify({ grade: parseInt(selectedGrade) }) // 학년을 숫자로 변환
+      });
+  
+      if (!response.ok) {
+        throw new Error("학년 정보 업데이트에 실패했습니다");
+      }
+  
+      // 로컬 상태 업데이트
+      localStorage.setItem("userProfile", JSON.stringify({ level, grade: selectedGrade }));
+      onProfileUpdate(level, selectedGrade);
+  
+      // 토스트 메시지 대신 모달 표시
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error("학년 업데이트 에러:", error);
+      toast({
+        title: "저장 실패",
+        description: "학년 정보 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.",
+        variant: "destructive"
+      });
+    }
+  };
+  
+  // 모달 닫기 핸들러 추가
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false);
+  };
 
   const handleSaveSettings = () => {
     // 설정 저장
@@ -101,19 +137,22 @@ export function SettingsPage({
     const file = e.target.files?.[0]
     if (!file) return
   
-    // 파일 유효성 검사 (기존 코드 유지)
-    
     // 이미지 업로드 처리
     setIsUploading(true)
     
     try {
-      // 기존 코드 유지 (파일 압축 및 formData 생성)
+      // FormData 생성
+      const formData = new FormData()
+      formData.append('file', file)
+      
+      // 하드코딩된 userId 사용
+      const userId = 1
   
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/profile_img`, {
         method: "PUT",
         body: formData,
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${userId}`
         }
       });
   
@@ -171,45 +210,10 @@ export function SettingsPage({
           description: "프로필 이미지가 성공적으로 업데이트되었습니다.",
         });
       } else {
-        // 이미지 URL을 찾지 못한 경우
-        console.error("이미지 URL을 찾을 수 없습니다");
-        
-        // 임시 방편: 로컬에서 이미지 처리
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          const base64Image = reader.result as string;
-          setImageUrl(base64Image);
-          localStorage.setItem("profileImageUrl", base64Image);
-          
-          if (onProfileImageUpdate) {
-            onProfileImageUpdate(base64Image);
-          }
-          
-          toast({
-            title: "프로필 이미지 설정 (로컬)",
-            description: "서버에서 URL을 받지 못해 로컬에 임시 저장했습니다.",
-          });
-        };
-        reader.readAsDataURL(file);
+        throw new Error("이미지 URL을 찾을 수 없습니다");
       }
     } catch (error) {
       console.error("이미지 업로드 에러:", error);
-      
-      // 오류 발생 시 로컬에서 이미지 처리 (옵션)
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64Image = reader.result as string;
-        setImageUrl(base64Image);
-        localStorage.setItem("profileImageUrl", base64Image);
-        
-        toast({
-          title: "프로필 이미지 설정 (로컬)",
-          description: "서버 연결에 문제가 있어 로컬에 임시 저장했습니다.",
-          variant: "destructive"
-        });
-      };
-      reader.readAsDataURL(file);
-      
       toast({
         title: "업로드 실패",
         description: "이미지 업로드 중 오류가 발생했습니다. 다시 시도해주세요.",
@@ -220,62 +224,29 @@ export function SettingsPage({
     }
   }
 
-  // 이미지 압축 함수 추가
-  const compressImage = (file: File): Promise<File> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 800;
-          const MAX_HEIGHT = 800;
-          let width = img.width;
-          let height = img.height;
-          
-          if (width > height) {
-            if (width > MAX_WIDTH) {
-              height = Math.round(height * (MAX_WIDTH / width));
-              width = MAX_WIDTH;
-            }
-          } else {
-            if (height > MAX_HEIGHT) {
-              width = Math.round(width * (MAX_HEIGHT / height));
-              height = MAX_HEIGHT;
-            }
-          }
-          
-          canvas.width = width;
-          canvas.height = height;
-          
-          const ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, width, height);
-          
-          canvas.toBlob((blob) => {
-            if (!blob) {
-              reject(new Error('Canvas to Blob conversion failed'));
-              return;
-            }
-            
-            const compressedFile = new File([blob], file.name, {
-              type: file.type,
-              lastModified: Date.now(),
-            });
-            
-            resolve(compressedFile);
-          }, file.type, 0.7); // 0.7은 압축 품질 (70%)
-        };
-        img.onerror = reject;
-        img.src = event.target.result as string;
-      };
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  };
-
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">설정</h1>
+
+      {/* 성공 확인 모달 */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>프로필 저장 완료</DialogTitle>
+            <DialogDescription>
+              프로필 정보가 성공적으로 변경되었습니다.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center">
+            <Button 
+              onClick={handleCloseSuccessModal}
+              className={`${level === "middle" ? "bg-green-500" : "bg-blue-500"} hover:${level === "middle" ? "bg-green-600" : "bg-blue-600"}`}
+            >
+              확인
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* 프로필 이미지 카드 */}
       <Card className="border-purple-100">
