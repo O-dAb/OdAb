@@ -26,15 +26,17 @@ public class QUser extends EntityPathBase<User> {
 
     public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
-    public final NumberPath<Integer> kakaoId = createNumber("kakaoId", Integer.class);
+    public final NumberPath<Long> kakaoId = createNumber("kakaoId", Long.class);
 
-    public final ListPath<com.ssafy.odab.domain.learning.entity.LastLearningDate, com.ssafy.odab.domain.learning.entity.QLastLearningDate> lastLearningDates = this.<com.ssafy.odab.domain.learning.entity.LastLearningDate, com.ssafy.odab.domain.learning.entity.QLastLearningDate>createList("lastLearningDates", com.ssafy.odab.domain.learning.entity.LastLearningDate.class, com.ssafy.odab.domain.learning.entity.QLastLearningDate.class, PathInits.DIRECT2);
+    public final ListPath<com.ssafy.odab.domain.learning.entity.LastLearningTime, com.ssafy.odab.domain.learning.entity.QLastLearningTime> lastLearningTimes = this.<com.ssafy.odab.domain.learning.entity.LastLearningTime, com.ssafy.odab.domain.learning.entity.QLastLearningTime>createList("lastLearningTimes", com.ssafy.odab.domain.learning.entity.LastLearningTime.class, com.ssafy.odab.domain.learning.entity.QLastLearningTime.class, PathInits.DIRECT2);
 
     public final StringPath profileUrl = createString("profileUrl");
 
     public final ListPath<com.ssafy.odab.domain.question_result.entity.QuestionResult, com.ssafy.odab.domain.question_result.entity.QQuestionResult> questionResults = this.<com.ssafy.odab.domain.question_result.entity.QuestionResult, com.ssafy.odab.domain.question_result.entity.QQuestionResult>createList("questionResults", com.ssafy.odab.domain.question_result.entity.QuestionResult.class, com.ssafy.odab.domain.question_result.entity.QQuestionResult.class, PathInits.DIRECT2);
 
     public final ListPath<com.ssafy.odab.domain.question.entity.Question, com.ssafy.odab.domain.question.entity.QQuestion> questions = this.<com.ssafy.odab.domain.question.entity.Question, com.ssafy.odab.domain.question.entity.QQuestion>createList("questions", com.ssafy.odab.domain.question.entity.Question.class, com.ssafy.odab.domain.question.entity.QQuestion.class, PathInits.DIRECT2);
+
+    public final BooleanPath status = createBoolean("status");
 
     public final StringPath userName = createString("userName");
 
