@@ -1,17 +1,19 @@
 package com.ssafy.odab.domain.learning.service;
 
-import com.ssafy.odab.domain.learning.dto.ReviewPageResponseDto;
-import com.ssafy.odab.domain.concept.entity.MajorConcept;
-import com.ssafy.odab.domain.learning.repository.LastLearningDateRepository;
-import com.ssafy.odab.domain.question_result.repository.QuestionResultRepository;
-import com.ssafy.odab.domain.concept.repository.MajorConceptRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+
+import com.ssafy.odab.domain.concept.entity.MajorConcept;
+import com.ssafy.odab.domain.concept.repository.MajorConceptRepository;
+import com.ssafy.odab.domain.learning.dto.ReviewPageResponseDto;
+import com.ssafy.odab.domain.learning.repository.LastLearningDateRepository;
+import com.ssafy.odab.domain.question_result.repository.QuestionResultRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -62,7 +64,7 @@ public class LearningServiceImpl implements LearningService {
             .collect(Collectors.toList());
 
         // 4. 모든 sub_concept의 마지막 학습일
-        List<Object[]> lastLearningRawList = lastLearningDateRepository.findLastLearningByUserId(userId);
+        List<Object[]> lastLearningRawList = lastLearningDateRepository.findAllSubConceptsWithLastLearningDate(userId);
         List<ReviewPageResponseDto.ReviewDto> lastLearningList = lastLearningRawList.stream()
             .map(arr -> new ReviewPageResponseDto.ReviewDto(
                 ((Number) arr[0]).intValue(),
@@ -72,7 +74,7 @@ public class LearningServiceImpl implements LearningService {
             .collect(Collectors.toList());
 
         // 5. majorConcept별로 subConcept 묶기
-        List<MajorConcept> majorConcepts = majorConceptRepository.findAll();
+        List<MajorConcept> majorConcepts = majorConceptRepository.findAllWithSubConcepts();
         List<ReviewPageResponseDto.MajorConceptDto> majorConceptDtoList = majorConcepts.stream()
             .map(mc -> ReviewPageResponseDto.MajorConceptDto.builder()
                 .majorConceptId(mc.getId())

@@ -19,6 +19,6 @@ public interface MajorConceptRepository extends JpaRepository<MajorConcept, Inte
      * @return 소개념을 포함한 모든 대개념 목록
      */
     @Query("SELECT m FROM MajorConcept m LEFT JOIN FETCH m.subConcepts")
-    List<MajorConcept> findAll();
+    List<MajorConcept> findAllWithSubConcepts();
 
 }
