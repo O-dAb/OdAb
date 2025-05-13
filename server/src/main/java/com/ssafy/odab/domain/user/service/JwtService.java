@@ -20,6 +20,9 @@ public class JwtService {
     @Value("${jwt.access-token-validity}")
     private long accessTokenValidity;
 
+    @Value("${jwt.refresh-token-validity}")
+    private long refreshTokenValidity;
+
     /**
      * 사용자 정보를 기반으로 JWT 토큰을 생성합니다.
      */
@@ -66,5 +69,9 @@ public class JwtService {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public long getRefreshTokenValidity() {
+        return refreshTokenValidity;
     }
 }
