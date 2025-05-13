@@ -69,7 +69,6 @@ interface DrawingState {
   lastPoint: Point | null;
   color: string;
   lineWidth: number;
-  eraserWidth: number; // 지우개 두께 추가
 }
 
 export default function RetryQuestionPage() {
@@ -87,13 +86,11 @@ export default function RetryQuestionPage() {
     ? parseInt(questionId as string, 10)
     : null;
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const canvasContainerRef = useRef<HTMLDivElement>(null);
   const [drawingState, setDrawingState] = useState<DrawingState>({
     isDrawing: false,
     lastPoint: null,
     color: "#000000",
     lineWidth: 2,
-    eraserWidth: 10, // 기본 지우개 두께
   });
   const [isEraser, setIsEraser] = useState(false);
 
@@ -132,81 +129,19 @@ export default function RetryQuestionPage() {
     fetchQuestion();
   }, [questionId, toast, numericQuestionId]);
 
-  // Canvas 크기 초기화 및 설정 (페이지 로드 시 한 번만 실행)
-  useEffect(() => {
-    const initializeCanvas = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const container = canvasContainerRef.current;
-      if (!container) return;
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return;
-
-      const dpr = window.devicePixelRatio || 1;
-      const rect = container.getBoundingClientRect();
-
-      // 캔버스 물리적 크기 설정 (픽셀 밀도 고려)
-      canvas.width = Math.floor(rect.width * dpr);
-      canvas.height = Math.floor(rect.height * dpr);
-
-      // 캔버스 CSS 크기 설정
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
-
-      // 컨텍스트 스케일 조정
-      ctx.scale(dpr, dpr);
-
-      // 기본 그리기 스타일 설정
-      ctx.strokeStyle = drawingState.color;
-      ctx.lineWidth = drawingState.lineWidth;
-      ctx.lineCap = "round";
-      ctx.lineJoin = "round";
-      ctx.fillStyle = drawingState.color;
-    };
-
-    // 컴포넌트 마운트 후 약간의 지연을 두고 초기화 (레이아웃이 완전히 계산된 후)
-    const timer = setTimeout(() => {
-      initializeCanvas();
-    }, 100);
-
-    // 윈도우 리사이즈 이벤트 리스너
-    const handleResize = () => {
-      initializeCanvas();
-    };
-
-    window.addEventListener("resize", handleResize);
-
-    // 클린업
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []); // 빈 의존성 배열로 컴포넌트 마운트 시 한 번만 실행
-
-  // 그리기 상태 변경 시 캔버스 컨텍스트 업데이트
+  // Canvas 초기화 및 설정
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
     ctx.strokeStyle = isEraser ? "#FFFFFF" : drawingState.color;
-    // 지우개 모드이면 지우개 두께 사용, 아니면 펜 두께 사용
-    ctx.lineWidth = isEraser
-      ? drawingState.eraserWidth
-      : drawingState.lineWidth;
+    ctx.lineWidth = isEraser ? 20 : drawingState.lineWidth;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
     ctx.fillStyle = isEraser ? "#FFFFFF" : drawingState.color;
-  }, [
-    drawingState.color,
-    drawingState.lineWidth,
-    drawingState.eraserWidth,
-    isEraser,
-  ]);
+  }, [drawingState.color, drawingState.lineWidth, isEraser]);
 
   // 캔버스 상태 저장 함수 (Undo용)
   const saveCanvasState = () => {
@@ -247,7 +182,17 @@ export default function RetryQuestionPage() {
 
   // 펜 색상 변경 함수
   const changeColor = (color: string) => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // 지우개 모드 해제
     setIsEraser(false);
+
+    // 새 색상 설정
+    ctx.strokeStyle = color;
     setDrawingState((prev) => ({
       ...prev,
       color: color,
@@ -256,30 +201,18 @@ export default function RetryQuestionPage() {
 
   // 펜 두께 변경 함수
   const changeLineWidth = (width: number) => {
-    // 현재 모드에 따라 펜 두께 또는 지우개 두께를 변경
-    if (isEraser) {
-      setDrawingState((prev) => ({
-        ...prev,
-        eraserWidth: width,
-      }));
-    } else {
-      setDrawingState((prev) => ({
-        ...prev,
-        lineWidth: width,
-      }));
-    }
-  };
-
-  // 좌표 변환 함수 - 캔버스 크기에 맞게 조정
-  const getCanvasCoordinates = (clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
-    if (!canvas) return { x: 0, y: 0 };
+    if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    return { x, y };
+    // 선 두께 업데이트
+    ctx.lineWidth = width;
+    setDrawingState((prev) => ({
+      ...prev,
+      lineWidth: width,
+    }));
   };
 
   // 그리기 시작 함수 - 터치 & 마우스 지원
@@ -294,19 +227,18 @@ export default function RetryQuestionPage() {
     // 캔버스 상태 저장 (undo를 위해)
     saveCanvasState();
 
-    // 마우스/터치 좌표 가져오기
-    let clientX, clientY;
-    if ("touches" in e) {
-      // 터치 이벤트
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
-    } else {
-      // 마우스 이벤트
-      clientX = e.clientX;
-      clientY = e.clientY;
-    }
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
 
-    const { x, y } = getCanvasCoordinates(clientX, clientY);
+    // 마우스/터치 좌표 가져오기
+    let x, y;
+    if ("touches" in e) {
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
+    } else {
+      x = e.clientX - rect.left;
+      y = e.clientY - rect.top;
+    }
 
     // 그리기 상태 업데이트
     setDrawingState({
@@ -319,10 +251,13 @@ export default function RetryQuestionPage() {
     const ctx = canvas.getContext("2d");
     if (ctx) {
       ctx.beginPath();
-      const currentWidth = isEraser
-        ? drawingState.eraserWidth
-        : drawingState.lineWidth;
-      ctx.arc(x, y, currentWidth / 2, 0, Math.PI * 2);
+      // 라인 스타일 적용
+      ctx.strokeStyle = isEraser ? "#FFFFFF" : drawingState.color;
+      ctx.lineWidth = drawingState.lineWidth;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      // 점을 찍을 때 펜 크기에 맞게 원 그리기
+      ctx.arc(x, y, drawingState.lineWidth / 2, 0, Math.PI * 2);
       ctx.fill();
     }
   };
@@ -331,7 +266,7 @@ export default function RetryQuestionPage() {
   const draw = (
     e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
   ) => {
-    if (!drawingState.isDrawing || !drawingState.lastPoint) return;
+    if (!drawingState.isDrawing) return;
 
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -339,25 +274,32 @@ export default function RetryQuestionPage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+
     // 마우스/터치 좌표 가져오기
-    let clientX, clientY;
+    let x, y;
     if ("touches" in e) {
-      // 터치 이벤트
-      clientX = e.touches[0].clientX;
-      clientY = e.touches[0].clientY;
+      x = e.touches[0].clientX - rect.left;
+      y = e.touches[0].clientY - rect.top;
     } else {
-      // 마우스 이벤트
-      clientX = e.clientX;
-      clientY = e.clientY;
+      x = e.clientX - rect.left;
+      y = e.clientY - rect.top;
     }
 
-    const { x, y } = getCanvasCoordinates(clientX, clientY);
-
     // 마지막 지점에서 현재 지점까지 선 그리기
-    ctx.beginPath();
-    ctx.moveTo(drawingState.lastPoint.x, drawingState.lastPoint.y);
-    ctx.lineTo(x, y);
-    ctx.stroke();
+    if (drawingState.lastPoint) {
+      ctx.beginPath();
+      // 라인 스타일 적용
+      ctx.strokeStyle = isEraser ? "#FFFFFF" : drawingState.color;
+      ctx.lineWidth = drawingState.lineWidth;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+
+      ctx.moveTo(drawingState.lastPoint.x, drawingState.lastPoint.y);
+      ctx.lineTo(x, y);
+      ctx.stroke();
+    }
 
     // 현재 위치 업데이트
     setDrawingState({
@@ -377,7 +319,25 @@ export default function RetryQuestionPage() {
 
   // 지우개 모드 토글
   const toggleEraser = () => {
-    setIsEraser(!isEraser);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    // 지우개 모드 토글
+    const newIsEraser = !isEraser;
+    setIsEraser(newIsEraser);
+
+    if (newIsEraser) {
+      // 지우개 모드 활성화
+      ctx.strokeStyle = "#FFFFFF"; // 흰색으로 덮어쓰기
+      ctx.lineWidth = 20; // 지우개는 더 두껍게
+    } else {
+      // 펜 모드로 돌아가기
+      ctx.strokeStyle = drawingState.color;
+      ctx.lineWidth = drawingState.lineWidth;
+    }
   };
 
   // 캔버스 지우기
@@ -497,30 +457,60 @@ export default function RetryQuestionPage() {
               <div className="flex justify-between items-center">
                 <div className="font-medium">풀이 과정</div>
                 <div className="flex gap-2">
-                  {/* 색상 선택기 */}
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-8 h-8 p-0 flex items-center justify-center"
-                        style={{
-                          backgroundColor: isEraser
-                            ? "white"
-                            : drawingState.color,
-                          borderColor: "rgb(216, 180, 254)",
-                        }}
-                      >
-                        <Circle
-                          className="h-4 w-4"
+                  {/* 펜/지우개 모드 전환 버튼 */}
+                  <Button
+                    variant={isEraser ? "outline" : "secondary"}
+                    size="sm"
+                    onClick={() => {
+                      setIsEraser(false);
+                      const canvas = canvasRef.current;
+                      if (!canvas) return;
+                      const ctx = canvas.getContext("2d");
+                      if (!ctx) return;
+                      ctx.strokeStyle = drawingState.color;
+                      ctx.lineWidth = drawingState.lineWidth;
+                    }}
+                    className={!isEraser ? "bg-purple-100" : ""}
+                  >
+                    <Pen className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant={isEraser ? "secondary" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      setIsEraser(true);
+                      const canvas = canvasRef.current;
+                      if (!canvas) return;
+                      const ctx = canvas.getContext("2d");
+                      if (!ctx) return;
+                      ctx.strokeStyle = "#FFFFFF";
+                      ctx.lineWidth = 20;
+                    }}
+                    className={isEraser ? "bg-purple-100" : ""}
+                  >
+                    <Eraser className="h-4 w-4" />
+                  </Button>
+
+                  {/* 펜 모드일 때만 색상 선택기 */}
+                  {!isEraser && (
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-8 h-8 p-0 flex items-center justify-center"
                           style={{
-                            color: isEraser ? drawingState.color : "white",
+                            backgroundColor: drawingState.color,
+                            borderColor: "rgb(216, 180, 254)",
                           }}
-                        />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-64 p-2">
-                      {!isEraser && (
+                        >
+                          <Circle
+                            className="h-4 w-4"
+                            style={{ color: "white" }}
+                          />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-64 p-2">
                         <div className="grid grid-cols-4 gap-2">
                           {availableColors.map((color) => (
                             <Button
@@ -540,47 +530,36 @@ export default function RetryQuestionPage() {
                             />
                           ))}
                         </div>
-                      )}
-                      <div className="mt-4 space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-sm">
-                            {isEraser ? "지우개 두께" : "펜 두께"}
-                          </span>
-                          <span className="text-sm">
-                            {isEraser
-                              ? drawingState.eraserWidth
-                              : drawingState.lineWidth}
-                            px
-                          </span>
-                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+
+                  {/* 굵기 조절은 항상 노출 */}
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-8 h-8 p-0 flex items-center justify-center"
+                      >
+                        <span className="text-xs">
+                          {drawingState.lineWidth}px
+                        </span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-48 p-2">
+                      <div className="flex flex-col gap-2">
+                        <span className="text-sm">굵기 조절</span>
                         <Slider
-                          defaultValue={[
-                            isEraser
-                              ? drawingState.eraserWidth
-                              : drawingState.lineWidth,
-                          ]}
-                          min={isEraser ? 5 : 1}
-                          max={isEraser ? 50 : 20}
+                          defaultValue={[drawingState.lineWidth]}
+                          min={1}
+                          max={isEraser ? 40 : 20}
                           step={1}
-                          value={[
-                            isEraser
-                              ? drawingState.eraserWidth
-                              : drawingState.lineWidth,
-                          ]}
                           onValueChange={(value) => changeLineWidth(value[0])}
                         />
                       </div>
                     </PopoverContent>
                   </Popover>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={toggleEraser}
-                    className={isEraser ? "bg-purple-100" : ""}
-                  >
-                    <Eraser className="h-4 w-4" />
-                  </Button>
 
                   <Button
                     variant="outline"
@@ -596,24 +575,10 @@ export default function RetryQuestionPage() {
                   </Button>
                 </div>
               </div>
-              <div
-                ref={canvasContainerRef}
-                className="border border-purple-100 rounded-lg overflow-auto"
-                style={{
-                  maxHeight: "300px", // 세로 최대 높이 제한
-                  maxWidth: "100%", // 가로 너비는 부모 요소 너비까지만 (스크롤 활성화 위해)
-                  position: "relative",
-                }}
-              >
+              <div className="border border-purple-100 rounded-lg overflow-hidden">
                 <canvas
                   ref={canvasRef}
-                  className="touch-none bg-white"
-                  style={{
-                    width: "1000px", // 가로 스크롤을 위해 넓은 너비 설정 (원하는 크기로 조정 가능)
-                    height: "600px", // 세로 스크롤을 위해 높은 높이 설정 (원하는 크기로 조정 가능)
-                    minWidth: "100%", // 최소 너비는 컨테이너 너비만큼
-                    minHeight: "300px", // 최소 높이는 컨테이너 높이만큼
-                  }}
+                  className="w-full h-[300px] bg-white touch-none"
                   onMouseDown={startDrawing}
                   onMouseMove={draw}
                   onMouseUp={stopDrawing}
