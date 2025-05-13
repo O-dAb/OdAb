@@ -1,0 +1,11 @@
+"use client";
+
+import { useAuth } from "@/contexts/auth-context";
+import { ConceptBrowser } from "@/components/concept-browser";
+
+export default function ConceptsPage() {
+  const { userProfile } = useAuth();
+  const { educationLevel, grade } = userProfile;
+
+  return <ConceptBrowser educationLevel={educationLevel} grade={grade} />;
+}

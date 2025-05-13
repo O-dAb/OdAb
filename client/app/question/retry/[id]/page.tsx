@@ -27,7 +27,6 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
-import { MainHeader } from "@/components/layout/main-header";
 import {
   Popover,
   PopoverContent,
@@ -431,7 +430,6 @@ export default function RetryQuestionPage() {
   if (!question) {
     return (
       <div className="flex flex-col h-screen">
-        <MainHeader activeTab="study" />
         <div className="flex-1 p-8">
           <Button variant="outline" onClick={handleBackToList} className="mb-4">
             <ArrowLeft className="h-4 w-4 mr-2" />
@@ -453,49 +451,132 @@ export default function RetryQuestionPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen">
-      <MainHeader activeTab="study" />
+    <div className="flex flex-col h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50">
       <div className="flex-1 p-8">
         <Button
           variant="outline"
           onClick={handleBackToList}
-          className="flex items-center gap-2 mb-4"
+          className="flex items-center gap-2 mb-4 bg-white/80 border-purple-200 text-purple-600 hover:bg-purple-50 rounded-xl font-bold"
         >
           <ArrowLeft className="h-4 w-4" />
           <span>목록으로 돌아가기</span>
         </Button>
 
-        <Card>
-          <CardHeader className="bg-purple-50 border-b border-purple-100">
-            <div className="flex justify-between items-center">
-              <CardTitle>문제 다시 풀기</CardTitle>
-              <div className="flex gap-2">
-                {question.retryQuestionSubConceptDtos.map((concept) => (
-                  <Badge key={concept.subConceptId} variant="secondary">
-                    {concept.subConceptType}
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="pt-6 space-y-4">
-            {/* 문제 내용 */}
-            <div className="space-y-4">
-              <div className="font-medium text-lg">문제</div>
-              <p className="text-gray-700">{question.questionText}</p>
-              {question.questionImg && (
-                <img
-                  src={question.questionImg}
-                  alt="문제 이미지"
-                  className="mt-4 max-w-full rounded-lg border border-purple-100"
-                />
-              )}
-            </div>
-
-            {/* 답안 입력 폼 */}
-            <div className="space-y-4 mt-6">
+        <div className="flex flex-col md:flex-row gap-6">
+          <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 w-2/5">
+            <CardHeader className="bg-purple-50/60 border-b-0 rounded-t-2xl">
               <div className="flex justify-between items-center">
-                <div className="font-medium">풀이 과정</div>
+                <CardTitle className="text-purple-700 font-extrabold">
+                  문제 다시 풀기
+                </CardTitle>
+                <div className="flex gap-2">
+                  {question.retryQuestionSubConceptDtos.map((concept) => (
+                    <Badge
+                      key={concept.subConceptId}
+                      variant="secondary"
+                      className="bg-purple-400 text-white font-bold rounded-full px-3 py-1"
+                    >
+                      {concept.subConceptType}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="pt-7 space-y-4">
+              {/* 문제 내용 */}
+              <div className="space-y-4">
+                <div className="font-bold text-lg text-purple-700">문제</div>
+                <p className="text-gray-700">{question.questionText}</p>
+                {question.questionImg && (
+                  <img
+                    src={question.questionImg}
+                    alt="문제 이미지"
+                    className="mt-4 max-w-full rounded-xl border border-purple-200 shadow-md"
+                  />
+                )}
+              </div>
+
+              {/* 해설 표시 */}
+              <div className="flex justify-between items-center mt-50 pt-20">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowSolution(!showSolution)}
+                  className="text-purple-600 hover:text-purple-700 rounded-xl font-bold"
+                >
+                  {showSolution ? "해설 닫기" : "해설 보기"}
+                </Button>
+                {showSolution &&
+                  question.retryQuestionSolutionDtos.length > 0 && (
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setCurrentStep((prev) => Math.max(0, prev - 1))
+                        }
+                        disabled={currentStep === 0}
+                        className="text-purple-600 hover:text-purple-700 rounded-xl font-bold"
+                      >
+                        <ChevronLeft className="h-4 w-4" />
+                      </Button>
+                      <span className="text-sm text-gray-600">
+                        {currentStep + 1} /{" "}
+                        {question.retryQuestionSolutionDtos.length}
+                      </span>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          setCurrentStep((prev) =>
+                            Math.min(
+                              question.retryQuestionSolutionDtos.length - 1,
+                              prev + 1
+                            )
+                          )
+                        }
+                        disabled={
+                          currentStep ===
+                          question.retryQuestionSolutionDtos.length - 1
+                        }
+                        className="text-purple-600 hover:text-purple-700 rounded-xl font-bold"
+                      >
+                        <ChevronRight className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  )}
+              </div>
+
+              {showSolution &&
+                question.retryQuestionSolutionDtos.length > 0 && (
+                  <div className="mt-6 p-4 bg-purple-50 border border-purple-100 rounded-md">
+                    <h3 className="font-bold text-purple-700 mb-3">해설</h3>
+                    <div className="space-y-3">
+                      <div className="space-y-1">
+                        <div className="font-bold text-purple-600">
+                          Step {currentStep + 1}
+                        </div>
+                        <p className="text-gray-700">
+                          {
+                            question.retryQuestionSolutionDtos[currentStep]
+                              .solutionContent
+                          }
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+            </CardContent>
+          </Card>
+
+          <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 w-3/5">
+            <CardHeader className="bg-purple-50/60 border-b-0 rounded-t-2xl">
+              <CardTitle className="text-purple-700 font-extrabold">
+                풀이 과정
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-4">
+              <div className="flex justify-between items-center">
                 <div className="flex gap-2">
                   {/* 색상 선택기 */}
                   <Popover>
@@ -625,7 +706,7 @@ export default function RetryQuestionPage() {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="font-medium">답:</span>
+                <span className="font-bold text-purple-700">답:</span>
                 <Input
                   value={userAnswer}
                   onChange={(e) => setUserAnswer(e.target.value)}
@@ -634,100 +715,15 @@ export default function RetryQuestionPage() {
                 />
                 <Button
                   size="sm"
-                  className="bg-purple-500 hover:bg-purple-600"
+                  className="bg-purple-500 hover:bg-purple-600 rounded-xl font-bold"
                   onClick={handleSubmitAnswer}
                 >
                   제출
                 </Button>
               </div>
-            </div>
-
-            {/* 제출한 답변 표시 */}
-            {submittedAnswer && (
-              <div className="mt-4 p-3 bg-green-50 border border-green-100 rounded-md">
-                <div className="flex items-center gap-2 text-green-600 font-medium mb-1">
-                  {submittedAnswer === question.answer ? (
-                    <CheckCircle className="h-4 w-4" />
-                  ) : (
-                    <XCircle className="h-4 w-4" />
-                  )}
-                  <span>제출한 답변</span>
-                </div>
-                <p>{submittedAnswer}</p>
-              </div>
-            )}
-
-            {/* 해설 표시 */}
-            <div className="flex justify-between items-center mt-6">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowSolution(!showSolution)}
-                className="text-purple-600 hover:text-purple-700"
-              >
-                {showSolution ? "해설 닫기" : "해설 보기"}
-              </Button>
-              {showSolution &&
-                question.retryQuestionSolutionDtos.length > 0 && (
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        setCurrentStep((prev) => Math.max(0, prev - 1))
-                      }
-                      disabled={currentStep === 0}
-                      className="text-purple-600 hover:text-purple-700"
-                    >
-                      <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                    <span className="text-sm text-gray-600">
-                      {currentStep + 1} /{" "}
-                      {question.retryQuestionSolutionDtos.length}
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        setCurrentStep((prev) =>
-                          Math.min(
-                            question.retryQuestionSolutionDtos.length - 1,
-                            prev + 1
-                          )
-                        )
-                      }
-                      disabled={
-                        currentStep ===
-                        question.retryQuestionSolutionDtos.length - 1
-                      }
-                      className="text-purple-600 hover:text-purple-700"
-                    >
-                      <ChevronRight className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
-            </div>
-
-            {showSolution && question.retryQuestionSolutionDtos.length > 0 && (
-              <div className="mt-4 p-4 bg-purple-50 border border-purple-100 rounded-md">
-                <h3 className="font-medium text-purple-700 mb-3">해설</h3>
-                <div className="space-y-3">
-                  <div className="space-y-1">
-                    <div className="font-medium text-purple-600">
-                      Step {currentStep + 1}
-                    </div>
-                    <p className="text-gray-700">
-                      {
-                        question.retryQuestionSolutionDtos[currentStep]
-                          .solutionContent
-                      }
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

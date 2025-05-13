@@ -1,3 +1,4 @@
+// components/mistake-tracker.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -8,6 +9,7 @@ import { BookOpen, RotateCcw, Clock, GraduationCap } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { EducationLevel, Grade } from "@/components/user-profile";
 import { useRouter } from "next/navigation";
+import Link from "next/link"; // Next.js의 Link 컴포넌트 추가
 import axios from "axios";
 import {
   Select,
@@ -76,6 +78,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+
   // 컴포넌트 마운트 시 초기 데이터 로드
   useEffect(() => {
     fetchWrongQuestions();
@@ -176,6 +179,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
     }
   };
 
+  // "다시 풀기" 버튼 클릭 핸들러 - App Router 방식으로 수정
   const handleRetry = (questionId: number) => {
     // 로딩 상태 시작
     setLoading(true);
@@ -214,18 +218,19 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 min-h-screen p-6">
+      <div className="flex items-center gap-3 mb-2"></div>
       {/* 상단 필터 영역 */}
-      <Card className="border-blue-100">
-        <CardHeader className="bg-blue-50 border-b border-blue-100">
-          <CardTitle className="flex justify-between items-center">
+      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100">
+        <CardHeader className="bg-blue-50/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="flex justify-between items-center text-blue-700">
             <span>오답 노트</span>
             <div className="flex items-center gap-2">
               <Button
                 variant={showAllGrades ? "default" : "outline"}
                 size="sm"
                 onClick={() => setShowAllGrades(true)}
-                className="flex items-center gap-1 bg-blue-400 hover:bg-blue-500"
+                className="flex items-center gap-1 bg-blue-400 hover:bg-blue-500 rounded-xl font-bold"
                 disabled={loading}
               >
                 <GraduationCap className="h-4 w-4" />
@@ -237,7 +242,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                   onValueChange={handleGradeChange}
                   disabled={loading}
                 >
-                  <SelectTrigger className="w-[100px] bg-blue-50 border-blue-100">
+                  <SelectTrigger className="w-[100px] bg-blue-50 border-blue-100 rounded-xl">
                     <SelectValue placeholder="학년 선택" />
                   </SelectTrigger>
                   <SelectContent>
@@ -255,7 +260,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                     setShowAllGrades(false);
                     setSelectedGrade(grade);
                   }}
-                  className="border-blue-100 text-blue-500 hover:bg-blue-50"
+                  className="border-blue-100 text-blue-500 hover:bg-blue-50 rounded-xl font-bold"
                   disabled={loading}
                 >
                   내 학년으로
@@ -268,17 +273,17 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
 
       {/* 탭 메뉴 */}
       <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid grid-cols-2 mb-6 bg-blue-100">
+        <TabsList className="grid grid-cols-2 mb-6 bg-blue-100 rounded-xl shadow">
           <TabsTrigger
             value="all"
-            className="flex items-center gap-2 data-[state=active]:bg-blue-400 data-[state=active]:text-white"
+            className="flex items-center gap-2 data-[state=active]:bg-blue-400 data-[state=active]:text-white rounded-xl font-bold"
           >
             <BookOpen className="h-4 w-4" />
             <span>전체 오답</span>
           </TabsTrigger>
           <TabsTrigger
             value="recent"
-            className="flex items-center gap-2 data-[state=active]:bg-yellow-400 data-[state=active]:text-white"
+            className="flex items-center gap-2 data-[state=active]:bg-yellow-400 data-[state=active]:text-white rounded-xl font-bold"
           >
             <Clock className="h-4 w-4" />
             <span>최근 학습</span>
@@ -296,8 +301,8 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                 onClick={() => handleTopicSelect(null)}
                 className={
                   selectedTopic === null
-                    ? "bg-blue-400 hover:bg-blue-500"
-                    : "border-blue-100 text-blue-500 hover:bg-blue-50"
+                    ? "bg-blue-400 hover:bg-blue-500 rounded-xl font-bold"
+                    : "border-blue-100 text-blue-500 hover:bg-blue-50 rounded-xl font-bold"
                 }
                 disabled={loading}
               >
@@ -307,16 +312,16 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                 <Button
                   key={subconcept.subConceptId}
                   variant={
-                    selectedTopic === subconcept.subConceptType
+                    selectedTopic === subconcept.subConceptId
                       ? "default"
                       : "outline"
                   }
                   size="sm"
                   onClick={() => handleTopicSelect(subconcept.subConceptId)}
                   className={
-                    selectedTopic === subconcept.subConceptType
-                      ? "bg-blue-400 hover:bg-blue-500"
-                      : "border-blue-100 text-blue-500 hover:bg-blue-50"
+                    selectedTopic === subconcept.subConceptId
+                      ? "bg-blue-400 hover:bg-blue-500 rounded-xl font-bold"
+                      : "border-blue-100 text-blue-500 hover:bg-blue-50 rounded-xl font-bold"
                   }
                   disabled={loading}
                 >
@@ -338,17 +343,18 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
               </Card>
             ) : wrongQuestions.length > 0 ? (
               wrongQuestions.map((question) => (
-                <Card key={question.questionId} className="border-blue-100">
+                <Card
+                  key={question.questionId}
+                  className="border-0 shadow-lg rounded-2xl bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50"
+                >
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2 mb-2">
                           {/* 해당 문제의 주제 찾기 */}
-                          <Badge className="bg-blue-400">
-                            {question.wrongQuestionSubconceptList?.length > 0
-                              ? question.wrongQuestionSubconceptList[0]
-                                  .subConceptType
-                              : "주제 없음"}
+                          <Badge className="bg-blue-400 rounded-full px-3 py-1 text-white font-bold">
+                            {question.wrongQuestionSubconceptList?.[0]
+                              ?.subConceptType || "주제 없음"}
                           </Badge>
                           <span className="text-sm text-gray-500">
                             {new Date(
@@ -356,25 +362,40 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                             ).toLocaleDateString()}
                           </span>
                         </div>
-                        <p>{question.questionText}</p>
+                        <p className="font-semibold text-blue-700">
+                          {question.questionText}
+                        </p>
                         {question.questionImg && (
                           <img
                             src={question.questionImg}
                             alt="문제 이미지"
-                            className="mt-2 max-h-40 object-contain"
+                            className="mt-2 max-h-40 object-contain rounded-xl border border-blue-100"
                           />
                         )}
                       </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex items-center gap-1 border-blue-100 text-blue-500 hover:bg-blue-50"
-                        onClick={() => handleRetry(question.questionId)}
-                        disabled={loading || question.solvedOnRetry}
-                      >
-                        <RotateCcw className="h-3 w-3" />
-                        {question.solvedOnRetry ? "정답 처리됨" : "다시 풀기"}
-                      </Button>
+                      {/* 라우팅 방식으로 변경 - Link 컴포넌트 사용 (선택적) */}
+                      {question.solvedOnRetry ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex items-center gap-1 border-blue-100 text-blue-500 hover:bg-blue-50 rounded-xl font-bold"
+                          disabled={true}
+                        >
+                          <RotateCcw className="h-3 w-3" />
+                          정답 처리됨
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex items-center gap-1 border-blue-100 text-blue-500 hover:bg-blue-50 rounded-xl font-bold"
+                          onClick={() => handleRetry(question.questionId)}
+                          disabled={loading}
+                        >
+                          <RotateCcw className="h-3 w-3" />
+                          다시 풀기
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -400,17 +421,18 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
               </Card>
             ) : recentQuestions.length > 0 ? (
               recentQuestions.map((question) => (
-                <Card key={question.questionId} className="border-yellow-100">
+                <Card
+                  key={question.questionId}
+                  className="border-0 shadow-lg rounded-2xl bg-gradient-to-r from-yellow-50 via-pink-50 to-purple-50"
+                >
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2 mb-2">
                           {/* 해당 문제의 주제 찾기 */}
-                          <Badge className="bg-yellow-400">
-                            {question.wrongQuestionSubconceptList?.length > 0
-                              ? question.wrongQuestionSubconceptList[0]
-                                  .subConceptType
-                              : "주제 없음"}
+                          <Badge className="bg-yellow-400 rounded-full px-3 py-1 text-white font-bold">
+                            {question.wrongQuestionSubconceptList?.[0]
+                              ?.subConceptType || "주제 없음"}
                           </Badge>
                           <span className="text-sm text-gray-500">
                             {new Date(
@@ -418,25 +440,40 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                             ).toLocaleDateString()}
                           </span>
                         </div>
-                        <p>{question.questionText}</p>
+                        <p className="font-semibold text-yellow-700">
+                          {question.questionText}
+                        </p>
                         {question.questionImg && (
                           <img
                             src={question.questionImg}
                             alt="문제 이미지"
-                            className="mt-2 max-h-40 object-contain"
+                            className="mt-2 max-h-40 object-contain rounded-xl border border-yellow-100"
                           />
                         )}
                       </div>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="flex items-center gap-1 border-yellow-100 text-yellow-600 hover:bg-yellow-50"
-                        onClick={() => handleRetry(question.questionId)}
-                        disabled={loading || question.solvedOnRetry}
-                      >
-                        <RotateCcw className="h-3 w-3" />
-                        {question.solvedOnRetry ? "정답 처리됨" : "다시 풀기"}
-                      </Button>
+                      {/* 라우팅 방식으로 변경 - 최근 학습 탭도 동일하게 수정 */}
+                      {question.solvedOnRetry ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex items-center gap-1 border-yellow-100 text-yellow-600 hover:bg-yellow-50 rounded-xl font-bold"
+                          disabled={true}
+                        >
+                          <RotateCcw className="h-3 w-3" />
+                          정답 처리됨
+                        </Button>
+                      ) : (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="flex items-center gap-1 border-yellow-100 text-yellow-600 hover:bg-yellow-50 rounded-xl font-bold"
+                          onClick={() => handleRetry(question.questionId)}
+                          disabled={loading}
+                        >
+                          <RotateCcw className="h-3 w-3" />
+                          다시 풀기
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>

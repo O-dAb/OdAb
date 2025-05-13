@@ -1,12 +1,13 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Calendar } from "lucide-react"
-import type { EducationLevel, Grade } from "@/components/user-profile"
-import { useRouter } from "next/navigation"
-import axios from "axios"
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Calendar } from "lucide-react";
+import type { EducationLevel, Grade } from "@/components/user-profile";
+import { useRouter } from "next/navigation";
+import Link from "next/link"; // Next.js의 Link 컴포넌트 추가
+import axios from "axios";
 
 /**
  * 복습 일정 컴포넌트
@@ -49,15 +50,24 @@ interface ReviewApiResponse {
 function formatDateArray(dateArr: number[] | null): string {
   if (!dateArr || dateArr.length < 3) return "미학습";
   const [year, month, day] = dateArr;
-  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(
+    2,
+    "0"
+  )}`;
 }
 
-export function ReviewSchedule({ educationLevel, grade }: { educationLevel: EducationLevel; grade: Grade }) {
+export function ReviewSchedule({
+  educationLevel,
+  grade,
+}: {
+  educationLevel: EducationLevel;
+  grade: Grade;
+}) {
   // API에서 받아온 복습 데이터 상태
   const [reviewData, setReviewData] = useState<ReviewApiResponse | null>(null);
   // 로딩 상태
   const [loading, setLoading] = useState(true);
-  // Next.js 라우터
+  // Next.js 라우터 (프로그래매틱 네비게이션 필요 시 사용)
   const router = useRouter();
   // 오늘 날짜 (yyyy-mm-dd)
   const today = new Date().toISOString().split("T")[0];
@@ -70,9 +80,12 @@ export function ReviewSchedule({ educationLevel, grade }: { educationLevel: Educ
       console.log("[복습] API 요청 시작", today);
       try {
         // 실제 서버로 요청 (프록시 미설정 시 http://localhost:8080 명시)
-        const res = await axios.get("http://localhost:8080/api/v1/learning/review", {
-          params: { date: today },
-        });
+        const res = await axios.get(
+          "http://localhost:8080/api/v1/learning/review",
+          {
+            params: { date: today },
+          }
+        );
         // 디버깅: 응답 전체 로그
         console.log("[복습] API 응답", res);
         // 응답 데이터 구조 확인
@@ -101,11 +114,11 @@ export function ReviewSchedule({ educationLevel, grade }: { educationLevel: Educ
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 min-h-screen p-6 flex flex-col items-center">
       {/* 오늘의 복습 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex justify-between items-center">
+      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-green-100 via-yellow-50 to-pink-100 w-full max-w-6xl">
+        <CardHeader className="bg-green-50/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="flex justify-between items-center text-green-700 text-xl font-extrabold">
             <span>복습 일정</span>
           </CardTitle>
         </CardHeader>
@@ -115,87 +128,125 @@ export function ReviewSchedule({ educationLevel, grade }: { educationLevel: Educ
               <Calendar className="h-5 w-5 text-purple-600" />
               <span className="font-medium">오늘의 복습</span>
             </div>
-            <Badge variant="outline" className="font-normal">
+            <Badge
+              variant="outline"
+              className="font-normal bg-white/80 border-green-200 text-green-700 rounded-full px-3 py-1"
+            >
               {reviewData ? reviewData.todayDate : today}
             </Badge>
           </div>
           {/* 데이터가 없을 때 에러 메시지 */}
           {!reviewData ? (
-            <div className="text-center py-6 text-red-500">데이터를 불러오지 못했습니다.</div>
+            <div className="text-center py-6 text-red-500">
+              데이터를 불러오지 못했습니다.
+            </div>
           ) : reviewData.todayReviewList.length > 0 ? (
             <div className="space-y-3">
               {reviewData.todayReviewList.map((review) => (
-                <Card
+                <Link
                   key={review.subConceptId}
-                  className="cursor-pointer hover:bg-gray-50"
-                  onClick={() => {
-                    router.push(`/review/${review.subConceptId}?educationLevel=${educationLevel}&grade=${grade}`)
-                  }}
+                  href={`/review/${review.subConceptId}`}
+                  className="block"
                 >
-                  <CardContent className="p-4 flex justify-between items-center">
-                    <div className="font-medium">{review.subConceptType}</div>
-                    <Badge>{review.questionCount}문제</Badge>
-                  </CardContent>
-                </Card>
+                  <Card className="cursor-pointer border-0 shadow-md rounded-xl bg-gradient-to-r from-green-50 via-yellow-50 to-pink-50 hover:scale-105 transition-transform duration-200">
+                    <CardContent className="p-4 flex justify-between items-center">
+                      <div className="font-bold text-green-700">
+                        {review.subConceptType}
+                      </div>
+                      <Badge className="bg-green-400 text-white text-base px-3 py-1 rounded-full shadow">
+                        {review.questionCount}문제
+                      </Badge>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           ) : (
-            <div className="text-center py-6 text-gray-500">오늘 복습할 항목이 없습니다.</div>
+            <div className="text-center py-6 text-gray-500">
+              오늘 복습할 항목이 없습니다.
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* 예정된 복습 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>예정된 복습</CardTitle>
+      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-yellow-100 via-pink-50 to-purple-50 w-full max-w-6xl">
+        <CardHeader className="bg-yellow-50/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="text-yellow-700 text-xl font-extrabold">
+            예정된 복습
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {/* 데이터가 없을 때 에러 메시지 */}
           {!reviewData ? (
-            <div className="text-center py-6 text-red-500">데이터를 불러오지 못했습니다.</div>
+            <div className="text-center py-6 text-red-500">
+              데이터를 불러오지 못했습니다.
+            </div>
           ) : reviewData.scheduledReviewList.length > 0 ? (
             <div className="space-y-3">
               {reviewData.scheduledReviewList.map((review) => (
-                <Card
+                <Link
                   key={review.subConceptId}
-                  className="cursor-pointer hover:bg-gray-50"
-                  onClick={() => {
-                    router.push(`/review/${review.subConceptId}?educationLevel=${educationLevel}&grade=${grade}`)
-                  }}
+                  href={`/review/${review.subConceptId}`}
+                  className="block"
                 >
-                  <CardContent className="p-4 flex justify-between items-center">
-                    <div className="font-medium">{review.subConceptType}</div>
-                    <Badge variant="outline">{review.questionCount}문제</Badge>
-                  </CardContent>
-                </Card>
+                  <Card className="cursor-pointer border-0 shadow-md rounded-xl bg-gradient-to-r from-yellow-50 via-pink-50 to-purple-50 hover:scale-105 transition-transform duration-200">
+                    <CardContent className="p-4 flex justify-between items-center">
+                      <div className="font-bold text-yellow-700">
+                        {review.subConceptType}
+                      </div>
+                      <Badge className="bg-yellow-400 text-white text-base px-3 py-1 rounded-full shadow">
+                        {review.questionCount}문제
+                      </Badge>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           ) : (
-            <div className="text-center py-6 text-gray-500">예정된 복습 항목이 없습니다.</div>
+            <div className="text-center py-6 text-gray-500">
+              예정된 복습 항목이 없습니다.
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* 주제별 마지막 학습일 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>주제별 마지막 학습일</CardTitle>
+      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-50 to-pink-100 w-full max-w-6xl">
+        <CardHeader className="bg-blue-50/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="text-blue-700 text-xl font-extrabold">
+            주제별 마지막 학습일
+          </CardTitle>
         </CardHeader>
         <CardContent>
           {/* 데이터가 없을 때 에러 메시지 */}
           {!reviewData ? (
-            <div className="text-center py-6 text-red-500">데이터를 불러오지 못했습니다.</div>
+            <div className="text-center py-6 text-red-500">
+              데이터를 불러오지 못했습니다.
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {reviewData.majorConceptList.map((majorConcept) => (
-                <Card key={majorConcept.majorConceptId}>
+                <Card
+                  key={majorConcept.majorConceptId}
+                  className="border-0 shadow rounded-xl bg-white/80"
+                >
                   <CardContent className="p-4">
-                    <div className="font-bold mb-2">{majorConcept.majorConceptType}</div>
+                    <div className="font-bold mb-2 text-blue-700">
+                      {majorConcept.majorConceptType}
+                    </div>
                     {majorConcept.subConceptList.map((subConcept) => (
-                      <div key={subConcept.subConceptId} className="flex justify-between items-center mb-1">
+                      <div
+                        key={subConcept.subConceptId}
+                        className="flex justify-between items-center mb-1"
+                      >
                         <div>{subConcept.subConceptType}</div>
-                        <Badge variant="outline">{formatDateArray(subConcept.lastLearningDate)}</Badge>
+                        <Badge
+                          variant="outline"
+                          className="bg-white/80 border-blue-200 text-blue-700 rounded-full px-3 py-1"
+                        >
+                          {formatDateArray(subConcept.lastLearningDate)}
+                        </Badge>
                       </div>
                     ))}
                   </CardContent>
@@ -206,5 +257,5 @@ export function ReviewSchedule({ educationLevel, grade }: { educationLevel: Educ
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
