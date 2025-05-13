@@ -24,5 +24,14 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("UPDATE User u SET u.grade = :grade WHERE u.id = :userId")
     @Transactional
     int updateUserGrade(@Param("userId") Integer userId, @Param("grade") Integer grade);
+    
+    /**
+     * 사용자와 사용자의 LastLearningTime 정보를 함께 조회합니다.
+     *
+     * @param userId 사용자 ID
+     * @return 사용자 정보와 LastLearningTime 정보를 포함한 User 객체
+     */
+    @Query("SELECT u FROM User u LEFT JOIN FETCH u.lastLearningTimes WHERE u.id = :userId")
+    Optional<User> findByIdWithLastLearningTimes(@Param("userId") Integer userId);
 }
 

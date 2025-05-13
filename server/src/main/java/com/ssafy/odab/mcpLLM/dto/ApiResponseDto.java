@@ -15,5 +15,5 @@ public class ApiResponseDto {
     String answer;
     String imageUrl;
     List<String> questionSolution;
-    List<String> concepts;
+    List<String> subConcepts;
 }

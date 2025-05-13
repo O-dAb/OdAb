@@ -7,6 +7,8 @@ import com.ssafy.odab.domain.concept.entity.QuestionConcept;
 import com.ssafy.odab.domain.concept.entity.SubConcept;
 import com.ssafy.odab.domain.concept.repository.QuestionConceptRepository;
 import com.ssafy.odab.domain.concept.repository.SubConceptRepository;
+import com.ssafy.odab.domain.learning.entity.LastLearningTime;
+import com.ssafy.odab.domain.learning.repository.LastLearningDateRepository;
 import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question.entity.QuestionSolution;
 import com.ssafy.odab.domain.question.repository.QuestionRepository;
@@ -31,6 +33,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -46,6 +49,7 @@ public class ClaudeServiceImpl implements ClaudeService {
     private final QuestionSolutionRepository questionSolutionRepository;
     private final SubConceptRepository subConceptRepository;
     private final QuestionConceptRepository questionConceptRepository;
+    private final LastLearningDateRepository lastLearningDateRepository;
     private String modelVersion = "claude-3-5-sonnet-20240620";    //사용할 모델명
     //    private String modelVersion = "claude-3-7-sonnet-20250219";	//사용할 모델명
     private int maxTokens = 4000;                    //최대 사용 가능한 토큰 수
@@ -56,7 +60,6 @@ public class ClaudeServiceImpl implements ClaudeService {
     /**
      * historyMessages 에는 과거 메시지와 내가 현재 질문할
      */
-
     @Transactional
     public Mono<ApiResponseDto> sendMathProblem(ApiRequestDto apiRequestDto) {
         List<Object> contents = new ArrayList<>();
@@ -109,8 +112,9 @@ public class ClaudeServiceImpl implements ClaudeService {
                 .build();
         return sendClaudeApi(request, sendMessages, 0)
                 .flatMap(response -> {
+                    // 유저 찾기
                     Integer userId = 1;
-                    User user = userRepository.findById(userId).orElseThrow(
+                    User user = userRepository.findByIdWithLastLearningTimes(userId).orElseThrow(
                             () -> new RuntimeException("User not found")
                     );
                     String dirName = "product";
@@ -119,7 +123,6 @@ public class ClaudeServiceImpl implements ClaudeService {
                     ClaudeRequestApiDto.Message message = sendMessages.get(sendMessages.size() - 1);
                     ClaudeRequestApiDto.TextContent content = (ClaudeRequestApiDto.TextContent) message.getContent().get(0);
                     String str = content.getText();
-                    System.out.println("str = " + str);
 
                     ObjectMapper objectMapper = new ObjectMapper();
                     QuestionJsonDto questionJsonDto;
@@ -160,6 +163,13 @@ public class ClaudeServiceImpl implements ClaudeService {
                         SubConcept subConcept = subConceptRepository.findById(concept).orElseThrow(
                                 () -> new RuntimeException("Sub concept not found")
                         );
+                        // 마지막 학습시간을 현재시간으로 업데이트
+                        for (LastLearningTime lastLearningTime : user.getLastLearningTimes()) {
+                            if (Objects.equals(lastLearningTime.getSubConcept().getId(), subConcept.getId())) {
+                                lastLearningTime.updateLastLearningDate(LocalDateTime.now());
+                                lastLearningDateRepository.save(lastLearningTime);
+                            }
+                        }
                         conceptsForDto.add(subConcept.getConceptType());
                         QuestionConcept questionConcept = QuestionConcept.builder()
                                 .question(question)
@@ -173,7 +183,7 @@ public class ClaudeServiceImpl implements ClaudeService {
                             .answer(questionJsonDto.getAnswer())
                             .imageUrl(imageUrl)
                             .questionSolution(solutionsForDto)
-                            .concepts(conceptsForDto)
+                            .subConcepts(conceptsForDto)
                             .build();
                     return Mono.just(apiResponseDto);
                 });
@@ -189,7 +199,7 @@ public class ClaudeServiceImpl implements ClaudeService {
             List<ClaudeRequestApiDto.Message> sendMessages,
             int depth) {
         ArrayDeque<Integer> toolUseIndexQueue = new ArrayDeque<>();
-        System.out.println("request = " + request.getMessages());
+//        System.out.println("request = " + request.getMessages());
         return claudeConfig.getWebClient().post()
                 .bodyValue(request)
                 .retrieve()
