@@ -30,10 +30,8 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -142,7 +140,7 @@ public class ClaudeServiceImpl implements ClaudeService {
                     question = questionRepository.save(question); // 저장 후 반환된 엔티티를 받음
                     // QuestionSolution 생성 및 리스트에 추가
                     List<QuestionSolution> solutions = new ArrayList<>();
-                    List<String> solutionsForDto  = new ArrayList<>();
+                    List<String> solutionsForDto = new ArrayList<>();
                     Byte i = 1;
                     for (String step : questionJsonDto.getSteps()) {
                         solutionsForDto.add(step);
@@ -158,7 +156,7 @@ public class ClaudeServiceImpl implements ClaudeService {
                     questionSolutionRepository.saveAll(solutions);
 
                     List<QuestionConcept> concepts = new ArrayList<>();
-                    List<String> conceptsForDto  = new ArrayList<>();
+                    List<String> conceptsForDto = new ArrayList<>();
                     for (Integer concept : questionJsonDto.getConcept()) {
                         SubConcept subConcept = subConceptRepository.findById(concept).orElseThrow(
                                 () -> new RuntimeException("Sub concept not found")
@@ -274,37 +272,47 @@ public class ClaudeServiceImpl implements ClaudeService {
             ClaudeRequestApiDto request,
             List<ClaudeRequestApiDto.Message> sendMessages) {
         List<Object> summaryContents = new ArrayList<>();
+        List<SubConcept> subConcepts = subConceptRepository.findAll();
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("""
+                아래에 맞춰 답변해줘.
+                1. 지금까지의 대화 내용을 바탕으로 정리해줘.
+                2. [[]] 안의 내용은 너가 채워 넣어야하는 부분이야.
+                3. question 은 문제야.
+                4. step 은 너가 문제 푼 내용이야. step10 이내로 만들어줘.
+                5. concept 은 사용된 수학 개념을 적어줘. 수학개념은 아래에서 가장 적절한 개념을 최대 5개 골라서 사용해줘. 적절한 것이 없을경우 빈배열로 반환해줘. 각 개념에 맞는 숫자로 반환해줘.
+                """);
+
+        int conceptIndex = 1;
+        for (SubConcept concept : subConcepts) {
+            sb.append(String.format("""
+                            5-%d. %s = %d%n
+                    """, conceptIndex++, concept.getConceptType(), concept.getId()));
+        }
+
+
+        sb.append("""
+                6. 아래 형식에 맞춰서 정리해주고 형식 이외의 대답은 넣지마.
+                
+                {
+                  "question":"[[문제 내용]]",
+                  "steps": [
+                    "[[step1의 대한 내용]]",
+                    "[[step2의 대한 내용]]",
+                    "[[step3의 대한 내용]]"
+                  ],
+                  "answer":"[[정답]]",
+                  "concept": [
+                    "[[사용된 수학 개념1. ex) 1]]",
+                    "[[사용된 수학 개념2. ex) 2]]"
+                  ]
+                }
+                """);
+        System.out.println("sb.toString() = " + sb);
         summaryContents.add(ClaudeRequestApiDto.TextContent.builder()
                 .type("text")
-                .text("""
-                        아래에 맞춰 답변해줘.
-                        1. 지금까지의 대화 내용을 바탕으로 정리해줘.
-                        2. [[]] 안의 내용은 너가 채워 넣어야하는 부분이야.
-                        3. question 은 문제야.
-                        3. step 은 너가 문제 푼 내용이야. step10 이내로 만들어줘.
-                        4. concept 은 사용된 수학 개념을 적어줘. 수학개념은 아래에서 가장 적절한 개념을 최대 5개 골라서 사용해줘. 적절한 것이 없을경우 빈배열로 반환해줘. 각 개념에 맞는 숫자로 반환해줘.
-                            4-1. 덧셈 = 1
-                            4-2. 뺄셈 = 2
-                            4-3. 곱셈 = 3
-                            4-4. 나눗셈 = 4
-                            4-5. 외접 = 5
-                            4-6. 내접 = 6
-                            4-7. 적분 = 7
-                        5. 아래 형식에 맞춰서 정리해주고 형식 이외의 대답은 넣지마.
-                        {
-                          "question":"[[문제 내용]]",
-                          "steps": [
-                            "[[step1의 대한 내용]]",
-                            "[[step2의 대한 내용]]",
-                            "[[step3의 대한 내용]]",
-                          ],
-                          "answer":"[[정답]]"
-                          "concept": [
-                            "[[사용된 수학 개념1. ex) 1]]",
-                            "[[사용된 수학 개념2. ex) 2]]"
-                          ]
-                        }
-                        """)
+                .text(sb.toString())
                 .build());
         ClaudeRequestApiDto.Message summaryMessage = ClaudeRequestApiDto.Message.builder()
                 .role("user")
