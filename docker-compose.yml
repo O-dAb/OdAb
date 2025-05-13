@@ -46,6 +46,7 @@ services:
       - CLOUD_AWS_S3_BUCKET=${CLOUD_AWS_S3_BUCKET}
       - CLOUD_AWS_REGION_STATIC=ap-northeast-2
       - CLOUD_AWS_STACK_AUTO=false
+      - CLAUDE_APIKEY=${CLAUDE_APIKEY}
       - TZ=Asia/Seoul
     depends_on:
       my-db:
@@ -70,6 +71,7 @@ services:
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - JWT_SECRET=${JWT_SECRET}
+      - CLAUDE_APIKEY=${CLAUDE_APIKEY}
       - TZ=Asia/Seoul
     volumes:
       - ./python-server:/app
