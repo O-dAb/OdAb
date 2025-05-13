@@ -3449,3 +3449,623 @@ $\angle B = 30^\circ$ 일 때,...
 2025-05-12 14:27:51,521 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 1
 2025-05-12 14:27:51,521 - app.routers.math - INFO - 유사 문제 검색 완료 - 1개 결과 반환
 2025-05-12 14:28:10,275 - app.services.vector_service - INFO - Qdrant compact 저장 성공: 69e4053a-6043-452f-b4a7-75894c026ef4
+2025-05-12 15:05:44,719 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:06:20,466 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 127
+2025-05-12 15:06:20,466 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, 
+$\angle B = 30^\circ$ 일 때,...
+2025-05-12 15:06:20,467 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:06:20,467 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:06:20,951 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 5
+2025-05-12 15:06:20,951 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 2
+2025-05-12 15:06:20,951 - app.services.math_solver - INFO - 유사 문제 2개 찾음
+2025-05-12 15:06:20,952 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 15:06:34,450 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:06:34,450 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 15:06:34,450 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 15:06:42,268 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:06:42,273 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 15:06:42,273 - app.services.math_solver - INFO - === 사고 단계 2/10 (분기: main) 처리 중 ===
+2025-05-12 15:06:52,671 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:06:52,673 - app.services.math_solver - INFO - 사고 단계 2 응답 수신
+2025-05-12 15:06:52,673 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 15:06:52,673 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 15:06:52,674 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 15:06:52,674 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 15:07:00,772 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:07:00,776 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: [
+  {
+    "title": "문제 이해",
+    "content": "삼각형 ABC에서 $\\overline{AB} = 4\\text{cm}$, $\\overline{BC} = 3\\text{cm}$, $\\angle B = 30^\\circ$일 때, 삼각형의 넓이를 구해야 합니다.",
+    "hint": "삼각형 넓이 공식을 사용하세요."
+  },
+  {
+    "title": "공식 적용",
+    "content": "삼각형 넓이 공식: $\\text{넓이} = \\frac{1}{2} \\times a \\times b \\times \\sin C$\n대입: $\\text{넓이} = \\frac{1}{2} \\times 4 \\times 3 \\times \\sin 30^\\circ = 6 \\times \\sin 30^\\circ$"
+  },
+  {
+    "title": "정답",
+    "content": "$\\text{넓이} = 6 \\times \\frac{1}{2} = 3 \\text{ cm}^2$\n따라서, 삼각형 ABC의 넓이는 3 $\\text{cm}^2$ 입니다."
+  }
+]
+2025-05-12 15:07:00,776 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: e4aa5008-35ef-4a07-a9d9-a2c0a1fb6092, 단계 수: 1
+2025-05-12 15:07:00,784 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overl..., 유형: geometry
+2025-05-12 15:07:00,785 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:07:01,148 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 5
+2025-05-12 15:07:01,148 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 2
+2025-05-12 15:07:01,148 - app.routers.math - INFO - 유사 문제 검색 완료 - 2개 결과 반환
+2025-05-12 15:07:19,458 - app.services.vector_service - INFO - Qdrant compact 저장 성공: 7ad3b39f-b5da-4edb-95d4-f179e4eb6aca
+2025-05-12 15:16:55,989 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:17:49,504 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 137
+2025-05-12 15:17:49,504 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. $\triangle ABC$에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$,
+   $\angle B = 30^\...
+2025-05-12 15:17:49,504 - app.services.math_solver - INFO - 감지된 개념: []
+2025-05-12 15:17:49,504 - app.services.vector_service - INFO - 감지된 개념: []
+2025-05-12 15:17:49,804 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:17:49,810 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:17:49,810 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 15:17:49,810 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 15:18:03,921 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:18:03,921 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 15:18:03,921 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 15:18:12,821 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:18:12,821 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 15:18:12,821 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 15:18:12,821 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 15:18:12,821 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 15:18:12,821 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 15:18:20,645 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:18:20,645 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: [
+  {
+    "title": "문제 이해",
+    "content": "$\triangle ABC$에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, $\angle B = 30^\circ$일 때, 삼각형의 넓이를 구해야 합니다.",
+    "hint": "삼각형 넓이 공식을 사용하세요."
+  },
+  {
+    "title": "공식 적용",
+    "content": "삼각형 넓이 공식: $\text{넓이} = \frac{1}{2} \times a \times b \times \sin C$\n$\text{넓이} = \frac{1}{2} \times 4 \times 3 \times \sin 30^\circ$\n$\sin 30^\circ = \frac{1}{2}$ 이므로,\n$\text{넓이} = \frac{1}{2} \times 4 \times 3 \times \frac{1}{2}$"
+  },
+  {
+    "title": "정답",
+    "content": "$\triangle ABC$의 넓이 $= 3\text{cm}^2$"
+  }
+]
+2025-05-12 15:18:20,645 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: c5f8b405-d7cd-4532-a7b6-a211c7ddd6d6, 단계 수: 1
+2025-05-12 15:18:20,655 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. $\triangle ABC$에서 $\overline{AB} = 4\text{cm}$,..., 유형: geometry
+2025-05-12 15:18:20,655 - app.services.vector_service - INFO - 감지된 개념: []
+2025-05-12 15:18:21,010 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:18:21,010 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:18:21,010 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 15:18:33,538 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 137
+2025-05-12 15:18:33,538 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. $\triangle ABC$에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$,
+   $\angle B = 30^\...
+2025-05-12 15:18:33,540 - app.services.math_solver - INFO - 감지된 개념: []
+2025-05-12 15:18:33,540 - app.services.vector_service - INFO - 감지된 개념: []
+2025-05-12 15:18:33,825 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:18:33,825 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:18:33,825 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 15:18:33,825 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 15:18:44,353 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:18:44,355 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 15:18:44,355 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 15:18:53,205 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:18:53,210 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 15:18:53,210 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 15:18:53,210 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 15:18:53,210 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 15:18:53,210 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 15:19:01,040 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:19:01,050 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: [
+  {
+    "title": "문제 이해",
+    "content": "$\triangle ABC$에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, $\angle B = 30^\circ$일 때, 삼각형의 넓이를 구해야 합니다.",
+    "hint": "삼각형 넓이 공식 $\text{넓이} = \frac{1}{2} \times a \times b \times \sin C$를 사용합니다."
+  },
+  {
+    "title": "공식 적용",
+    "content": "$\text{넓이} = \frac{1}{2} \times 4 \times 3 \times \sin 30^\circ = 6 \times \sin 30^\circ = 6 \times \frac{1}{2}$"
+  },
+  {
+    "title": "정답",
+    "content": "$\triangle ABC$의 넓이 $= 3 \text{ cm}^2$"
+  }
+]
+2025-05-12 15:19:01,050 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: 5b34152e-74fc-4aae-a5c7-b126da48fdda, 단계 수: 1
+2025-05-12 15:19:01,055 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. $\triangle ABC$에서 $\overline{AB} = 4\text{cm}$,..., 유형: geometry
+2025-05-12 15:19:01,055 - app.services.vector_service - INFO - 감지된 개념: []
+2025-05-12 15:19:01,380 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:19:01,380 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:19:01,380 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 15:22:51,680 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 137
+2025-05-12 15:22:51,680 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. $\triangle ABC$에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$,
+   $\angle B = 30^\...
+2025-05-12 15:22:51,680 - app.services.math_solver - INFO - 감지된 개념: []
+2025-05-12 15:22:51,680 - app.services.vector_service - INFO - 감지된 개념: []
+2025-05-12 15:22:51,981 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:22:51,981 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:22:51,981 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 15:22:51,981 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 15:23:02,001 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:23:02,011 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 15:23:02,011 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 15:23:10,062 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:23:10,063 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 15:23:10,063 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 15:23:10,064 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 15:23:10,064 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 15:23:10,064 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 15:23:18,030 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:23:18,031 - app.services.math_solver - ERROR - 최종 요약 생성 오류: 'MathSolver' object has no attribute '_escape_latex_in_json_values'
+2025-05-12 15:23:18,031 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: 35925fff-7675-419a-8542-5e9a44e4b508, 단계 수: 1
+2025-05-12 15:23:18,036 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. $\triangle ABC$에서 $\overline{AB} = 4\text{cm}$,..., 유형: geometry
+2025-05-12 15:23:18,036 - app.services.vector_service - INFO - 감지된 개념: []
+2025-05-12 15:23:18,319 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:23:18,320 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:23:18,320 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 15:23:37,150 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:23:39,971 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 127
+2025-05-12 15:23:39,972 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, 
+$\angle B = 30^\circ$ 일 때,...
+2025-05-12 15:23:39,972 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:23:39,972 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:23:40,341 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:23:40,341 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:23:40,344 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 15:23:40,344 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 15:23:51,762 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:23:51,764 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 15:23:51,764 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 15:23:59,221 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:23:59,231 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 15:23:59,231 - app.services.math_solver - INFO - === 사고 단계 2/10 (분기: main) 처리 중 ===
+2025-05-12 15:24:12,157 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:24:12,159 - app.services.math_solver - INFO - 사고 단계 2 응답 수신
+2025-05-12 15:24:12,159 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 15:24:12,159 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 15:24:12,160 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 15:24:12,160 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 15:24:21,488 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:24:21,496 - app.services.math_solver - ERROR - 최종 요약 생성 오류: 'MathSolver' object has no attribute '_escape_latex_in_json_values'
+2025-05-12 15:24:21,496 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: b7dfa5ca-7969-4120-9873-eaa4eb952b45, 단계 수: 1
+2025-05-12 15:24:21,505 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overl..., 유형: geometry
+2025-05-12 15:24:21,505 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:24:21,846 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:24:21,851 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:24:21,851 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 15:25:26,751 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:25:28,466 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 123
+2025-05-12 15:25:28,466 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB}=4\text{cm}$, $\overline{BC}=3\text{cm}$, 
+$\angle B = 30^\circ$ 일 때, $\t...
+2025-05-12 15:25:28,467 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:25:28,467 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:25:28,839 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:25:28,839 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:25:28,839 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 15:25:28,840 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 15:25:39,078 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:25:39,079 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 15:25:39,080 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 15:25:47,943 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:25:47,944 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 15:25:47,944 - app.services.math_solver - INFO - === 사고 단계 2/10 (분기: main) 처리 중 ===
+2025-05-12 15:25:58,257 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:25:58,258 - app.services.math_solver - INFO - 사고 단계 2 응답 수신
+2025-05-12 15:25:58,258 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 15:25:58,259 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 15:25:58,259 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 15:25:58,259 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 15:26:13,243 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:26:13,244 - app.services.math_solver - ERROR - 최종 요약 생성 오류: 'MathSolver' object has no attribute '_escape_latex_in_json_values'
+2025-05-12 15:26:13,244 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: a896c9b0-e6e9-4bd6-8fc4-38374651a33a, 단계 수: 1
+2025-05-12 15:26:13,251 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB}=4\text{cm}$, $\overlin..., 유형: geometry
+2025-05-12 15:26:13,251 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:26:13,593 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:26:13,593 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:26:13,593 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 15:28:21,548 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 123
+2025-05-12 15:28:21,549 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB}=4\text{cm}$, $\overline{BC}=3\text{cm}$, 
+$\angle B = 30^\circ$ 일 때, $\t...
+2025-05-12 15:28:21,549 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:28:21,549 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:28:21,902 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:28:21,902 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:28:21,903 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 15:28:21,903 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 15:28:32,199 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:28:32,201 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 15:28:32,202 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 15:28:39,860 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:28:39,866 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 15:28:39,866 - app.services.math_solver - INFO - === 사고 단계 2/10 (분기: main) 처리 중 ===
+2025-05-12 15:28:54,946 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:28:54,948 - app.services.math_solver - INFO - 사고 단계 2 응답 수신
+2025-05-12 15:28:54,948 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 15:28:54,949 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 15:28:54,949 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 15:28:54,949 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 15:29:09,414 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:29:09,415 - app.services.math_solver - ERROR - 최종 요약 생성 오류: 'MathSolver' object has no attribute '_escape_latex_in_json_values'
+2025-05-12 15:29:09,415 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: cdeec9c4-2077-4a88-9dcc-504dc1aa9983, 단계 수: 1
+2025-05-12 15:29:09,421 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB}=4\text{cm}$, $\overlin..., 유형: geometry
+2025-05-12 15:29:09,422 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:29:09,759 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:29:09,759 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:29:09,759 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 15:29:58,002 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:29:59,923 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 127
+2025-05-12 15:29:59,923 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, 
+$\angle B = 30^\circ$ 일 때,...
+2025-05-12 15:29:59,923 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:29:59,923 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:30:00,295 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:30:00,296 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:30:00,296 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 15:30:00,296 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 15:30:11,134 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:30:11,135 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 15:30:11,136 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 15:30:19,725 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:30:19,727 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 15:30:19,728 - app.services.math_solver - INFO - === 사고 단계 2/10 (분기: main) 처리 중 ===
+2025-05-12 15:30:30,751 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:30:30,753 - app.services.math_solver - INFO - 사고 단계 2 응답 수신
+2025-05-12 15:30:30,753 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 15:30:30,754 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 15:30:30,754 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 15:30:30,754 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 15:30:39,772 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:30:39,773 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: [
+  {
+    "title": "문제 이해",
+    "content": ""삼각형 ABC에서 $\\\\overline{AB} = 4\\\\text{cm}$, $\\\\overline{BC} = 3\\\\text{cm}$, $\\\\angle B = 30^\\\\circ$일 때, 삼각형의 넓이를 구해야 합니다. 삼각형 넓이 공식 $\\\\text{넓이} = \\\\frac{1}{2} \\\\times a \\\\times b \\\\times \\\\sin C$를 사용할 수 있습니다.",
+    "hint": ""두 변의 길이와 그 사이의 각도가 주어졌으므로, 사인 법칙을 이용한 삼각형 넓이 공식을 직접 적용할 수 있습니다."
+  },
+  {
+    "title": "공식 적용",
+    "content": ""넓이 공식에 주어진 값을 대입합니다: $\\\\text{넓이} = \\\\frac{1}{2} \\\\times 4 \\\\times 3 \\\\times \\\\sin 30^\\\\circ = 6 \\\\times \\\\sin 30^\\\\circ \\\\text{ cm}^2$",
+    "hint": ""$\\\\sin 30^\\\\circ = \\\\frac{1}{2}$임을 기억하세요."
+  },
+  {
+    "title": "정답",
+    "content": ""삼각형 ABC의 넓이 = $6 \\\\times \\\\frac{1}{2} = 3 \\\\text{ cm}^2$"
+  }
+]
+2025-05-12 15:30:39,774 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: f274c416-4ff9-4914-bffc-3dbf92421a1e, 단계 수: 1
+2025-05-12 15:30:39,781 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overl..., 유형: geometry
+2025-05-12 15:30:39,781 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:30:40,127 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:30:40,127 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:30:40,127 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 15:55:17,433 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:55:20,183 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 127
+2025-05-12 15:55:20,183 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, 
+$\angle B = 30^\circ$ 일 때,...
+2025-05-12 15:55:20,183 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:55:20,183 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:55:20,546 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:55:20,546 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:55:20,549 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 15:55:20,550 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 15:55:30,518 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:55:30,528 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 15:55:30,528 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 15:55:39,347 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:55:39,349 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 15:55:39,350 - app.services.math_solver - INFO - === 사고 단계 2/10 (분기: main) 처리 중 ===
+2025-05-12 15:55:49,451 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 15:55:49,452 - app.services.math_solver - INFO - 사고 단계 2 응답 수신
+2025-05-12 15:55:49,452 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 15:55:49,452 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 15:55:49,452 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 15:55:49,452 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 15:55:49,458 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: {"error": "JSON 파싱 실패: Expecting value: line 1 column 2 (char 1)", "raw": "[초기 분석과 다음 단계별 사고 과정을 바탕으로, 원본 문제 '1. 삼각형 ABC에서 $\\overline{AB} = 4\\text{cm}$, $\\overline{BC} = 3\\text{cm}$, \n$\\angle B = 30^\\circ$ 일 때, $\\triangle ABC$의 넓이를 구하시오.'에 대한 최종적이고 깔끔하며 간결한 설명 또는 해결책을 제공하세요.\n        각 단계의 핵심 통찰을 통합하세요. 모든 수학적 공식은 LaTeX($inline$ 또는 $$block$$)를 사용해 표현하세요.\n\n        **문제 유형:** geometry\n\n        **초기 분석:**\n        분석 결과:\n\n1. 문제 유형 파악:\n   이 문제는 기하학(Geometry) 영역에 속합니다. 특히 삼각형의 넓이를 구하는 문제입니다.\n\n2. 주어진 정보:\n   - 삼각형 ABC\n   - $\\overline{AB} = 4\\text{ cm}$\n   - $\\overline{BC} = 3\\text{ cm}$\n   - $\\angle B = 30^\\circ$\n\n3. 구해야 할 것:\n   삼각형 ABC의 넓이\n\n4. 적용 가능한 개념/공식:\n   - 삼각형 넓이 공식: $\\text{넓이} = \\frac{1}{2} \\times a \\times b \\times \\sin C$\n     (여기서 $a$와 $b$는 두 변의 길이, $C$는 그 사이의 각)\n\n5. 해결 방향:\n   a) 주어진 정보를 삼각형 넓이 공식에 대입합니다.\n   b) $\\sin 30^\\circ$ 값을 알고 있거나 계산합니다.\n   c) 공식에 따라 계산을 수행하여 넓이를 구합니다.\n\n이 문제는 삼각형의 두 변의 길이와 그 사이의 각도가 주어졌을 때 넓이를 구하는 전형적인 기하학 문제입니다. 사인 함수를 이용한 삼각형 넓이 공식을 직접 적용하면 쉽게 해결할 수 있습니다.\n\n        **사고 과정 기록 (실행 단계):**\n        단계 1 (분기: main, 완료: True): 사고 단계 1: 삼각형 넓이 공식 적용\n\n주어진 정보를 삼각형 넓이 공식에 대입하겠습니다.\n\n삼각형 넓이 공식: $\\text{넓이} = \\frac{1}{2} \\times a \\times b \\times \\sin C$\n\n여기서:\n$a = \\overline{AB} = 4\\text{ cm}$\n$b = \\overline{BC} = 3\\text{ cm}$\n$C = \\angle B = 30^\\circ$\n\n따라서 공식에 대입하면:\n\n$\\text{넓이} = \\frac{1}{2} \\times 4 \\times 3 \\times \\sin 30^\\circ$\n\n$= 6 \\times \\sin 30^\\circ \\text{ cm}^2$\n\n다음 단계에서는 $\\sin 30^\\circ$ 값을 계산하고 최종 넓이를 구하겠습니다.\n최종 단계 (완료 신호 이전): 사고 단계 2: $\\sin 30^\\circ$ 값 계산 및 최종 넓이 구하기\n\n이전 단계에서 우리는 삼각형의 넓이 공식을 적용하여 다음과 같은 식을 얻었습니다:\n\n$\\text{넓이} = 6 \\times \\sin 30^\\circ \\text{ cm}^2$\n\n이제 $\\sin 30^\\circ$ 값을 계산하고 최종 넓이를 구하겠습니다.\n\n1) $\\sin 30^\\circ$ 값 계산:\n   $\\sin 30^\\circ = \\frac{1}{2}$\n   \n   이는 특수각에 대한 삼각함수 값으로, 일반적으로 알고 있는 값입니다.\n\n2) 최종 넓이 계산:\n   $\\text{넓이} = 6 \\times \\frac{1}{2} \\text{ cm}^2$\n   $= 3 \\text{ cm}^2$\n\n따라서, 삼각형 ABC의 넓이는 $3 \\text{ cm}^2$ 입니다.\n\n검증: 이 결과는 합리적으로 보입니다. 주어진 삼각형의 두 변의 길이가 4cm와 3cm이고, 그 사이의 각이 30°인 것을 고려하면, 넓이가 3cm²인 것은 적절한 크기입니다.\n\n\n        **최종 요약 지침:**\n        - 반드시 아래 예시처럼 JSON 배열만 반환하세요. (불필요한 텍스트, 마크다운, 설명, 라벨 등 금지)\n        - 각 content, hint 등 문자열 내부의 LaTeX 역슬래시(\\)는 반드시 두 번(\\) 이스케이프해서 반환하세요. (예: $\\frac{1}{2}$)\n        - 마지막 단계의 title은 반드시 '정답' 또는 '최종 요약'으로 하세요.\n        예시:\n        [\n          {\"title\": \"문제 이해\", \"content\": \"...$\\text{넓이}=\\frac{1}{2}ab\\sin C$...\", \"hint\": \"...\"},\n          {\"title\": \"공식 적용\", \"content\": \"$...$\"},\n          {\"title\": \"정답\", \"content\": \"$...$\"}\n        ]]"}
+2025-05-12 15:55:49,458 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: dff3593f-b626-40ee-a642-a27569b7e362, 단계 수: 1
+2025-05-12 15:55:49,468 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overl..., 유형: geometry
+2025-05-12 15:55:49,468 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 15:55:49,911 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 15:55:49,912 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 15:55:49,912 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 16:00:36,157 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:00:42,598 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 135
+2025-05-12 16:00:42,599 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. $\triangle ABC$에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, 
+$\angle B = 30^\ci...
+2025-05-12 16:00:42,599 - app.services.math_solver - INFO - 감지된 개념: []
+2025-05-12 16:00:42,599 - app.services.vector_service - INFO - 감지된 개념: []
+2025-05-12 16:00:42,891 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:00:42,897 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:00:42,897 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 16:00:42,897 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 16:00:52,665 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:00:52,670 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 16:00:52,671 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 16:01:00,966 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:01:00,967 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 16:01:00,968 - app.services.math_solver - INFO - === 사고 단계 2/10 (분기: main) 처리 중 ===
+2025-05-12 16:01:10,345 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:01:10,360 - app.services.math_solver - INFO - 사고 단계 2 응답 수신
+2025-05-12 16:01:10,361 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 16:01:10,361 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 16:01:10,361 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 16:01:10,361 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 16:01:10,362 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: {"error": "JSON 파싱 실패: Invalid \\escape: line 2 column 69 (char 70)", "raw": "[\n          {\"title\": \"문제 이해\", \"content\": \"...$\\text{넓이}=\\frac{1}{2}ab\\sin C$...\", \"hint\": \"...\"},\n          {\"title\": \"공식 적용\", \"content\": \"$...$\"},\n          {\"title\": \"정답\", \"content\": \"$...$\"}\n        ]"}
+2025-05-12 16:01:10,363 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: a16e5a12-d59c-4f5d-95d3-a90fde33b9b6, 단계 수: 1
+2025-05-12 16:01:10,370 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. $\triangle ABC$에서 $\overline{AB} = 4\text{cm}$,..., 유형: geometry
+2025-05-12 16:01:10,371 - app.services.vector_service - INFO - 감지된 개념: []
+2025-05-12 16:01:10,708 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:01:10,708 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:01:10,708 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 16:09:41,413 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:09:43,325 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 127
+2025-05-12 16:09:43,325 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, 
+$\angle B = 30^\circ$ 일 때,...
+2025-05-12 16:09:43,325 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:09:43,325 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:09:43,676 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:09:43,677 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:09:43,677 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 16:09:43,677 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 16:09:53,617 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:09:53,619 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 16:09:53,619 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 16:10:12,803 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:10:12,804 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 16:10:12,805 - app.services.math_solver - INFO - === 사고 단계 2/10 (분기: main) 처리 중 ===
+2025-05-12 16:10:23,194 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:10:23,194 - app.services.math_solver - INFO - 사고 단계 2 응답 수신
+2025-05-12 16:10:23,194 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 16:10:23,194 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 16:10:23,194 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 16:10:23,194 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 16:10:23,202 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: {"error": "JSON 파싱 실패: Invalid \\escape: line 2 column 69 (char 70)", "raw": "[\n          {\"title\": \"문제 이해\", \"content\": \"...$\\text{넓이}=\\frac{1}{2}ab\\sin C$...\", \"hint\": \"...\"},\n          {\"title\": \"공식 적용\", \"content\": \"$...$\"},\n          {\"title\": \"정답\", \"content\": \"$...$\"}\n        ]", "original": "초기 분석과 다음 단계별 사고 과정을 바탕으로, 원본 문제 '1. 삼각형 ABC에서 $\\overline{AB} = 4\\text{cm}$, $\\overline{BC} = 3\\text{cm}$, \n$\\angle B = 30^\\circ$ 일 때, $\\triangle ABC$의 넓이를 구하시오.'에 대한 최종적이고 깔끔하며 간결한 설명 또는 해결책을 제공하세요.\n        각 단계의 핵심 통찰을 통합하세요. 모든 수학적 공식은 LaTeX($inline$ 또는 $$block$$)를 사용해 표현하세요.\n\n        **문제 유형:** geometry\n\n        **초기 분석:**\n        분석 결과:\n\n1. 문제 유형 파악:\n   이 문제는 기하학(geometry) 영역에 속합니다.\n\n2. 주어진 정보:\n   - 삼각형 ABC\n   - $\\overline{AB} = 4\\text{cm}$\n   - $\\overline{BC} = 3\\text{cm}$\n   - $\\angle B = 30^\\circ$\n\n3. 구해야 할 것:\n   삼각형 ABC의 넓이\n\n4. 적용 가능한 개념/공식:\n   - 삼각형 넓이 공식: $\\text{넓이} = \\frac{1}{2} \\times a \\times b \\times \\sin C$\n     (여기서 $a$와 $b$는 두 변의 길이, $C$는 그 사이의 각)\n\n5. 해결 방향:\n   a) 주어진 정보를 삼각형 넓이 공식에 대입합니다.\n   b) $\\sin 30^\\circ$ 값을 알고 있거나 계산합니다.\n   c) 공식에 따라 계산을 수행합니다.\n   d) 최종 넓이를 구합니다.\n\n이 문제는 삼각형의 두 변의 길이와 그 사이의 각도가 주어졌을 때 넓이를 구하는 전형적인 기하학 문제입니다. 사인 법칙을 이용한 삼각형 넓이 공식을 직접 적용할 수 있어 비교적 간단하게 해결할 수 있습니다.\n\n        **사고 과정 기록 (실행 단계):**\n        단계 1 (분기: main, 완료: True): 사고 단계 1:\n\n삼각형 넓이 공식을 적용하기 위해 주어진 정보를 정리하고 공식에 대입합니다.\n\n1. 삼각형 넓이 공식: $\\text{넓이} = \\frac{1}{2} \\times a \\times b \\times \\sin C$\n\n2. 주어진 정보 대입:\n   $a = \\overline{AB} = 4\\text{ cm}$\n   $b = \\overline{BC} = 3\\text{ cm}$\n   $C = \\angle B = 30^\\circ$\n\n3. 공식에 대입:\n   $\\text{넓이} = \\frac{1}{2} \\times 4 \\times 3 \\times \\sin 30^\\circ$\n\n4. 단순화:\n   $\\text{넓이} = 6 \\times \\sin 30^\\circ$\n\n다음 단계에서는 $\\sin 30^\\circ$ 값을 계산하고 최종 넓이를 구해야 합니다.\n최종 단계 (완료 신호 이전): 사고 단계 2:\n\n이전 단계에서 우리는 삼각형의 넓이 공식을 적용하여 다음 식을 얻었습니다:\n\n$\\text{넓이} = 6 \\times \\sin 30^\\circ$\n\n이제 $\\sin 30^\\circ$ 값을 계산하고 최종 넓이를 구해야 합니다.\n\n1. $\\sin 30^\\circ$ 값 계산:\n   $\\sin 30^\\circ = \\frac{1}{2}$\n   \n   이는 특수각의 삼각비로, 30-60-90 삼각형의 성질에서 도출됩니다.\n\n2. 값 대입:\n   $\\text{넓이} = 6 \\times \\frac{1}{2}$\n\n3. 계산:\n   $\\text{넓이} = 3 \\text{ cm}^2$\n\n따라서, 삼각형 ABC의 넓이는 3 cm²입니다.\n\n검증: 이 결과는 합리적으로 보입니다. 주어진 삼각형은 직각삼각형이 아니며, 30° 각도로 인해 높이가 밑변보다 작을 것이므로, 넓이가 (4 × 3) / 2 = 6 cm²보다 작은 것이 타당합니다.\n\n\n        **최종 요약 지침:**\n        - 반드시 아래 예시처럼 JSON 배열만 반환하세요. (불필요한 텍스트, 마크다운, 설명, 라벨 등 금지)\n        - 각 content, hint 등 문자열 내부의 LaTeX 역슬래시(\\)는 반드시 두 번(\\) 이스케이프해서 반환하세요. (예: $\\frac{1}{2}$)\n        - 마지막 단계의 title은 반드시 '정답' 또는 '최종 요약'으로 하세요.\n        예시:\n        [\n          {\"title\": \"문제 이해\", \"content\": \"...$\\text{넓이}=\\frac{1}{2}ab\\sin C$...\", \"hint\": \"...\"},\n          {\"title\": \"공식 적용\", \"content\": \"$...$\"},\n          {\"title\": \"정답\", \"content\": \"$...$\"}\n        ]"}
+2025-05-12 16:10:23,203 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: a36dc9f6-54f6-4348-977a-3d6155512fa2, 단계 수: 1
+2025-05-12 16:10:23,522 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overl..., 유형: geometry
+2025-05-12 16:10:23,522 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:10:23,843 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:10:23,843 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:10:23,845 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 16:14:23,661 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:14:25,504 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 127
+2025-05-12 16:14:25,504 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, 
+$\angle B = 30^\circ$ 일 때,...
+2025-05-12 16:14:25,504 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:14:25,504 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:14:25,872 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:14:25,872 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:14:25,872 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 16:14:25,872 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 16:14:39,956 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:14:39,956 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 16:14:39,956 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 16:14:48,486 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:14:48,486 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 16:14:48,486 - app.services.math_solver - INFO - === 사고 단계 2/10 (분기: main) 처리 중 ===
+2025-05-12 16:14:58,181 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:14:58,181 - app.services.math_solver - INFO - 사고 단계 2 응답 수신
+2025-05-12 16:14:58,181 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 16:14:58,181 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 16:14:58,181 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 16:14:58,181 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 16:14:58,181 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: {"error": "JSON 파싱 실패: Expecting value: line 2 column 9 (char 9)", "raw": "\n        초기 분석과 다음 단계별 사고 과정을 바탕으로, 원본 문제 '1. 삼각형 ABC에서 $\\overline{AB} = 4\\text{cm}$, $\\overline{BC} = 3\\text{cm}$, \n$\\angle B = 30^\\circ$ 일 때, $\\triangle ABC$의 넓이를 구하시오.'에 대한 최종적이고 깔끔하며 간결한 설명 또는 해결책을 제공하세요.\n        각 단계의 핵심 통찰을 통합하세요. 모든 수학적 공식은 LaTeX($inline$ 또는 $$block$$)를 사용해 표현하세요.\n\n        **문제 유형:** geometry\n\n        **초기 분석:**\n        분석 결과:\n\n1. 문제 유형 파악:\n   이 문제는 기하학(geometry) 영역에 속합니다.\n\n2. 주어진 정보:\n   - 삼각형 ABC\n   - $\\overline{AB} = 4\\text{cm}$\n   - $\\overline{BC} = 3\\text{cm}$\n   - $\\angle B = 30^\\circ$\n\n3. 구해야 할 것:\n   삼각형 ABC의 넓이\n\n4. 적용 가능한 개념/공식:\n   - 삼각형 넓이 공식: $\\text{넓이} = \\frac{1}{2} \\times a \\times b \\times \\sin C$\n     (여기서 $a$와 $b$는 두 변의 길이, $C$는 그 사이의 각)\n\n5. 해결 방향:\n   a) 주어진 정보를 삼각형 넓이 공식에 대입합니다.\n   b) $\\sin 30^\\circ$ 값을 알고 있거나 계산합니다.\n   c) 공식에 따라 계산을 수행하여 넓이를 구합니다.\n\n이 문제는 삼각형의 두 변의 길이와 그 사이의 각도가 주어졌을 때 넓이를 구하는 전형적인 기하학 문제입니다. 사인 법칙을 이용한 삼각형 넓이 공식을 직접 적용할 수 있어 비교적 간단하게 해결할 수 있습니다. $\\sin 30^\\circ = \\frac{1}{2}$ 임을 알고 있다면 계산이 더욱 쉬워집니다.\n\n        **사고 과정 기록 (실행 단계):**\n        단계 1 (분기: main, 완료: True): 사고 단계 1: 삼각형 넓이 공식 적용\n\n삼각형 ABC의 넓이를 구하기 위해 주어진 정보를 삼각형 넓이 공식에 대입하겠습니다.\n\n삼각형 넓이 공식: $\\text{넓이} = \\frac{1}{2} \\times a \\times b \\times \\sin C$\n\n여기서,\n$a = \\overline{AB} = 4\\text{ cm}$\n$b = \\overline{BC} = 3\\text{ cm}$\n$C = \\angle B = 30^\\circ$\n\n공식에 대입하면:\n\n$\\text{넓이} = \\frac{1}{2} \\times 4 \\times 3 \\times \\sin 30^\\circ$\n\n$= 6 \\times \\sin 30^\\circ$\n\n다음 단계에서는 $\\sin 30^\\circ$ 값을 구하고 최종 계산을 수행하겠습니다.\n최종 단계 (완료 신호 이전): 사고 단계 2: $\\sin 30^\\circ$ 값 계산 및 최종 넓이 도출\n\n이전 단계에서 우리는 삼각형의 넓이 공식을 적용하여 다음과 같은 식을 얻었습니다:\n\n$\\text{넓이} = 6 \\times \\sin 30^\\circ$\n\n이제 $\\sin 30^\\circ$ 값을 계산하고 최종 넓이를 구하겠습니다.\n\n1) $\\sin 30^\\circ$ 값 계산:\n   $\\sin 30^\\circ = \\frac{1}{2}$\n   \n   이는 30-60-90 삼각형의 특성에서 도출되는 값으로, 많은 수학 문제에서 자주 사용되는 기본적인 삼각함수 값입니다.\n\n2) 넓이 계산:\n   $\\text{넓이} = 6 \\times \\sin 30^\\circ = 6 \\times \\frac{1}{2} = 3$\n\n따라서, 삼각형 ABC의 넓이는 3 cm² 입니다.\n\n검증: \n- 결과가 양수이며 실수값입니다.\n- 주어진 변의 길이(4cm, 3cm)와 각도(30°)를 고려할 때, 3cm²는 합리적인 크기입니다.\n\n\n        **최종 요약 지침:**\n        - 반드시 아래 예시처럼 JSON 배열만 반환하세요. (불필요한 텍스트, 마크다운, 설명, 라벨 등 금지)\n        - 각 content, hint 등 문자열 내부의 LaTeX 역슬래시(\\)는 반드시 두 번(\\) 이스케이프해서 반환하세요. (예: $\\frac{1}{2}$)\n        - 마지막 단계의 title은 반드시 '정답' 또는 '최종 요약'으로 하세요.\n        예시:\n        [\n          {\"title\": \"문제 이해\", \"content\": \"...$\\text{넓이}=\\frac{1}{2}ab\\sin C$...\", \"hint\": \"...\"},\n          {\"title\": \"공식 적용\", \"content\": \"$...$\"},\n          {\"title\": \"정답\", \"content\": \"$...$\"}\n        ]\n        "}
+2025-05-12 16:14:58,181 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: 13e0e2d0-0b0e-41a2-8783-1c59350e204b, 단계 수: 1
+2025-05-12 16:14:58,191 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overl..., 유형: geometry
+2025-05-12 16:14:58,191 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:14:58,656 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:14:58,656 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:14:58,656 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 16:21:44,503 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:21:47,990 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 126
+2025-05-12 16:21:47,990 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$,
+$\angle B = 30^\circ$ 일 때, ...
+2025-05-12 16:21:47,990 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:21:47,991 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:21:48,338 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:21:48,339 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:21:48,339 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 16:21:48,339 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 16:21:58,488 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:21:58,491 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 16:21:58,491 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 16:22:06,340 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:22:06,340 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 16:22:06,340 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 16:22:06,340 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 16:22:06,340 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 16:22:06,340 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 16:22:06,340 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: {"error": "JSON 파싱 실패: Expecting value: line 2 column 9 (char 9)", "raw": "\n        초기 분석과 다음 단계별 사고 과정을 바탕으로, 원본 문제 '1. 삼각형 ABC에서 $\\overline{AB} = 4\\text{cm}$, $\\overline{BC} = 3\\text{cm}$,\n$\\angle B = 30^\\circ$ 일 때, $\\triangle ABC$의 넓이를 구하시오.'에 대한 최종적이고 깔끔하며 간결한 설명 또는 해결책을 제공하세요.\n        각 단계의 핵심 통찰을 통합하세요. 모든 수학적 공식은 LaTeX($inline$ 또는 $$block$$)를 사용해 표현하세요.\n\n        **문제 유형:** geometry\n\n        **초기 분석:**\n        문제 분석:\n\n1. 문제 유형 파악: \n   이 문제는 기하학(geometry) 영역에 속합니다. 특히 삼각형의 넓이를 구하는 문제입니다.\n\n2. 주어진 정보:\n   - 삼각형 ABC\n   - $\\overline{AB} = 4\\text{cm}$\n   - $\\overline{BC} = 3\\text{cm}$\n   - $\\angle B = 30^\\circ$\n\n3. 구해야 할 것:\n   삼각형 ABC의 넓이\n\n4. 적용 가능한 개념/공식:\n   - 삼각형 넓이 공식: $\\text{넓이} = \\frac{1}{2} \\times a \\times b \\times \\sin C$\n     (여기서 $a$와 $b$는 두 변의 길이, $C$는 그 사이의 각)\n   - $\\sin 30^\\circ = \\frac{1}{2}$\n\n5. 해결 방향:\n   a) 주어진 정보를 삼각형 넓이 공식에 대입합니다.\n   b) $\\sin 30^\\circ$의 값을 대입합니다.\n   c) 계산을 수행하여 최종 넓이를 구합니다.\n\n이 문제는 주어진 두 변의 길이와 그 사이의 각을 이용하여 삼각형의 넓이를 구하는 전형적인 기하학 문제입니다. 삼각형 넓이 공식을 직접 적용할 수 있어 비교적 간단하게 해결할 수 있습니다.\n\n        **사고 과정 기록 (실행 단계):**\n        단계 1 (분기: main, 완료: True): 삼각형 넓이 공식을 적용하여 문제를 해결하겠습니다.\n\n삼각형 ABC의 넓이를 구하기 위해 다음 공식을 사용합니다:\n\n$\\text{넓이} = \\frac{1}{2} \\times a \\times b \\times \\sin C$\n\n여기서:\n$a = \\overline{AB} = 4\\text{ cm}$\n$b = \\overline{BC} = 3\\text{ cm}$\n$C = \\angle B = 30^\\circ$\n\n이 값들을 공식에 대입하면:\n\n$\\text{넓이} = \\frac{1}{2} \\times 4 \\times 3 \\times \\sin 30^\\circ$\n\n$\\sin 30^\\circ = \\frac{1}{2}$ 임을 알고 있으므로, 이를 대입하면:\n\n$\\text{넓이} = \\frac{1}{2} \\times 4 \\times 3 \\times \\frac{1}{2}$\n\n$= 2 \\times 3 \\times \\frac{1}{2}$\n\n$= 3\\text{ cm}^2$\n\n따라서, 삼각형 ABC의 넓이는 $3\\text{ cm}^2$ 입니다.\n\n\n        **최종 요약 지침:**\n        - 오직 JSON 배열만 반환하세요. (불필요한 텍스트, 마크다운, 설명, 안내문, 예시, 코드블록 등 절대 포함하지 마세요)\n        - JSON 배열 이외의 어떤 텍스트도 반환하지 마세요.\n        - 예시라는 단어도 포함하지 마세요.\n        - 아래는 참고용 형식입니다. (이 형식만 따르세요)\n        [\n          {\"title\": \"문제 이해\", \"content\": \"...$\\text{넓이}=\\frac{1}{2}ab\\sin C$...\", \"hint\": \"...\"},\n          {\"title\": \"공식 적용\", \"content\": \"$...$\"},\n          {\"title\": \"정답\", \"content\": \"$...$\"}\n        ]\n        "}
+2025-05-12 16:22:06,340 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: b84f6dd0-01df-406f-80da-139f8933337d, 단계 수: 1
+2025-05-12 16:22:06,351 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overl..., 유형: geometry
+2025-05-12 16:22:06,352 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:22:06,690 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:22:06,690 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:22:06,690 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 16:29:21,760 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:29:23,624 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 127
+2025-05-12 16:29:23,624 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, 
+$\angle B = 30^\circ$ 일 때,...
+2025-05-12 16:29:23,624 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:29:23,624 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:29:23,980 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:29:23,980 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:29:23,980 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 16:29:23,980 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 16:29:35,339 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:29:35,339 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 16:29:35,339 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 16:29:44,555 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:29:44,559 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 16:29:44,559 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 16:29:44,559 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 16:29:44,559 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 16:29:44,559 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 16:29:53,829 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:29:53,829 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: [
+  {
+    "title": "문제 이해",
+    "content": ""삼각형 ABC에서 $\\\\overline{AB} = 4\\\\text{cm}$, $\\\\overline{BC} = 3\\\\text{cm}$, $\\\\angle B = 30^\\\\circ$일 때, 삼각형의 넓이를 구해야 합니다. 이를 위해 삼각형 넓이 공식 $\\\\text{넓이} = \\\\frac{1}{2} \\\\times a \\\\times b \\\\times \\\\sin C$를 사용할 수 있습니다.",
+    "hint": ""두 변의 길이와 그 사이의 각을 알고 있으므로 삼각형 넓이 공식을 직접 적용할 수 있습니다."
+  },
+  {
+    "title": "공식 적용",
+    "content": ""넓이 공식에 주어진 값을 대입합니다: $\\\\text{넓이} = \\\\frac{1}{2} \\\\times 4 \\\\times 3 \\\\times \\\\sin 30^\\\\circ$\\n$= 6 \\\\times \\\\sin 30^\\\\circ$\\n$\\\\sin 30^\\\\circ = \\\\frac{1}{2}$ 이므로,\\n$\\\\text{넓이} = 6 \\\\times \\\\frac{1}{2} = 3 \\\\text{ cm}^2$",
+    "hint": ""$\\\\sin 30^\\\\circ = \\\\frac{1}{2}$ 임을 기억하세요."
+  },
+  {
+    "title": "정답",
+    "content": ""삼각형 ABC의 넓이는 $3 \\\\text{ cm}^2$ 입니다.",
+    "hint": ""결과의 단위가 $\\\\text{cm}^2$임을 확인하세요."
+  }
+]
+2025-05-12 16:29:53,829 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: fe8f1fcf-5606-438d-bffb-a9ad79d8dcf7, 단계 수: 1
+2025-05-12 16:29:53,835 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overl..., 유형: geometry
+2025-05-12 16:29:53,840 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:29:54,182 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:29:54,182 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:29:54,182 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 16:35:35,800 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:35:37,636 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 126
+2025-05-12 16:35:37,636 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, $\angle B = 30^\circ$ 일 때, ...
+2025-05-12 16:35:37,636 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:35:37,637 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:35:38,011 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:35:38,011 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:35:38,011 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 16:35:38,011 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 16:35:47,650 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:35:47,650 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 16:35:47,650 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 16:36:01,045 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:36:01,045 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 16:36:01,045 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 16:36:01,045 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 16:36:01,045 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 16:36:01,045 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 16:36:10,195 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:36:10,195 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: [
+  {
+    "title": "문제 이해",
+    "content": "삼각형 ABC에서 $\\\\overline{AB} = 4\\\\text{cm}$, $\\\\overline{BC} = 3\\\\text{cm}$, $\\\\angle B = 30^\\\\circ$일 때, 삼각형의 넓이를 구해야 합니다. 삼각형 넓이 공식 $\\\\text{넓이} = \\\\frac{1}{2} \\\\times a \\\\times b \\\\times \\\\sin C$를 사용할 수 있습니다.",
+    "hint": "$\\\\sin 30^\\\\circ = \\\\frac{1}{2}$ 임을 기억하세요."
+  },
+  {
+    "title": "공식 적용",
+    "content": "$\\\\text{넓이} = \\\\frac{1}{2} \\\\times 4 \\\\times 3 \\\\times \\\\sin 30^\\\\circ = \\\\frac{1}{2} \\\\times 4 \\\\times 3 \\\\times \\\\frac{1}{2}$"
+  },
+  {
+    "title": "정답",
+    "content": "삼각형 ABC의 넓이 $= 2 \\\\times 3 \\\\times \\\\frac{1}{2} = 3\\\\text{ cm}^2$"
+  }
+]
+2025-05-12 16:36:10,195 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: 45cbba3d-ee38-447b-8ce0-2950e7a82f2c, 단계 수: 1
+2025-05-12 16:36:10,200 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overl..., 유형: geometry
+2025-05-12 16:36:10,200 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:36:10,559 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:36:10,560 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:36:10,560 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 16:39:06,198 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 126
+2025-05-12 16:39:06,199 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, $\angle B = 30^\circ$ 일 때, ...
+2025-05-12 16:39:06,199 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:39:06,199 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:39:06,547 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:39:06,548 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:39:06,548 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 16:39:06,548 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 16:39:18,829 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:39:18,829 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 16:39:18,829 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 16:39:27,548 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:39:27,555 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 16:39:27,555 - app.services.math_solver - INFO - === 사고 단계 2/10 (분기: main) 처리 중 ===
+2025-05-12 16:39:37,913 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:39:37,913 - app.services.math_solver - INFO - 사고 단계 2 응답 수신
+2025-05-12 16:39:37,913 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 16:39:37,913 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 16:39:37,913 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 16:39:37,913 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 16:39:49,368 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:39:49,368 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: [
+  {
+    "title": "문제 이해",
+    "content": "삼각형 ABC에서 $\\\\overline{AB} = 4\\\\text{cm}$, $\\\\overline{BC} = 3\\\\text{cm}$, $\\\\angle B = 30^\\\\circ$일 때, 삼각형의 넓이를 구해야 합니다. 이는 두 변의 길이와 그 사이의 각을 이용하는 삼각형 넓이 공식을 사용하여 해결할 수 있습니다.",
+    "hint": "삼각형 넓이 공식: $\\\\text{넓이} = \\\\frac{1}{2} \\\\times a \\\\times b \\\\times \\\\sin C$"
+  },
+  {
+    "title": "공식 적용",
+    "content": "삼각형 넓이 공식에 주어진 값을 대입합니다:\\n$\\\\text{넓이} = \\\\frac{1}{2} \\\\times 4 \\\\times 3 \\\\times \\\\sin 30^\\\\circ$\\n$\\\\sin 30^\\\\circ = \\\\frac{1}{2}$이므로,\\n$\\\\text{넓이} = \\\\frac{1}{2} \\\\times 4 \\\\times 3 \\\\times \\\\frac{1}{2}$",
+    "hint": "$\\\\sin 30^\\\\circ = \\\\frac{1}{2}$를 기억하세요."
+  },
+  {
+    "title": "정답",
+    "content": "계산 결과:\\n$\\\\text{넓이} = \\\\frac{1}{2} \\\\times 4 \\\\times 3 \\\\times \\\\frac{1}{2} = 3 \\\\text{ cm}^2$\\n따라서, 삼각형 ABC의 넓이는 3 $\\\\text{cm}^2$ 입니다."
+  }
+]
+2025-05-12 16:39:49,368 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: db7fa4f0-7972-4295-8935-dce4a5218daf, 단계 수: 1
+2025-05-12 16:39:49,380 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overl..., 유형: geometry
+2025-05-12 16:39:49,381 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:39:49,712 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:39:49,714 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:39:49,714 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 16:48:57,725 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:48:59,532 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 127
+2025-05-12 16:48:59,532 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, 
+$\angle B = 30^\circ$ 일 때,...
+2025-05-12 16:48:59,532 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:48:59,532 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:48:59,891 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:48:59,891 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:48:59,891 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 16:48:59,891 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 16:49:10,177 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:49:10,177 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 16:49:10,177 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 16:49:17,959 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:49:17,959 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 16:49:17,967 - app.services.math_solver - INFO - === 사고 단계 2/10 (분기: main) 처리 중 ===
+2025-05-12 16:49:28,517 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:49:28,517 - app.services.math_solver - INFO - 사고 단계 2 응답 수신
+2025-05-12 16:49:28,517 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 16:49:28,517 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 16:49:28,517 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 16:49:28,517 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 16:49:40,649 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:49:40,658 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: [
+  {"title": "문제 이해", "content": "삼각형 ABC에서 $\overline{AB}=4\text{cm}$, $\overline{BC}=3\text{cm}$, $\angle B=30^\circ$일 때, 삼각형의 넓이를 구하세요.", "hint": "삼각형 넓이 공식: $\text{넓이} = \frac{1}{2} \times a \times b \times \sin C$"},
+  {"title": "공식 적용", "content": "$\text{넓이} = \frac{1}{2} \times 4 \times 3 \times \sin 30^\circ = 6 \times \sin 30^\circ$", "hint": "$\sin 30^\circ = \frac{1}{2}$ 임을 기억하세요."},
+  {"title": "계산 수행", "content": "$\text{넓이} = 6 \times \frac{1}{2} = 3 \text{ cm}^2$"},
+  {"title": "정답", "content": "삼각형 ABC의 넓이는 $3 \text{ cm}^2$입니다."}
+]
+2025-05-12 16:49:40,659 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: 1f79e79e-92d8-425d-98f2-876b239fb001, 단계 수: 1
+2025-05-12 16:49:40,665 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overl..., 유형: geometry
+2025-05-12 16:49:40,666 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:49:41,009 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:49:41,009 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:49:41,009 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 16:52:55,036 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:52:56,583 - app.routers.math - INFO - 문제 해결 요청 - 문제 유형: geometry, 텍스트 길이: 127
+2025-05-12 16:52:56,583 - app.services.math_solver - INFO - 수학 문제 풀이 시작: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overline{BC} = 3\text{cm}$, 
+$\angle B = 30^\circ$ 일 때,...
+2025-05-12 16:52:56,584 - app.services.math_solver - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:52:56,584 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:52:56,956 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:52:56,961 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:52:56,961 - app.services.math_solver - INFO - 유사 문제 3개 찾음
+2025-05-12 16:52:56,961 - app.services.math_solver - INFO - === Sequential Thinking 기반 문제 해결 시작 ===
+2025-05-12 16:53:07,089 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:53:07,090 - app.services.math_solver - INFO - 초기 분석 완료
+2025-05-12 16:53:07,091 - app.services.math_solver - INFO - === 사고 단계 1/10 (분기: main) 처리 중 ===
+2025-05-12 16:53:15,035 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:53:15,036 - app.services.math_solver - INFO - 사고 단계 1 응답 수신
+2025-05-12 16:53:15,036 - app.services.math_solver - INFO - === 사고 단계 2/10 (분기: main) 처리 중 ===
+2025-05-12 16:53:28,568 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:53:28,570 - app.services.math_solver - INFO - 사고 단계 2 응답 수신
+2025-05-12 16:53:28,570 - app.services.math_solver - INFO - 완료 키워드 'THOUGHT_COMPLETE' 발견 (편집 거리: 0)
+2025-05-12 16:53:28,570 - app.services.math_solver - INFO - 완료 신호 감지, 사고 단계 루프 종료
+2025-05-12 16:53:28,570 - app.services.math_solver - INFO - === Sequential Thinking 완료: 1개 사고 단계 생성 ===
+2025-05-12 16:53:28,570 - app.services.math_solver - INFO - 최종 요약 생성 중...
+2025-05-12 16:53:37,482 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-05-12 16:53:37,482 - app.services.math_solver - INFO - [최종 요약 LLM 응답]: [{"title": "문제 이해", "content": "삼각형 ABC에서 $\\overline{AB} = 4\\text{cm}$, $\\overline{BC} = 3\\text{cm}$, $\\angle B = 30^\\circ$일 때, 삼각형의 넓이를 구해야 합니다.", "hint": "삼각형 넓이 공식 $\\text{넓이} = \\frac{1}{2} \\times a \\times b \\times \\sin C$를 사용하세요."}, {"title": "공식 적용", "content": "넓이 공식에 주어진 값을 대입합니다: $\\text{넓이} = \\frac{1}{2} \\times 4 \\times 3 \\times \\sin 30^\\circ$", "hint": "$\\sin 30^\\circ = \\frac{1}{2}$ 임을 기억하세요."}, {"title": "계산", "content": "$\\text{넓이} = 6 \\times \\sin 30^\\circ = 6 \\times \\frac{1}{2} = 3 \\text{cm}^2$"}, {"title": "최종 요약", "content": "삼각형 ABC의 넓이는 $3 \\text{cm}^2$ 입니다."}]
+2025-05-12 16:53:37,486 - app.routers.math - INFO - 문제 해결 완료 - 문제 ID: c5929372-1dcf-41a4-839c-feb1389ef622, 단계 수: 1
+2025-05-12 16:53:37,486 - app.routers.math - INFO - 유사 문제 검색 요청 - 쿼리: 1. 삼각형 ABC에서 $\overline{AB} = 4\text{cm}$, $\overl..., 유형: geometry
+2025-05-12 16:53:37,486 - app.services.vector_service - INFO - 감지된 개념: ['삼각형']
+2025-05-12 16:53:37,826 - app.services.vector_service - INFO - Qdrant 전체 문제 개수(검색 결과): 6
+2025-05-12 16:53:37,826 - app.services.vector_service - INFO - Qdrant 유사 문제(임계값 0.85) 개수: 3
+2025-05-12 16:53:37,826 - app.routers.math - INFO - 유사 문제 검색 완료 - 3개 결과 반환
+2025-05-12 16:54:00,316 - app.services.vector_service - INFO - Qdrant compact 저장 성공: b81192c9-0199-4bdb-bf9c-4436d6c33d35

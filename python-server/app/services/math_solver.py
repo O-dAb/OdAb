@@ -296,6 +296,8 @@ class MathSolver:
             try:
                 summary_response = await self._call_claude_api(summary_prompt, max_tokens=1000)
                 final_summary = summary_response.strip()
+                # 후처리: LLM 응답을 최종 JSON으로 정규화
+                final_summary = self.postprocess_llm_response(final_summary)
                 logger.info(f"[최종 요약 LLM 응답]: {final_summary}")
                 try:
                     # LLM 응답이 파이썬 객체(리스트/딕트)라면 문자열로 변환
@@ -395,7 +397,7 @@ LaTeX을 사용하여 수식을 명확하게 표현해 주세요. 답을 아직 
         """순차적 사고 과정을 위한 프롬프트 생성"""
         
         prompt = f"""
-        당신은 수학 문제 해결을 위한 전문가 어시스턴트로, 단계별 사고 과정을 통해 문제를 해결하고 있습니다.
+        당신은 수학 문제 해결을 위한 수학 선생님 어시스턴트로, 단계별 사고 과정을 통해 문제를 해결하고 있습니다.
 
         **원본 문제:** {problem_text}
         
@@ -422,6 +424,9 @@ LaTeX을 사용하여 수식을 명확하게 표현해 주세요. 답을 아직 
         3. 논리적 단계마다 명확한 이유를 설명하세요.
         4. 가능하면 중간 검증 단계를 포함하세요.
         5. 증명 문제의 경우, 각 논리적 단계 사이의 연결을 분명히 보여주세요.
+        6. 계산기처럼 근삿값(예: $\sqrt{2} \approx 1.414$)을 직접 계산하지 마세요.
+        7. 사람이 일반적으로 하지 않는 복잡한 수치 계산(무리수, 소수점 근사 등)은 피하고, 수학적 성질과 논리적 변형을 통해 풀이하세요.
+        8. 답은 기호(예: $\sqrt{2}$, $\pi$ 등)나 수식 형태로 남기세요.
 
         **응답 지침:**
         1. 단계 {thought_number}에 대한 사고와 행동을 명확히 설명하세요.
@@ -472,12 +477,15 @@ LaTeX을 사용하여 수식을 명확하게 표현해 주세요. 답을 아직 
         summary_prompt += """
         **최종 요약 지침:**
         - 반드시 아래 예시처럼 JSON 배열만 반환하세요. (불필요한 텍스트, 마크다운, 설명, 라벨 등 금지)
+        - 각 content, hint 등 문자열 내부의 LaTeX 역슬래시(\)는 반드시 두 번(\\) 이스케이프해서 반환하세요. (예: $\\frac{1}{2}$)
         - 마지막 단계의 title은 반드시 '정답' 또는 '최종 요약'으로 하세요.
+        - 한글 등 일반 텍스트는 반드시 수식($...$) 밖에 두세요.
+        - $...$ 또는 \\(...\\) 안에는 수식(영문, 기호, 숫자 등)만 넣으세요.
         예시:
         [
-          {"title": "문제 이해", "content": "...", "hint": "..."},
-          {"title": "공식 적용", "content": "$...$"},
-          {"title": "정답", "content": "$...$"}
+          {"title": "문제 이해", "content": "삼각형 ABC에서 $\\overline{AB}=4\\text{cm}$, $\\overline{BC}=3\\text{cm}$, $\\angle B=30^\\circ$일 때, 삼각형의 넓이를 구하세요.", "hint": "$\\sin 30^\\circ = \\frac{1}{2}$ 임을 기억하세요."},
+          {"title": "공식 적용", "content": "$\\text{넓이} = \\frac{1}{2} \\times 4 \\times 3 \\times \\sin 30^\\circ = 6 \\times \\sin 30^\\circ$"},
+          {"title": "정답", "content": "삼각형 ABC의 넓이 $= 6 \\times \\frac{1}{2} = 3 \\text{cm}^2$"}
         ]
         """
         
@@ -683,4 +691,48 @@ LaTeX을 사용하여 수식을 명확하게 표현해 주세요. 답을 아직 
         # ClaudeService의 send_message는 dict를 반환하므로, 텍스트만 추출
         if isinstance(result, dict) and "content" in result:
             return result["content"]
-        return str(result) 
+        return str(result)
+
+    def _escape_latex_in_json_values(self, json_str: str) -> str:
+        """content, hint, explanation 등 value 내부의 역슬래시를 모두 두 번 이스케이프"""
+        def replacer(match):
+            value = match.group(2)
+            value = value.replace('\\', '\\\\')
+            return f'{match.group(1)}"{value}"'
+        fields = ["content", "hint", "explanation"]
+        for field in fields:
+            json_str = re.sub(rf'("{field}":\s?")([^"]*)"', replacer, json_str)
+        return json_str
+
+    def _normalize_quotes(self, json_str: str) -> str:
+        """content, hint, explanation 등 value의 앞/뒤 이중 따옴표를 한 개로 정규화"""
+        fields = ["content", "hint", "explanation"]
+        for field in fields:
+            # 앞쪽 이중 따옴표를 한 개로
+            json_str = re.sub(rf'("{field}":\s*)""', rf'\1"', json_str)
+            # 뒤쪽 이중 따옴표를 한 개로 (value 끝에만)
+            json_str = re.sub(rf'("{field}":\s*"[^"]*)""(\s*[\,\}}])', rf'\1"\2', json_str)
+        return json_str
+
+    def _remove_double_quotes(self, json_str: str) -> str:
+        """content, hint, explanation 등 value의 이중 따옴표를 한 번만 남기도록 후처리"""
+        fields = ["content", "hint", "explanation"]
+        for field in fields:
+            json_str = re.sub(rf'("{field}": )""([^"]*)""', rf'\1"\2"', json_str)
+        return json_str
+
+    def postprocess_llm_response(self, text: str) -> str:
+        """LLM 응답에서 JSON 배열만 추출, 파이썬 객체로 파싱 후 json.dumps로 직렬화 (역슬래시 2개 보장)"""
+        import re
+        import json
+        # 1. JSON 배열만 추출
+        match = re.search(r'\[.*\]', text, re.DOTALL)
+        json_str = match.group(0) if match else text
+        # 2. 파이썬 객체로 파싱
+        try:
+            obj = json.loads(json_str)
+        except Exception as e:
+            # 파싱 실패 시 원본 반환 (프론트에서 fallback)
+            return json_str
+        # 3. 다시 json.dumps로 직렬화 (역슬래시 2개로 자동 변환)
+        return json.dumps(obj, ensure_ascii=False) 

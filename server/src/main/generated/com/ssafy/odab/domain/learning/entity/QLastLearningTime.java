@@ -11,16 +11,16 @@ import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
- * QLastLearningDate is a Querydsl query type for LastLearningDate
+ * QLastLearningTime is a Querydsl query type for LastLearningTime
  */
 @Generated("com.querydsl.codegen.DefaultEntitySerializer")
-public class QLastLearningDate extends EntityPathBase<LastLearningDate> {
+public class QLastLearningTime extends EntityPathBase<LastLearningTime> {
 
-    private static final long serialVersionUID = 1230819062L;
+    private static final long serialVersionUID = 1231303189L;
 
     private static final PathInits INITS = PathInits.DIRECT2;
 
-    public static final QLastLearningDate lastLearningDate1 = new QLastLearningDate("lastLearningDate1");
+    public static final QLastLearningTime lastLearningTime = new QLastLearningTime("lastLearningTime");
 
     public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
@@ -30,23 +30,23 @@ public class QLastLearningDate extends EntityPathBase<LastLearningDate> {
 
     public final com.ssafy.odab.domain.user.entity.QUser user;
 
-    public QLastLearningDate(String variable) {
-        this(LastLearningDate.class, forVariable(variable), INITS);
+    public QLastLearningTime(String variable) {
+        this(LastLearningTime.class, forVariable(variable), INITS);
     }
 
-    public QLastLearningDate(Path<? extends LastLearningDate> path) {
+    public QLastLearningTime(Path<? extends LastLearningTime> path) {
         this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
-    public QLastLearningDate(PathMetadata metadata) {
+    public QLastLearningTime(PathMetadata metadata) {
         this(metadata, PathInits.getFor(metadata, INITS));
     }
 
-    public QLastLearningDate(PathMetadata metadata, PathInits inits) {
-        this(LastLearningDate.class, metadata, inits);
+    public QLastLearningTime(PathMetadata metadata, PathInits inits) {
+        this(LastLearningTime.class, metadata, inits);
     }
 
-    public QLastLearningDate(Class<? extends LastLearningDate> type, PathMetadata metadata, PathInits inits) {
+    public QLastLearningTime(Class<? extends LastLearningTime> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
         this.subConcept = inits.isInitialized("subConcept") ? new com.ssafy.odab.domain.concept.entity.QSubConcept(forProperty("subConcept"), inits.get("subConcept")) : null;
         this.user = inits.isInitialized("user") ? new com.ssafy.odab.domain.user.entity.QUser(forProperty("user")) : null;
