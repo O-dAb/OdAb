@@ -67,7 +67,7 @@ public class QuestionServiceImpl implements QuestionService {
         // 문제id에 해당하는 문제 찾아오기
         Question question = questionRepository.findById(questionId).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
         // 문제별 정답 여부에서 가장 최근 정답기록 찾아오기
-        List<RetryQuestionResponseDto> retryQuestionResponseDtos = questionResultRepository.findRecentQuestionResultByQuestionId(questionId);
+        List<RetryQuestionResponseDto> retryQuestionResponseDtos = questionResultRepository.findRetryQuestionResultByQuestionId(questionId);
         RetryQuestionResponseDto retryQuestionResponseDto = retryQuestionResponseDtos.get(0);
         List<SubConcept> subConcepts = subConceptRepository.findByQuestionId(questionId);
         Set<RetryQuestionSubConceptDto> retryQuestionSubConceptDtoSet = subConcepts.stream().map(RetryQuestionSubConceptDto::from).collect(Collectors.toSet());

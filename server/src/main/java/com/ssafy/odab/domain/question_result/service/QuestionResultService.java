@@ -15,5 +15,5 @@ public interface QuestionResultService {
 
     WrongQuestionResponseDto findRecentWrongAnswersBySchoolLevel(String schoolLevel, Integer userId, LocalDateTime startTime);
 
-    WrongQuestionResponseDto findRecentWrongAnswersByGrade(Integer grade, Integer userId, LocalDateTime startTime);
+    WrongQuestionResponseDto findRecentWrongAnswersByGrade(Byte grade, Integer userId, LocalDateTime startTime);
 }

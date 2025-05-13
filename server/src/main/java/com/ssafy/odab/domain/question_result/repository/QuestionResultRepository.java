@@ -19,12 +19,15 @@ public interface QuestionResultRepository extends JpaRepository<QuestionResult, 
     @Query("select distinct q from Question q join fetch q.questionResults qr where q.user.id = :userId")
     List<Question> findWrongQuestionsByUserId(@Param("userId") Integer userId);
 
+    @Query("select distinct q from Question q join fetch q.questionResults qr where q.user.id = :userId and q.registedAt between :start and :end")
+    List<Question> findRecentWrongQuestionsByUserId(@Param("userId") Integer userId, @Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
     @Query(value = "select new com.ssafy.odab.domain.question.dto.RetryQuestionResponseDto("
             + " q.id, q.questionImg, q.questionText, q.answer, q.registedAt, "
             + " qr.isCorrect, qr.times, qr.solvedAt) "
             + " from Question q join q.questionResults qr "
             + " where q.id = :questionId order by qr.solvedAt desc")
-    List<RetryQuestionResponseDto> findRecentQuestionResultByQuestionId(
+    List<RetryQuestionResponseDto> findRetryQuestionResultByQuestionId(
             @Param("questionId") Integer questionId);
 
     @Query("select q from Question q join fetch q.questionConcepts qc join fetch qc.subConcept sc where q.user.id = :userId and sc.gradeLevel.grade in (:grades)")
