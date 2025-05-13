@@ -18,20 +18,20 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/login/oauth2/code/kakao",
-                    "/login/oauth2/code/kakao/**",
-                    "/api/v1/auth/kakao/**",
-                    "/api/auth/**",
-                    "/api/health",
-                    "/swagger-ui/**",
-                    "/v3/api-docs/**"
-                ).permitAll()
-                .anyRequest().permitAll()
-            )
-            .oauth2Login(oauth2 -> oauth2.disable());
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/login/oauth2/code/kakao",
+                                "/login/oauth2/code/kakao/**",
+                                "/api/v1/auth/kakao/**",
+                                "/api/auth/**",
+                                "/api/health",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
+                        ).permitAll()
+                        .anyRequest().permitAll()
+                )
+                .oauth2Login(oauth2 -> oauth2.disable());
         return http.build();
     }
 
@@ -48,9 +48,4 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
     }
-
-
-
-
-
 }
