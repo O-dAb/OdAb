@@ -44,6 +44,7 @@ export function SettingsPage({
   const fileInputRef = useRef<HTMLInputElement>(null)
   const { toast } = useToast()
   const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [showSettingsModal, setShowSettingsModal] = useState(false) // 설정 모달 상태 추가
   
   // 추가된 useEffect: 컴포넌트 마운트 시 localStorage에서 이미지 URL 불러오기
   useEffect(() => {
@@ -100,6 +101,11 @@ export function SettingsPage({
     setShowSuccessModal(false);
   };
 
+  // 설정 모달 닫기 핸들러 추가
+  const handleCloseSettingsModal = () => {
+    setShowSettingsModal(false);
+  };
+
   const handleSaveSettings = () => {
     // 설정 저장
     localStorage.setItem(
@@ -109,10 +115,8 @@ export function SettingsPage({
       }),
     )
 
-    toast({
-      title: "설정이 저장되었습니다",
-      description: "앱 설정이 성공적으로 저장되었습니다.",
-    })
+    // 토스트 대신 모달 표시
+    setShowSettingsModal(true);
   }
 
   const handleResetData = () => {
@@ -228,7 +232,7 @@ export function SettingsPage({
     <div className="space-y-6">
       <h1 className="text-2xl font-bold">설정</h1>
 
-      {/* 성공 확인 모달 */}
+      {/* 프로필 성공 확인 모달 */}
       <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
@@ -241,6 +245,28 @@ export function SettingsPage({
             <Button 
               onClick={handleCloseSuccessModal}
               className={`${level === "middle" ? "bg-green-500" : "bg-blue-500"} hover:${level === "middle" ? "bg-green-600" : "bg-blue-600"}`}
+            >
+              확인
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* 설정 성공 확인 모달 */}
+      <Dialog open={showSettingsModal} onOpenChange={setShowSettingsModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>설정 저장 완료</DialogTitle>
+            <DialogDescription>
+              앱 설정이 성공적으로 변경되었습니다.
+              <br />
+              {darkMode ? ' 다크 모드가 활성화되었습니다.' : ' 라이트 모드가 활성화되었습니다.'}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="sm:justify-center">
+            <Button 
+              onClick={handleCloseSettingsModal}
+              className="bg-yellow-400 hover:bg-yellow-500"
             >
               확인
             </Button>
