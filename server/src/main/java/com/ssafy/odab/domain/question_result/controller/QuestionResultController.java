@@ -28,7 +28,7 @@ public class QuestionResultController {
     @GetMapping("{schoolLevel}")
     public ResponseEntity<WrongQuestionResponseDto> findWrongAnswersBySchoolLevel(
             @PathVariable("schoolLevel") String schoolLevel) {
-        Integer userId = 1;
+        Integer userId = 2;
         WrongQuestionResponseDto wrongQuestionResponseDto =
                 questionResultService.findWrongAnswersBySchoolLevel(schoolLevel, userId);
         return ResponseEntity.ok(wrongQuestionResponseDto);
@@ -45,21 +45,23 @@ public class QuestionResultController {
     // 전체 최근 오답 조회
     @GetMapping("{schoolLevel}/recent")
     public ResponseEntity<WrongQuestionResponseDto> findRecentWrongAnswersBySchoolLevel(
-            @PathVariable("schoolLevel") String schoolLevel, @RequestParam(name = "days", defaultValue = "14") Integer days) {
-        Integer userId = 1;
-        LocalDateTime startDate = LocalDateTime.now().minusDays(days);
+            @PathVariable("schoolLevel") String schoolLevel, @RequestParam(name = "days", defaultValue = "25") Integer days) {
+        Integer userId = 2;
+        LocalDateTime startTime = LocalDateTime.now().minusDays(days);
         WrongQuestionResponseDto wrongQuestionResponseDto =
-                questionResultService.findRecentWrongAnswersBySchoolLevel(schoolLevel, userId, startDate);
+                questionResultService.findRecentWrongAnswersBySchoolLevel(schoolLevel, userId, startTime);
         return ResponseEntity.ok(wrongQuestionResponseDto);
     }
 
     // 학년별 최근 오답 조회
     @GetMapping("{grade}/recent/grade")
-    public ResponseEntity<Void> findRecentWrongAnswersByGrade(@PathVariable("grade") Integer grade, @RequestParam(name = "days", defaultValue = "14") Integer days) {
-        Integer userId = 1;
-        LocalDateTime startDate = LocalDateTime.now().minusDays(days);
-
-        return null;
+    public ResponseEntity<WrongQuestionResponseDto> findRecentWrongAnswersByGrade(@PathVariable("grade") Byte grade,
+                                                                                  @RequestParam(name = "days", defaultValue = "25") Integer days) {
+        Integer userId = 2;
+        LocalDateTime startTime = LocalDateTime.now().minusDays(days);
+        WrongQuestionResponseDto wrongQuestionResponseDto =
+                questionResultService.findRecentWrongAnswersByGrade(grade, userId, startTime);
+        return ResponseEntity.ok(wrongQuestionResponseDto);
     }
 
     // 주제별 최근 오답 조회

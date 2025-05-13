@@ -1,5 +1,6 @@
 package com.ssafy.odab.domain.question_result.dto;
 
+import com.ssafy.odab.domain.concept.entity.SubConcept;
 import com.ssafy.odab.domain.question.entity.QuestionSolution;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,6 +29,7 @@ public class WrongQuestionResponseDto {
         private String answer;
         private LocalDateTime registDate;
         private List<WrongQuestionSolution> wrongQuestionSolutions;
+        private List<WrongQuestionSubconcept> wrongQuestionSubconceptList;
 
         @Builder
         @Getter
@@ -53,6 +55,15 @@ public class WrongQuestionResponseDto {
     public static class WrongQuestionSubconcept {
         private Integer subConceptId;
         private String subConceptType;
+
+
+
+        public static WrongQuestionSubconcept from(SubConcept subConcept) {
+            return new WrongQuestionSubconcept(
+                    subConcept.getId(),
+                    subConcept.getConceptType()
+            );
+        }
     }
 
 }

@@ -48,6 +48,8 @@ public class QuestionResultServiceImpl implements QuestionResultService {
                         .questionImg(question.getQuestionImg())
                         .questionText(question.getQuestionText())
                         .registDate(question.getRegistedAt())
+                        .wrongQuestionSubconceptList(question.getQuestionConcepts().stream()
+                                .map(questionConcept -> WrongQuestionSubconcept.from(questionConcept.getSubConcept())).toList())
                         .answer(question.getAnswer())
                         .wrongQuestionSolutions(question.getQuestionSolutions().stream().map(
                                         WrongQuestionSolution::from)
@@ -81,6 +83,7 @@ public class QuestionResultServiceImpl implements QuestionResultService {
                 grades.add(i + 4);
             }
         }
+
         List<Question> wrongQuestions = questionResultRepository.findWrongQuestionsByUserIdAndSchoolLevel(
                 userId, grades);
         List<WrongQuestionDto> gradeWrongQuestionResponseDtos = wrongQuestions.stream()
@@ -89,6 +92,8 @@ public class QuestionResultServiceImpl implements QuestionResultService {
                         .questionImg(question.getQuestionImg())
                         .questionText(question.getQuestionText())
                         .registDate(question.getRegistedAt())
+                        .wrongQuestionSubconceptList(question.getQuestionConcepts().stream()
+                                .map(questionConcept -> WrongQuestionSubconcept.from(questionConcept.getSubConcept())).toList())
                         .answer(question.getAnswer())
                         .wrongQuestionSolutions(
                                 question.getQuestionSolutions().stream()
@@ -156,6 +161,8 @@ public class QuestionResultServiceImpl implements QuestionResultService {
                         .questionImg(question.getQuestionImg())
                         .questionText(question.getQuestionText())
                         .registDate(question.getRegistedAt())
+                        .wrongQuestionSubconceptList(question.getQuestionConcepts().stream()
+                                .map(questionConcept -> WrongQuestionSubconcept.from(questionConcept.getSubConcept())).toList())
                         .answer(question.getAnswer())
                         .wrongQuestionSolutions(
                                 question.getQuestionSolutions().stream()
@@ -181,9 +188,36 @@ public class QuestionResultServiceImpl implements QuestionResultService {
 
     @Override
     @Transactional
-    public WrongQuestionResponseDto findRecentWrongAnswersByGrade(Integer grade, Integer userId,
+    public WrongQuestionResponseDto findRecentWrongAnswersByGrade(Byte grade, Integer userId,
                                                                   LocalDateTime startTime) {
-
-        return null;
+        List<Question> wrongQuestions = questionResultRepository.findRecentWrongQuestionsByUserId(userId, startTime, LocalDateTime.now());
+        wrongQuestions = wrongQuestions.stream().filter(
+                question -> question.getQuestionConcepts().stream().anyMatch(
+                        questionConcept -> questionConcept.getSubConcept().getGradeLevel().getGrade()
+                                .equals(grade))).toList();
+        List<Integer> wrongQuestionIds = wrongQuestions.stream().map(Question::getId).toList();
+        List<SubConcept> subConcepts = subConceptRepository.findByQuestionIds(wrongQuestionIds);
+        List<WrongQuestionDto> gradeWrongQuestionResponseDtos = wrongQuestions.stream()
+                .map(question -> WrongQuestionDto.builder()
+                        .questionId(question.getId())
+                        .questionImg(question.getQuestionImg())
+                        .questionText(question.getQuestionText())
+                        .registDate(question.getRegistedAt())
+                        .wrongQuestionSubconceptList(question.getQuestionConcepts().stream()
+                                .map(questionConcept -> WrongQuestionSubconcept.from(questionConcept.getSubConcept())).toList())
+                        .answer(question.getAnswer())
+                        .wrongQuestionSolutions(question.getQuestionSolutions().stream().map(
+                                        WrongQuestionSolution::from)
+                                .sorted(Comparator.comparingInt(WrongQuestionSolution::getStep))
+                                .toList())
+                        .build()).toList();
+        Set<WrongQuestionSubconcept> wrongQuestionSubconcepts = subConcepts.stream()
+                .map(subConcept -> new WrongQuestionSubconcept(
+                        subConcept.getId(),
+                        subConcept.getConceptType()
+                )).collect(Collectors.toSet());
+        return WrongQuestionResponseDto.builder()
+                .gradeWrongQuestionDtos(gradeWrongQuestionResponseDtos)
+                .wrongQuestionSubconcepts(wrongQuestionSubconcepts).build();
     }
 }

@@ -1,14 +1,11 @@
 package com.ssafy.odab.domain.user.controller;
 
 import com.ssafy.odab.domain.user.dto.KakaoUserInfo;
-import com.ssafy.odab.domain.user.entity.User;
+import com.ssafy.odab.domain.user.dto.ProfileImageResponse;
 import com.ssafy.odab.domain.user.service.JwtService;
-import com.ssafy.odab.domain.user.dto.ProfileImageResponse;
 import com.ssafy.odab.domain.user.service.KakaoService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import com.ssafy.odab.domain.user.dto.ProfileImageResponse;
 import com.ssafy.odab.domain.user.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -148,5 +145,4 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "학년 업데이트 중 오류가 발생했습니다."));
         }
     }
-
 }
