@@ -1,22 +1,32 @@
-"use client"
+"use client";
 
-import { Badge } from "@/components/ui/badge"
-import { useState, useEffect, useMemo } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Search, GraduationCap } from "lucide-react"
-import type { EducationLevel, Grade } from "@/components/user-profile"
-import { getCurriculumConcepts, getAllCurriculumConcepts } from "@/lib/curriculum-data"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Badge } from "@/components/ui/badge";
+import { useState, useEffect, useMemo } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Search, GraduationCap } from "lucide-react";
+import type { EducationLevel, Grade } from "@/components/user-profile";
+import {
+  getCurriculumConcepts,
+  getAllCurriculumConcepts,
+} from "@/lib/curriculum-data";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useRouter } from "next/navigation";
 
 /**
  * 개념 학습 컴포넌트
  * 학생이 수학 개념을 학년별로 탐색하고 학습할 수 있는 기능 제공
  */
 interface ConceptBrowserProps {
-  educationLevel: EducationLevel
-  grade: Grade
+  educationLevel: EducationLevel;
+  grade: Grade;
 }
 
 // 중학교 개념 데이터 추가
@@ -63,56 +73,59 @@ const MIDDLE_SCHOOL_CONCEPTS = [
   },
   {
     id: 106,
-    title: "이차방정식",
+    title: "이차방정식1231231",
     description: "미지수가 2제곱으로 표현된 방정식을 해결하는 방법을 배웁니다.",
     formula: "ax² + bx + c = 0",
     examples: ["x² - 5x + 6 = 0", "2x² - 3x - 5 = 0"],
     grade: "3",
   },
-]
+];
 
 export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
   // 상태 관리
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedConcept, setSelectedConcept] = useState<any | null>(null)
-  const [showAllGrades, setShowAllGrades] = useState(false)
-  const [selectedGrade, setSelectedGrade] = useState<Grade>(grade)
-  const [filteredConcepts, setFilteredConcepts] = useState<any[]>([])
+  const [searchTerm, setSearchTerm] = useState("");
+  const [selectedConcept, setSelectedConcept] = useState<any | null>(null);
+  const [showAllGrades, setShowAllGrades] = useState(false);
+  const [selectedGrade, setSelectedGrade] = useState<Grade>(grade);
+  const [filteredConcepts, setFilteredConcepts] = useState<any[]>([]);
+  const router = useRouter();
 
   // 교육과정에 맞는 개념 데이터 가져오기
   const concepts = useMemo(() => {
     return showAllGrades
       ? getAllCurriculumConcepts(educationLevel)
-      : getCurriculumConcepts(educationLevel, selectedGrade)
-  }, [showAllGrades, educationLevel, selectedGrade])
+      : getCurriculumConcepts(educationLevel, selectedGrade);
+  }, [showAllGrades, educationLevel, selectedGrade]);
 
   // 중학교 개념 데이터 추가
   const allConcepts = useMemo(() => {
-    return educationLevel === "middle" ? [...concepts, ...MIDDLE_SCHOOL_CONCEPTS] : concepts
-  }, [educationLevel, concepts])
+    return educationLevel === "middle"
+      ? [...concepts, ...MIDDLE_SCHOOL_CONCEPTS]
+      : concepts;
+  }, [educationLevel, concepts]);
 
   // 학년에 맞는 개념만 필터링하는 함수
   const filterConceptsByGrade = (concepts: any[], grade: Grade): any[] => {
     return concepts.filter((concept) => {
       // 중학교 개념의 경우
       if (concept.id >= 101 && concept.id <= 106) {
-        return concept.grade === grade
+        return concept.grade === grade;
       }
 
       // 고등학교 개념의 경우
-      if (concept.id <= 4) return grade === "1"
-      if (concept.id <= 8) return grade === "2"
-      return grade === "3"
-    })
-  }
+      if (concept.id <= 4) return grade === "1";
+      if (concept.id <= 8) return grade === "2";
+      return grade === "3";
+    });
+  };
 
   // 검색어와 학년에 따라 개념 필터링
   useEffect(() => {
-    let filtered = allConcepts
+    let filtered = allConcepts;
 
     // 학년 필터링
     if (!showAllGrades) {
-      filtered = filterConceptsByGrade(filtered, selectedGrade)
+      filtered = filterConceptsByGrade(filtered, selectedGrade);
     }
 
     // 검색어 필터링
@@ -120,16 +133,16 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
       filtered = filtered.filter(
         (concept) =>
           concept.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          concept.description.toLowerCase().includes(searchTerm.toLowerCase()),
-      )
+          concept.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
     }
 
-    setFilteredConcepts(filtered)
-  }, [searchTerm, showAllGrades, selectedGrade, allConcepts])
+    setFilteredConcepts(filtered);
+  }, [searchTerm, showAllGrades, selectedGrade, allConcepts]);
 
   const handleGradeChange = (value: string) => {
-    setSelectedGrade(value as Grade)
-  }
+    setSelectedGrade(value as Grade);
+  };
 
   return (
     <div className="space-y-6">
@@ -171,8 +184,8 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
               variant="outline"
               size="sm"
               onClick={() => {
-                setShowAllGrades(false)
-                setSelectedGrade(grade)
+                setShowAllGrades(false);
+                setSelectedGrade(grade);
               }}
               className="border-blue-100 text-blue-500 hover:bg-blue-50"
             >
@@ -189,28 +202,43 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
             <Card
               key={concept.id}
               className={`cursor-pointer hover:border-blue-300 transition-colors ${
-                educationLevel === "middle" ? "border-green-100" : "border-blue-100"
-              } ${selectedConcept?.id === concept.id ? (educationLevel === "middle" ? "border-green-400" : "border-blue-400") : ""}`}
+                educationLevel === "middle"
+                  ? "border-green-100"
+                  : "border-blue-100"
+              } ${
+                selectedConcept?.id === concept.id
+                  ? educationLevel === "middle"
+                    ? "border-green-400"
+                    : "border-blue-400"
+                  : ""
+              }`}
               onClick={() => setSelectedConcept(concept)}
             >
               <CardContent className="p-4">
                 <h3 className="font-medium text-lg">{concept.title}</h3>
-                <p className="text-gray-500 text-sm mt-1">{concept.description}</p>
+                <p className="text-gray-500 text-sm mt-1">
+                  {concept.description}
+                </p>
                 <Badge
                   variant="outline"
                   className={`mt-2 ${
-                    educationLevel === "middle" ? "border-green-200 text-green-600" : "border-blue-200 text-blue-600"
+                    educationLevel === "middle"
+                      ? "border-green-200 text-green-600"
+                      : "border-blue-200 text-blue-600"
                   }`}
                 >
                   {educationLevel === "middle" ? "중" : "고"}
-                  {concept.grade || (concept.id <= 4 ? "1" : concept.id <= 8 ? "2" : "3")}
+                  {concept.grade ||
+                    (concept.id <= 4 ? "1" : concept.id <= 8 ? "2" : "3")}
                   학년
                 </Badge>
               </CardContent>
             </Card>
           ))
         ) : (
-          <div className="col-span-2 text-center py-10 text-gray-500">검색 결과가 없습니다.</div>
+          <div className="col-span-2 text-center py-10 text-gray-500">
+            검색 결과가 없습니다.
+          </div>
         )}
       </div>
 
@@ -228,22 +256,33 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
 
             <div>
               <h3 className="text-sm font-medium mb-1">공식</h3>
-              <div className="bg-yellow-50 p-3 rounded-md font-mono">{selectedConcept.formula}</div>
+              <div className="bg-yellow-50 p-3 rounded-md font-mono">
+                {selectedConcept.formula}
+              </div>
             </div>
 
             <div>
               <h3 className="text-sm font-medium mb-1">예시</h3>
               <ul className="list-disc pl-5 space-y-1">
-                {selectedConcept.examples.map((example: string, index: number) => (
-                  <li key={index}>{example}</li>
-                ))}
+                {selectedConcept.examples.map(
+                  (example: string, index: number) => (
+                    <li key={index}>{example}</li>
+                  )
+                )}
               </ul>
             </div>
 
-            <Button className="w-full bg-yellow-400 hover:bg-yellow-500">관련 문제 풀어보기</Button>
+            <Button
+              className="w-full bg-yellow-400 hover:bg-yellow-500"
+              onClick={() =>
+                router.push(`/study/related?subConceptId=${selectedConcept.id}`)
+              }
+            >
+              관련 문제 풀어보기
+            </Button>
           </CardContent>
         </Card>
       )}
     </div>
-  )
+  );
 }

@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { BookOpen, RotateCcw, Clock, GraduationCap } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
-import type { EducationLevel, Grade } from "@/components/profile/user-profile"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { BookOpen, RotateCcw, Clock, GraduationCap } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import type { EducationLevel, Grade } from "@/components/profile/user-profile";
 import {
   getCurriculumTopics,
   getAllCurriculumTopics,
@@ -14,97 +14,110 @@ import {
   getAllRecentlyStudiedTopics,
   getMistakesByTopic,
   getAllMistakesByTopic,
-} from "@/lib/curriculum-data"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/hooks/use-toast"
+} from "@/lib/curriculum-data";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 /**
  * 오답 노트 컴포넌트
+ * adfasdfdasfasdfsdsdsdsdsdsds
  * 학생이 틀린 문제들을 확인하고 다시 풀어볼 수 있는 기능 제공
  */
 interface MistakeTrackerProps {
-  educationLevel: EducationLevel
-  grade: Grade
+  educationLevel: EducationLevel;
+  grade: Grade;
 }
 
 export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
   // 상태 관리
-  const [activeTab, setActiveTab] = useState("all")
-  const [selectedTopic, setSelectedTopic] = useState<string | null>(null)
-  const [recentTopics, setRecentTopics] = useState<string[]>([])
-  const [showAllGrades, setShowAllGrades] = useState(false)
-  const [selectedGrade, setSelectedGrade] = useState<Grade>(grade)
-  const [filteredMistakes, setFilteredMistakes] = useState<any[]>([])
-  const [recentMistakes, setRecentMistakes] = useState<any[]>([])
-  const { toast } = useToast()
+  const [activeTab, setActiveTab] = useState("all");
+  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [recentTopics, setRecentTopics] = useState<string[]>([]);
+  const [showAllGrades, setShowAllGrades] = useState(false);
+  const [selectedGrade, setSelectedGrade] = useState<Grade>(grade);
+  const [filteredMistakes, setFilteredMistakes] = useState<any[]>([]);
+  const [recentMistakes, setRecentMistakes] = useState<any[]>([]);
+  const { toast } = useToast();
 
   // 교육과정에 맞는 주제 가져오기
   const topics = showAllGrades
     ? getAllCurriculumTopics(educationLevel)
-    : getCurriculumTopics(educationLevel, selectedGrade)
+    : getCurriculumTopics(educationLevel, selectedGrade);
 
   // 최근 학습한 주제 가져오기
   useEffect(() => {
     if (showAllGrades) {
-      setRecentTopics(getAllRecentlyStudiedTopics(educationLevel))
+      setRecentTopics(getAllRecentlyStudiedTopics(educationLevel));
     } else {
-      setRecentTopics(getRecentlyStudiedTopics(educationLevel, selectedGrade))
+      setRecentTopics(getRecentlyStudiedTopics(educationLevel, selectedGrade));
     }
-  }, [educationLevel, selectedGrade, showAllGrades])
+  }, [educationLevel, selectedGrade, showAllGrades]);
 
   // 선택된 주제에 따라 문제 필터링
   useEffect(() => {
     if (showAllGrades) {
-      setFilteredMistakes(getAllMistakesByTopic(selectedTopic, educationLevel))
+      setFilteredMistakes(getAllMistakesByTopic(selectedTopic, educationLevel));
     } else {
-      setFilteredMistakes(getMistakesByTopic(selectedTopic, educationLevel, selectedGrade))
+      setFilteredMistakes(
+        getMistakesByTopic(selectedTopic, educationLevel, selectedGrade)
+      );
     }
-  }, [selectedTopic, educationLevel, selectedGrade, showAllGrades])
+  }, [selectedTopic, educationLevel, selectedGrade, showAllGrades]);
 
   // 최근 학습한 주제의 오답 가져오기
   useEffect(() => {
     if (showAllGrades) {
       // 모든 학년에서 최근 학습한 주제의 오답 가져오기
-      const mistakes = recentTopics.flatMap((topic) => getAllMistakesByTopic(topic, educationLevel))
-      setRecentMistakes(mistakes)
+      const mistakes = recentTopics.flatMap((topic) =>
+        getAllMistakesByTopic(topic, educationLevel)
+      );
+      setRecentMistakes(mistakes);
     } else {
       // 현재 학년에서 최근 학습한 주제의 오답 가져오기
-      const mistakes = recentTopics.flatMap((topic) => getMistakesByTopic(topic, educationLevel, selectedGrade))
-      setRecentMistakes(mistakes)
+      const mistakes = recentTopics.flatMap((topic) =>
+        getMistakesByTopic(topic, educationLevel, selectedGrade)
+      );
+      setRecentMistakes(mistakes);
     }
-  }, [recentTopics, educationLevel, selectedGrade, showAllGrades])
+  }, [recentTopics, educationLevel, selectedGrade, showAllGrades]);
 
   const handleGradeChange = (value: string) => {
-    setSelectedGrade(value as Grade)
-  }
+    setSelectedGrade(value as Grade);
+  };
 
   // 다시 풀기 기능
   const handleRetry = (problemId: number) => {
     toast({
       title: "문제 해결 완료!",
       description: "정답 처리되었습니다. 오답률이 갱신됩니다.",
-    })
+    });
 
     // 문제를 정답 처리로 표시
     const updatedMistakes = [...filteredMistakes].map((mistake) => {
       if (mistake.id === problemId) {
-        return { ...mistake, solvedOnRetry: true }
+        return { ...mistake, solvedOnRetry: true };
       }
-      return mistake
-    })
+      return mistake;
+    });
 
-    setFilteredMistakes(updatedMistakes)
+    setFilteredMistakes(updatedMistakes);
 
     // 최근 학습 탭의 오답도 업데이트
     const updatedRecentMistakes = [...recentMistakes].map((mistake) => {
       if (mistake.id === problemId) {
-        return { ...mistake, solvedOnRetry: true }
+        return { ...mistake, solvedOnRetry: true };
       }
-      return mistake
-    })
+      return mistake;
+    });
 
-    setRecentMistakes(updatedRecentMistakes)
-  }
+    setRecentMistakes(updatedRecentMistakes);
+  };
 
   return (
     <div className="space-y-6">
@@ -140,8 +153,8 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                   variant="outline"
                   size="sm"
                   onClick={() => {
-                    setShowAllGrades(false)
-                    setSelectedGrade(grade)
+                    setShowAllGrades(false);
+                    setSelectedGrade(grade);
                   }}
                   className="border-blue-100 text-blue-500 hover:bg-blue-50"
                 >
@@ -219,7 +232,9 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                       <div>
                         <div className="flex items-center gap-2 mb-2">
                           <Badge className="bg-blue-400">{mistake.topic}</Badge>
-                          <span className="text-sm text-gray-500">{mistake.date}</span>
+                          <span className="text-sm text-gray-500">
+                            {mistake.date}
+                          </span>
                         </div>
                         <p>{mistake.problem}</p>
                       </div>
@@ -256,8 +271,12 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2 mb-2">
-                          <Badge className="bg-yellow-400">{mistake.topic}</Badge>
-                          <span className="text-sm text-gray-500">{mistake.date}</span>
+                          <Badge className="bg-yellow-400">
+                            {mistake.topic}
+                          </Badge>
+                          <span className="text-sm text-gray-500">
+                            {mistake.date}
+                          </span>
                         </div>
                         <p>{mistake.problem}</p>
                       </div>
@@ -285,5 +304,5 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }
