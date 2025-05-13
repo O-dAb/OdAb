@@ -6,13 +6,16 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Upload, BookOpen, GraduationCap, ArrowRight, Eye, ThumbsUp, ThumbsDown, HelpCircle } from "lucide-react"
 import { ProblemUploader } from "@/components/problem-uploader"
-import type { EducationLevel, Grade } from "@/components/user-profile"
+// 외부 모듈 대신 직접 타입 정의
+export type EducationLevel = "초등학교" | "중학교" | "고등학교"
+export type Grade = "1" | "2" | "3" | "4" | "5" | "6"
 import { getCurriculumTopics, getAllCurriculumTopics } from "@/lib/curriculum-data"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Textarea } from "@/components/ui/textarea"
 import { useToast } from "@/hooks/use-toast"
 import { Input } from "@/components/ui/input"
+import axios from "axios"
 
 /**
  * 문제 풀이 컴포넌트
@@ -32,6 +35,15 @@ interface SolutionStep {
   isCorrect?: boolean
 }
 
+// API 응답 타입 정의
+interface ProblemApiResponse {
+  questionText: string
+  answer: string
+  imageUrl: string
+  questionSolution: string[]
+  subConcepts: string[]
+}
+
 export function ProblemSolver({ educationLevel, grade }: ProblemSolverProps) {
   // 상태 관리
   const [problemText, setProblemText] = useState("")
@@ -46,6 +58,7 @@ export function ProblemSolver({ educationLevel, grade }: ProblemSolverProps) {
   const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium")
   const [viewMode, setViewMode] = useState<"step" | "all">("step")
   const [userSolution, setUserSolution] = useState("")
+  const [correctAnswer, setCorrectAnswer] = useState<string>("")
   const { toast } = useToast()
 
   // 교육과정에 맞는 주제 가져오기
@@ -339,58 +352,145 @@ export function ProblemSolver({ educationLevel, grade }: ProblemSolverProps) {
     ],
   }
 
-  const handleProblemRecognized = (text: string) => {
-    setProblemText(text)
-
-    // 실제로는 백엔드에서 문제 유형을 분석하고 단계별 풀이를 받아올 것입니다
-    // 여기서는 예시로 이차방정식 유형으로 가정합니다
-    const detectedType = "이차방정식"
-    setProblemType(detectedType)
-
-    // 백엔드에서 받아온 단계별 풀이 데이터를 설정합니다
-    // 문제마다 단계 수가 다를 수 있습니다
-    const problemsOfType = exampleProblems[detectedType as keyof typeof exampleProblems] || []
-    const selectedProblem = problemsOfType.find((p) => p.difficulty === difficulty) || problemsOfType[0]
-
-    if (selectedProblem) {
-      setSolutionSteps(selectedProblem.steps)
-      setCurrentStep(0)
-      setShowAllSteps(false)
-      setIsInputMode(false)
-    } else {
-      // 예시 문제가 없는 경우 기본 단계 생성
-      const defaultSteps: SolutionStep[] = [
-        {
-          title: "문제 이해하기",
-          content: `이 문제는 ${detectedType} 유형의 문제입니다. 주어진 조건을 분석해 봅시다.`,
-          hint: "문제에서 주어진 정보를 정리해보세요.",
-        },
-        {
-          title: "해결 방법 선택하기",
-          content: `${detectedType} 문제를 해결하기 위한 적절한 방법을 선택합니다.`,
-          hint: "이 유형의 문제에 적용할 수 있는 공식이나 접근법을 생각해보세요.",
-        },
-        {
-          title: "단계적 해결",
-          content: "선택한 방법을 단계적으로 적용합니다.",
-          hint: "한 단계씩 차근차근 계산해보세요.",
-        },
-        {
-          title: "정답 도출하기",
-          content: "계산 결과를 정리하여 최종 답을 구합니다.",
-          hint: "구한 결과가 문제의 요구사항을 만족하는지 확인하세요.",
-        },
-        {
-          title: "검산하기",
-          content: "구한 답이 맞는지 검산해봅니다.",
-          hint: "구한 답을 원래 문제에 대입하여 확인해보세요.",
-        },
-      ]
-      setSolutionSteps(defaultSteps)
-      setCurrentStep(0)
-      setShowAllSteps(false)
-      setIsInputMode(false)
+  const handleProblemRecognized = async (text: string, imageData?: File) => {
+    setProblemText(text || "이미지를 분석 중입니다...")
+    
+    try {
+      // 이미지가 있는 경우 API로 전송
+      if (imageData) {
+        const formData = new FormData()
+        formData.append("imageData", imageData, "math_problem.png")
+        
+        const response = await axios.post<ProblemApiResponse>(
+          "http://localhost:8080/api/claude",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        )
+        
+        // API 응답 처리
+        const { questionText, answer, imageUrl, questionSolution, subConcepts } = response.data
+        
+        setProblemText(questionText)
+        setProblemType(subConcepts[0] || "수학 문제")
+        setCorrectAnswer(answer)
+        
+        // 해결 단계 생성
+        const steps: SolutionStep[] = questionSolution.map((solution, index) => {
+          let title = ""
+          
+          if (index === 0) title = "문제 이해하기"
+          else if (index === questionSolution.length - 1) title = "최종 결과"
+          else title = `${index + 1}단계 풀이`
+          
+          return {
+            title,
+            content: solution,
+            hint: index < questionSolution.length - 1 ? "다음 단계를 생각해보세요." : "검산해보세요."
+          }
+        })
+        
+        setSolutionSteps(steps)
+        setCurrentStep(0)
+        setShowAllSteps(false)
+        setIsInputMode(false)
+        
+        toast({
+          title: "문제 분석 완료",
+          description: "문제와 해설이 준비되었습니다.",
+        })
+      } else {
+        // 기존 예시 문제 로직 유지
+        const detectedType = "이차방정식"
+        setProblemType(detectedType)
+        
+        const problemsOfType = exampleProblems[detectedType as keyof typeof exampleProblems] || []
+        const selectedProblem = problemsOfType.find((p) => p.difficulty === difficulty) || problemsOfType[0]
+        
+        if (selectedProblem) {
+          setSolutionSteps(selectedProblem.steps)
+          setCurrentStep(0)
+          setShowAllSteps(false)
+          setIsInputMode(false)
+        } else {
+          // 예시 문제가 없는 경우 기본 단계 생성
+          const defaultSteps: SolutionStep[] = [
+            {
+              title: "문제 이해하기",
+              content: `이 문제는 ${detectedType} 유형의 문제입니다. 주어진 조건을 분석해 봅시다.`,
+              hint: "문제에서 주어진 정보를 정리해보세요.",
+            },
+            {
+              title: "해결 방법 선택하기",
+              content: `${detectedType} 문제를 해결하기 위한 적절한 방법을 선택합니다.`,
+              hint: "이 유형의 문제에 적용할 수 있는 공식이나 접근법을 생각해보세요.",
+            },
+            {
+              title: "단계적 해결",
+              content: "선택한 방법을 단계적으로 적용합니다.",
+              hint: "한 단계씩 차근차근 계산해보세요.",
+            },
+            {
+              title: "정답 도출하기",
+              content: "계산 결과를 정리하여 최종 답을 구합니다.",
+              hint: "구한 결과가 문제의 요구사항을 만족하는지 확인하세요.",
+            },
+            {
+              title: "검산하기",
+              content: "구한 답이 맞는지 검산해봅니다.",
+              hint: "구한 답을 원래 문제에 대입하여 확인해보세요.",
+            },
+          ]
+          setSolutionSteps(defaultSteps)
+          setCurrentStep(0)
+          setShowAllSteps(false)
+          setIsInputMode(false)
+        }
+      }
+    } catch (error) {
+      console.error("문제 분석 중 오류 발생:", error)
+      toast({
+        title: "문제 분석 실패",
+        description: "문제를 분석하는 중 오류가 발생했습니다.",
+        variant: "destructive",
+      })
+      
+      // 오류 발생 시 기본 예시 문제 로드
+      const detectedType = "이차방정식"
+      setProblemType(detectedType)
+      const problemsOfType = exampleProblems[detectedType as keyof typeof exampleProblems] || []
+      const selectedProblem = problemsOfType[0]
+      
+      if (selectedProblem) {
+        setSolutionSteps(selectedProblem.steps)
+        setCurrentStep(0)
+        setShowAllSteps(false)
+        setIsInputMode(false)
+      }
     }
+  }
+
+  const handleSubmitAnswer = () => {
+    if (!userAnswer.trim()) {
+      toast({
+        title: "답변을 입력해주세요",
+        variant: "destructive",
+      })
+      return
+    }
+
+    const isCorrect = userAnswer === correctAnswer;
+
+    toast({
+      title: isCorrect ? "정답입니다!" : "오답입니다",
+      description: isCorrect 
+        ? "정답을 맞추셨습니다." 
+        : `정답은 ${correctAnswer}입니다. 다시 한번 생각해보세요.`,
+      variant: isCorrect ? "default" : "destructive",
+    })
   }
 
   const handleNextStep = () => {
@@ -625,7 +725,7 @@ export function ProblemSolver({ educationLevel, grade }: ProblemSolverProps) {
       )}
 
       {/* 문제 풀이 공간 */}
-      {problemText && (
+      {/* {problemText && (
         <Card className="border-gray-200">
           <CardHeader className="bg-gray-50 border-b border-gray-200">
             <CardTitle>문제 풀이</CardTitle>
@@ -647,11 +747,14 @@ export function ProblemSolver({ educationLevel, grade }: ProblemSolverProps) {
                 value={userAnswer}
                 onChange={(e) => setUserAnswer(e.target.value)}
               />
-              <Button className="bg-blue-400 hover:bg-blue-500">제출</Button>
+              <Button 
+                className="bg-blue-400 hover:bg-blue-500"
+                onClick={handleSubmitAnswer}
+              >제출</Button>
             </div>
           </CardFooter>
         </Card>
-      )}
+      )} */}
 
       {/* 해설 영역 */}
       {solutionSteps.length > 0 && (
