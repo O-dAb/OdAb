@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRouter } from "next/navigation";
+import Link from "next/link"; // useRouter 대신 Link 사용
 
 /**
  * 개념 학습 컴포넌트
@@ -88,7 +88,6 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
   const [showAllGrades, setShowAllGrades] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState<Grade>(grade);
   const [filteredConcepts, setFilteredConcepts] = useState<any[]>([]);
-  const router = useRouter();
 
   // 교육과정에 맞는 개념 데이터 가져오기
   const concepts = useMemo(() => {
@@ -145,14 +144,14 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 min-h-screen p-6 flex flex-col items-center">
       {/* 검색 및 필터 영역 */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center w-full max-w-6xl">
         <div className="relative flex-1 mr-4">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
           <Input
             placeholder="개념 검색..."
-            className="pl-10 border-blue-100"
+            className="pl-10 border-blue-100 rounded-xl shadow"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -162,14 +161,14 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
             variant={showAllGrades ? "default" : "outline"}
             size="sm"
             onClick={() => setShowAllGrades(true)}
-            className="flex items-center gap-1 bg-blue-400 hover:bg-blue-500"
+            className="flex items-center gap-1 bg-blue-400 hover:bg-blue-500 rounded-xl font-bold"
           >
             <GraduationCap className="h-4 w-4" />
             <span>전체 학년</span>
           </Button>
           {!showAllGrades && (
             <Select value={selectedGrade} onValueChange={handleGradeChange}>
-              <SelectTrigger className="w-[100px] bg-blue-50 border-blue-100">
+              <SelectTrigger className="w-[100px] bg-blue-50 border-blue-100 rounded-xl">
                 <SelectValue placeholder="학년 선택" />
               </SelectTrigger>
               <SelectContent>
@@ -187,7 +186,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
                 setShowAllGrades(false);
                 setSelectedGrade(grade);
               }}
-              className="border-blue-100 text-blue-500 hover:bg-blue-50"
+              className="border-blue-100 text-blue-500 hover:bg-blue-50 rounded-xl font-bold"
             >
               내 학년으로
             </Button>
@@ -196,35 +195,38 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
       </div>
 
       {/* 개념 목록 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl">
         {filteredConcepts.length > 0 ? (
           filteredConcepts.map((concept) => (
             <Card
               key={concept.id}
-              className={`cursor-pointer hover:border-blue-300 transition-colors ${
+              className={`cursor-pointer border-0 shadow-lg rounded-2xl bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 hover:scale-105 transition-transform duration-200 ${
                 educationLevel === "middle"
                   ? "border-green-100"
                   : "border-blue-100"
               } ${
                 selectedConcept?.id === concept.id
                   ? educationLevel === "middle"
-                    ? "border-green-400"
-                    : "border-blue-400"
+                    ? "ring-4 ring-green-200"
+                    : "ring-4 ring-blue-200"
                   : ""
               }`}
               onClick={() => setSelectedConcept(concept)}
             >
-              <CardContent className="p-4">
-                <h3 className="font-medium text-lg">{concept.title}</h3>
-                <p className="text-gray-500 text-sm mt-1">
+              <CardContent className="p-6">
+                <h3 className="font-extrabold text-xl text-blue-700 mb-1 flex items-center gap-2">
+                  <span className="text-2xl">📚</span>
+                  {concept.title}
+                </h3>
+                <p className="text-gray-600 text-base mt-1 mb-2">
                   {concept.description}
                 </p>
                 <Badge
                   variant="outline"
-                  className={`mt-2 ${
+                  className={`mt-2 px-3 py-1 rounded-full font-bold text-base shadow ${
                     educationLevel === "middle"
-                      ? "border-green-200 text-green-600"
-                      : "border-blue-200 text-blue-600"
+                      ? "border-green-200 text-green-600 bg-white/80"
+                      : "border-blue-200 text-blue-600 bg-white/80"
                   }`}
                 >
                   {educationLevel === "middle" ? "중" : "고"}
@@ -244,26 +246,31 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
 
       {/* 선택한 개념 상세 정보 */}
       {selectedConcept && (
-        <Card className="border-yellow-100">
-          <CardHeader className="bg-yellow-50 border-b border-yellow-100">
-            <CardTitle>{selectedConcept.title}</CardTitle>
+        <Card className="border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-yellow-100 via-pink-50 to-purple-50 w-full max-w-4xl mt-8">
+          <CardHeader className="bg-yellow-50/60 border-b-0 rounded-t-2xl">
+            <CardTitle className="flex items-center gap-2 text-yellow-700 text-2xl font-extrabold">
+              <span className="text-3xl">🦦</span>
+              {selectedConcept.title}
+            </CardTitle>
           </CardHeader>
-          <CardContent className="pt-6 space-y-4">
+          <CardContent className="pt-6 space-y-6">
             <div>
-              <h3 className="text-sm font-medium mb-1">설명</h3>
-              <p>{selectedConcept.description}</p>
+              <h3 className="text-base font-bold mb-1 text-yellow-700">설명</h3>
+              <p className="text-lg text-gray-700">
+                {selectedConcept.description}
+              </p>
             </div>
 
             <div>
-              <h3 className="text-sm font-medium mb-1">공식</h3>
-              <div className="bg-yellow-50 p-3 rounded-md font-mono">
+              <h3 className="text-base font-bold mb-1 text-yellow-700">공식</h3>
+              <div className="bg-yellow-50 p-4 rounded-xl font-mono text-lg shadow">
                 {selectedConcept.formula}
               </div>
             </div>
 
             <div>
-              <h3 className="text-sm font-medium mb-1">예시</h3>
-              <ul className="list-disc pl-5 space-y-1">
+              <h3 className="text-base font-bold mb-1 text-yellow-700">예시</h3>
+              <ul className="list-disc pl-5 space-y-1 text-lg">
                 {selectedConcept.examples.map(
                   (example: string, index: number) => (
                     <li key={index}>{example}</li>
@@ -272,14 +279,15 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
               </ul>
             </div>
 
-            <Button
-              className="w-full bg-yellow-400 hover:bg-yellow-500"
-              onClick={() =>
-                router.push(`/study/related?subConceptId=${selectedConcept.id}`)
-              }
+            {/* 라우팅 방식으로 변경: useRouter.push() → Link 컴포넌트 */}
+            <Link
+              href={`/study/related?subConceptId=${selectedConcept.id}`}
+              className="w-full block"
             >
-              관련 문제 풀어보기
-            </Button>
+              <Button className="w-full bg-yellow-400 hover:bg-yellow-500 rounded-xl font-bold text-lg mt-4">
+                관련 문제 풀어보기
+              </Button>
+            </Link>
           </CardContent>
         </Card>
       )}
