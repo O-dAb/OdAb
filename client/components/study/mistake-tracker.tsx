@@ -279,7 +279,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
             className="flex items-center gap-2 data-[state=active]:bg-blue-400 data-[state=active]:text-white rounded-xl font-bold"
           >
             <BookOpen className="h-4 w-4" />
-            <span>전체 오답aaa</span>
+            <span>전체 오답</span>
           </TabsTrigger>
           <TabsTrigger
             value="recent"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
-import { ConceptBrowser } from "@/components/concept-browser";
+import { ConceptBrowser } from "@/components/study/concept-browser";
 
 export default function ConceptsPage() {
   const { userProfile } = useAuth();
