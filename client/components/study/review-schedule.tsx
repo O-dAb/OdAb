@@ -1,95 +1,125 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Calendar, Clock, GraduationCap, ChevronDown, ChevronUp } from "lucide-react"
-import type { EducationLevel, Grade } from "@/components/profile/user-profile"
-import { getReviewSchedule, getAllReviewSchedule, getMajorConcepts, getCurriculumTopics } from "@/lib/curriculum-data"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useRouter } from "next/navigation"
+import { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Calendar } from "lucide-react";
+import type { EducationLevel, Grade } from "@/components/user-profile";
+import { useRouter } from "next/navigation";
+import Link from "next/link"; // Next.js의 Link 컴포넌트 추가
+import axios from "axios";
 
 /**
  * 복습 일정 컴포넌트
  * 학생이 이전에 학습한 내용을 효과적으로 복습할 수 있도록 일정을 관리
  */
-interface ReviewScheduleProps {
-  educationLevel: EducationLevel
-  grade: Grade
+
+// 타입 정의
+interface TodayReview {
+  subConceptId: number;
+  subConceptType: string;
+  questionCount: string;
 }
 
-// 복습 단계별 레이블
-const REVIEW_STAGES = {
-  1: "1일차",
-  2: "4일차",
-  3: "6일차",
-  4: "13일차",
+interface ScheduledReview {
+  subConceptId: number;
+  subConceptType: string;
+  questionCount: string;
 }
 
-// 경과일 계산 함수
-const getDaysAgo = (dateString: string) => {
-  const today = new Date()
-  const pastDate = new Date(dateString)
-  const diffTime = Math.abs(today.getTime() - pastDate.getTime())
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
-  return diffDays
+interface SubConcept {
+  subConceptId: number;
+  subConceptType: string;
+  lastLearningDate: number[] | null;
 }
 
-export function ReviewSchedule({ educationLevel, grade }: ReviewScheduleProps) {
-  // 상태 관리
-  const [showAllGrades, setShowAllGrades] = useState(false)
-  const [selectedGrade, setSelectedGrade] = useState<Grade>(grade)
-  const [expandedMajorConcepts, setExpandedMajorConcepts] = useState<Record<number, boolean>>({})
-  const router = useRouter()
+interface MajorConcept {
+  majorConceptId: number;
+  majorConceptType: string;
+  subConceptList: SubConcept[];
+}
 
-  // 오늘 날짜
-  const today = new Date().toISOString().split("T")[0]
+interface ReviewApiResponse {
+  todayDate: string;
+  todayReviewList: TodayReview[];
+  scheduledReviewList: ScheduledReview[];
+  majorConceptList: MajorConcept[];
+}
 
-  // 복습 일정 가져오기
-  const reviewSchedule = showAllGrades
-    ? getAllReviewSchedule(educationLevel)
-    : getReviewSchedule(educationLevel, selectedGrade)
+// 날짜 배열 → yyyy-mm-dd 문자열 변환
+function formatDateArray(dateArr: number[] | null): string {
+  if (!dateArr || dateArr.length < 3) return "미학습";
+  const [year, month, day] = dateArr;
+  return `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(
+    2,
+    "0"
+  )}`;
+}
 
-  // 오늘 복습할 항목
-  const todayReviews = reviewSchedule.filter((review) => review.nextReview === today)
+export function ReviewSchedule({
+  educationLevel,
+  grade,
+}: {
+  educationLevel: EducationLevel;
+  grade: Grade;
+}) {
+  // API에서 받아온 복습 데이터 상태
+  const [reviewData, setReviewData] = useState<ReviewApiResponse | null>(null);
+  // 로딩 상태
+  const [loading, setLoading] = useState(true);
+  // Next.js 라우터 (프로그래매틱 네비게이션 필요 시 사용)
+  const router = useRouter();
+  // 오늘 날짜 (yyyy-mm-dd)
+  const today = new Date().toISOString().split("T")[0];
 
-  // 예정된 복습 항목
-  const upcomingReviews = reviewSchedule.filter((review) => review.nextReview > today)
+  useEffect(() => {
+    // 비동기 함수로 API 데이터 fetch
+    async function fetchReviewData() {
+      setLoading(true);
+      // 디버깅: 요청 시작 로그
+      console.log("[복습] API 요청 시작", today);
+      try {
+        // 실제 서버로 요청 (프록시 미설정 시 http://localhost:8080 명시)
+        const res = await axios.get(
+          "http://localhost:8080/api/v1/learning/review",
+          {
+            params: { date: today },
+          }
+        );
+        // 디버깅: 응답 전체 로그
+        console.log("[복습] API 응답", res);
+        // 응답 데이터 구조 확인
+        if (res.data && res.data.data) {
+          setReviewData(res.data.data);
+          // 디버깅: 파싱된 데이터 로그
+          console.log("[복습] 파싱된 데이터", res.data.data);
+        } else {
+          // 응답 구조가 예상과 다를 때
+          setReviewData(null);
+          console.error("[복습] 응답 데이터 구조 이상", res.data);
+        }
+      } catch (e) {
+        // 네트워크 에러, 서버 에러 등
+        setReviewData(null);
+        console.error("[복습] API 요청 에러", e);
+      }
+      setLoading(false);
+    }
+    fetchReviewData();
+  }, [today]);
 
-  // 주제 목록 가져오기 - 현재 학년
-  const currentGradeTopics = getCurriculumTopics(educationLevel, grade)
-
-  // 대주제 목록 가져오기
-  const majorConcepts = getMajorConcepts(educationLevel)
-
-  const handleGradeChange = (value: string) => {
-    setSelectedGrade(value as Grade)
-  }
-
-  const toggleMajorConcept = (majorConceptId: number) => {
-    setExpandedMajorConcepts((prev) => ({
-      ...prev,
-      [majorConceptId]: !prev[majorConceptId],
-    }))
-  }
-
-  const handleReviewClick = (reviewId: number) => {
-    // 복습 상세 페이지로 이동
-    router.push(`/review/${reviewId}?educationLevel=${educationLevel}&grade=${selectedGrade}`)
+  if (loading) {
+    // 로딩 중 표시
+    return <div className="text-center py-10">로딩 중...</div>;
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 min-h-screen p-6 flex flex-col items-center">
       {/* 오늘의 복습 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex justify-between items-center">
+      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-green-100 via-yellow-50 to-pink-100 w-full max-w-6xl">
+        <CardHeader className="bg-green-50/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="flex justify-between items-center text-green-700 text-xl font-extrabold">
             <span>복습 일정</span>
-            <div className="flex items-center gap-2">
-              <Badge variant="outline" className="font-normal">
-                이전에 학습한 문제 기준
-              </Badge>
-            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -98,137 +128,134 @@ export function ReviewSchedule({ educationLevel, grade }: ReviewScheduleProps) {
               <Calendar className="h-5 w-5 text-purple-600" />
               <span className="font-medium">오늘의 복습</span>
             </div>
-            <Badge variant="outline" className="font-normal">
-              {today}
+            <Badge
+              variant="outline"
+              className="font-normal bg-white/80 border-green-200 text-green-700 rounded-full px-3 py-1"
+            >
+              {reviewData ? reviewData.todayDate : today}
             </Badge>
           </div>
-
-          {todayReviews.length > 0 ? (
+          {/* 데이터가 없을 때 에러 메시지 */}
+          {!reviewData ? (
+            <div className="text-center py-6 text-red-500">
+              데이터를 불러오지 못했습니다.
+            </div>
+          ) : reviewData.todayReviewList.length > 0 ? (
             <div className="space-y-3">
-              {todayReviews.map((review) => (
-                <Card
-                  key={review.id}
-                  className="cursor-pointer hover:bg-gray-50 border-purple-100"
-                  onClick={() => handleReviewClick(review.id)}
+              {reviewData.todayReviewList.map((review) => (
+                <Link
+                  key={review.subConceptId}
+                  href={`/review/${review.subConceptId}`}
+                  className="block"
                 >
-                  <CardContent className="p-4 flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">{review.topic}</div>
-                      <div className="text-sm text-gray-500 flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {REVIEW_STAGES[review.reviewStage]} 복습
+                  <Card className="cursor-pointer border-0 shadow-md rounded-xl bg-gradient-to-r from-green-50 via-yellow-50 to-pink-50 hover:scale-105 transition-transform duration-200">
+                    <CardContent className="p-4 flex justify-between items-center">
+                      <div className="font-bold text-green-700">
+                        {review.subConceptType}
                       </div>
-                      <div className="text-xs text-gray-400 mt-1">
-                        처음 학습: {getDaysAgo(review.firstLearned)} 일 전
-                      </div>
-                    </div>
-                    <Badge className="bg-purple-500">{review.problems.length}문제</Badge>
-                  </CardContent>
-                </Card>
+                      <Badge className="bg-green-400 text-white text-base px-3 py-1 rounded-full shadow">
+                        {review.questionCount}문제
+                      </Badge>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           ) : (
-            <div className="text-center py-6 text-gray-500">오늘 복습할 항목이 없습니다.</div>
+            <div className="text-center py-6 text-gray-500">
+              오늘 복습할 항목이 없습니다.
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* 예정된 복습 */}
-      <Card>
-        <CardHeader>
-          <CardTitle>예정된 복습</CardTitle>
+      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-yellow-100 via-pink-50 to-purple-50 w-full max-w-6xl">
+        <CardHeader className="bg-yellow-50/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="text-yellow-700 text-xl font-extrabold">
+            예정된 복습
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          {upcomingReviews.length > 0 ? (
+          {/* 데이터가 없을 때 에러 메시지 */}
+          {!reviewData ? (
+            <div className="text-center py-6 text-red-500">
+              데이터를 불러오지 못했습니다.
+            </div>
+          ) : reviewData.scheduledReviewList.length > 0 ? (
             <div className="space-y-3">
-              {upcomingReviews.map((review) => (
-                <Card key={review.id} className="cursor-pointer hover:bg-gray-50 border-blue-100">
-                  <CardContent className="p-4 flex justify-between items-center">
-                    <div>
-                      <div className="font-medium">{review.topic}</div>
-                      <div className="text-sm text-gray-500 flex items-center gap-1">
-                        <Clock className="h-3 w-3" />
-                        {REVIEW_STAGES[review.reviewStage]} 복습
+              {reviewData.scheduledReviewList.map((review) => (
+                <Link
+                  key={review.subConceptId}
+                  href={`/review/${review.subConceptId}`}
+                  className="block"
+                >
+                  <Card className="cursor-pointer border-0 shadow-md rounded-xl bg-gradient-to-r from-yellow-50 via-pink-50 to-purple-50 hover:scale-105 transition-transform duration-200">
+                    <CardContent className="p-4 flex justify-between items-center">
+                      <div className="font-bold text-yellow-700">
+                        {review.subConceptType}
                       </div>
-                      <div className="text-xs text-gray-400 mt-1">
-                        처음 학습: {getDaysAgo(review.firstLearned)} 일 전
-                      </div>
-                    </div>
-                    <Badge variant="outline" className="border-blue-200 text-blue-600">
-                      {review.nextReview}
-                    </Badge>
-                  </CardContent>
-                </Card>
+                      <Badge className="bg-yellow-400 text-white text-base px-3 py-1 rounded-full shadow">
+                        {review.questionCount}문제
+                      </Badge>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           ) : (
-            <div className="text-center py-6 text-gray-500">예정된 복습 항목이 없습니다.</div>
+            <div className="text-center py-6 text-gray-500">
+              예정된 복습 항목이 없습니다.
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* 주제별 마지막 학습일 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex justify-between items-center">
-            <span>주제별 마지막 학습일</span>
-            <div className="flex items-center gap-2">
-              <Select value={selectedGrade} onValueChange={handleGradeChange}>
-                <SelectTrigger className="w-[100px] bg-blue-50 border-blue-100">
-                  <SelectValue placeholder="학년 선택" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1학년</SelectItem>
-                  <SelectItem value="2">2학년</SelectItem>
-                  <SelectItem value="3">3학년</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-50 to-pink-100 w-full max-w-6xl">
+        <CardHeader className="bg-blue-50/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="text-blue-700 text-xl font-extrabold">
+            주제별 마지막 학습일
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {/* 대주제별 마지막 학습일 */}
-          {majorConcepts.map((majorConcept) => (
-            <div key={majorConcept.majorConceptId} className="border rounded-lg overflow-hidden">
-              <div
-                className="flex justify-between items-center p-4 bg-gray-50 cursor-pointer"
-                onClick={() => toggleMajorConcept(majorConcept.majorConceptId)}
-              >
-                <h3 className="text-lg font-medium flex items-center gap-2">
-                  <GraduationCap className="h-5 w-5 text-blue-500" />
-                  <span>{majorConcept.majorConceptType}</span>
-                </h3>
-                {expandedMajorConcepts[majorConcept.majorConceptId] ? (
-                  <ChevronUp className="h-5 w-5 text-gray-500" />
-                ) : (
-                  <ChevronDown className="h-5 w-5 text-gray-500" />
-                )}
-              </div>
-
-              {expandedMajorConcepts[majorConcept.majorConceptId] && (
-                <div className="p-4 space-y-3">
-                  {majorConcept.subConceptList.map((subConcept) => (
-                    <Card key={subConcept.subConceptId} className="border-blue-100">
-                      <CardContent className="p-3 flex justify-between items-center">
-                        <div className="font-medium">{subConcept.subConceptType}</div>
-                        {subConcept.lastLearningDate ? (
-                          <Badge variant="outline" className="border-blue-200 text-blue-600">
-                            {subConcept.lastLearningDate}
-                          </Badge>
-                        ) : (
-                          <Badge variant="outline" className="bg-gray-100">
-                            미학습
-                          </Badge>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
+        <CardContent>
+          {/* 데이터가 없을 때 에러 메시지 */}
+          {!reviewData ? (
+            <div className="text-center py-6 text-red-500">
+              데이터를 불러오지 못했습니다.
             </div>
-          ))}
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {reviewData.majorConceptList.map((majorConcept) => (
+                <Card
+                  key={majorConcept.majorConceptId}
+                  className="border-0 shadow rounded-xl bg-white/80"
+                >
+                  <CardContent className="p-4">
+                    <div className="font-bold mb-2 text-blue-700">
+                      {majorConcept.majorConceptType}
+                    </div>
+                    {majorConcept.subConceptList.map((subConcept) => (
+                      <div
+                        key={subConcept.subConceptId}
+                        className="flex justify-between items-center mb-1"
+                      >
+                        <div>{subConcept.subConceptType}</div>
+                        <Badge
+                          variant="outline"
+                          className="bg-white/80 border-blue-200 text-blue-700 rounded-full px-3 py-1"
+                        >
+                          {formatDateArray(subConcept.lastLearningDate)}
+                        </Badge>
+                      </div>
+                    ))}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

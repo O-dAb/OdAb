@@ -2,7 +2,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/auth-context";
-import { MistakeTracker } from "@/components/mistake-tracker";
+import { MistakeTracker } from "@/components/study/mistake-tracker";
 
 export default function MistakesPage() {
   const { userProfile } = useAuth();

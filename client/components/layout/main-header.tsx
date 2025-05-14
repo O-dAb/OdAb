@@ -53,8 +53,8 @@ export function MainHeader({
     switch (activeTab) {
       case "home":
         return "홈";
-      case "solve":
-        return "문제 풀이";
+      case "upload":
+        return "문제 업로드 ";
       case "mistakes":
         return "오답 노트";
       case "concepts":

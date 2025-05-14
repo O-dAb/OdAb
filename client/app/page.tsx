@@ -68,7 +68,7 @@ export default function HomePage() {
               <Button className="h-auto py-4 bg-blue-400 hover:bg-blue-500 w-full rounded-xl text-lg shadow-md">
                 <div className="flex flex-col items-center gap-2">
                   <Calculator className="h-6 w-6" />
-                  <span>문제 풀이</span>
+                  <span>문제 업로드</span>
                 </div>
               </Button>
             </Link>

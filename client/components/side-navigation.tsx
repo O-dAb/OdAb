@@ -24,7 +24,7 @@ export function SideNavigation() {
       icon: <Home className="h-5 w-5" />,
     },
     {
-      name: "문제 풀이",
+      name: "문제 업로드",
       path: "/problem-uploader",
       value: "problem-uploader",
       icon: <Calculator className="h-5 w-5" />,
