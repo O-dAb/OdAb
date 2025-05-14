@@ -7,10 +7,11 @@ import { GraduationCap, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-type MainHeaderProps = {
+interface MainHeaderProps {
   educationLevel: EducationLevel;
   grade: Grade;
-};
+  userName: string;
+}
 
 type User = {
   userId: string;
@@ -31,23 +32,29 @@ export function MainHeader({ educationLevel, grade }: MainHeaderProps) {
       if (authCode) {
         try {
           // 2. auth_code로 토큰/유저정보 요청
-          const response = await axios.get<{ token: string; userId: string; nickname: string }>(
-            `http://localhost:8080/api/auth/result?auth_code=${authCode}`
-          );
-          
+          const response = await axios.get<{
+            token: string;
+            userId: string;
+            nickname: string;
+          }>(`http://localhost:8080/api/auth/result?auth_code=${authCode}`);
+
           // 3. 받은 정보 저장
           localStorage.setItem("token", response.data.token);
           localStorage.setItem("userId", response.data.userId);
           localStorage.setItem("nickname", response.data.nickname);
-          
+
           setUser({
             userId: response.data.userId,
             token: response.data.token,
-            nickname: response.data.nickname
+            nickname: response.data.nickname,
           });
 
           // 4. URL에서 auth_code 제거
-          window.history.replaceState({}, document.title, window.location.pathname);
+          window.history.replaceState(
+            {},
+            document.title,
+            window.location.pathname
+          );
         } catch (error) {
           console.error("로그인 처리 중 오류:", error);
           alert("로그인 인증이 만료되었거나 잘못되었습니다.");
@@ -57,12 +64,12 @@ export function MainHeader({ educationLevel, grade }: MainHeaderProps) {
         const token = localStorage.getItem("token");
         const userId = localStorage.getItem("userId");
         const nickname = localStorage.getItem("nickname");
-        
+
         if (token && userId) {
           setUser({
             userId,
             token,
-            nickname: nickname || undefined
+            nickname: nickname || undefined,
           });
         }
       }
@@ -77,7 +84,7 @@ export function MainHeader({ educationLevel, grade }: MainHeaderProps) {
     localStorage.removeItem("userId");
     localStorage.removeItem("nickname");
     setUser(null);
-    
+
     // 카카오 로그아웃
     const KAKAO_CLIENT_ID = "8a48914bf786805cc4d0e1087b0e03a9";
     const LOGOUT_REDIRECT_URI = "http://localhost:3000/login";
@@ -86,9 +93,7 @@ export function MainHeader({ educationLevel, grade }: MainHeaderProps) {
 
   // 학년/학교명 한글 변환
   const schoolLabel =
-    educationLevel === "elementary"
-      ? "초등"
-      : educationLevel === "middle"
+    educationLevel === "middle"
       ? "중등"
       : educationLevel === "high"
       ? "고등"
