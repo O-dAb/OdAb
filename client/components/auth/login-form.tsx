@@ -1,7 +1,6 @@
 "use client";
 
-
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { useToast } from "@/hooks/use-toast"
@@ -10,31 +9,45 @@ import Link from "next/link"
 import { BrainCircuit } from "lucide-react"
 import axios from "axios"
 
-
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
 
+  // 이미 로그인된 상태인지 확인
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      router.push('/');
+    }
+  }, [router]);
 
-    // 카카오 로그인 시작
+  // 카카오 로그인 시작
   const loginWithKakao = async () => {
+    setIsLoading(true);
     try {
       const response = await axios.get<{ url: string }>('http://localhost:8080/api/v1/auth/kakao');
       const kakaoUrl = response.data.url;
-      window.location.href = kakaoUrl; // 여기서 실제로 카카오 로그인 페이지로 이동!
+      
+      if (!kakaoUrl) {
+        throw new Error('카카오 로그인 URL이 없습니다.');
+      }
+
+      // 로그인 시도 로그
+      console.log('카카오 로그인 시도:', kakaoUrl);
+      
+      window.location.href = kakaoUrl;
     } catch (error) {
-      alert('카카오 로그인 URL을 가져오지 못했습니다.');
+      console.error('카카오 로그인 에러:', error);
+      toast({
+        title: "로그인 실패",
+        description: error instanceof Error ? error.message : "카카오 로그인 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
-  
-  const handleKakaoLogin = () => {
-    setIsLoading(true)
-
-    // 실제 구현에서는 카카오 SDK를 사용하여 로그인 처리
-    // 여기서는 예시로 간단히 구현
-    router.push("/")
-  }
 
   return (
     <Card className="w-full max-w-md mx-auto border-blue-200">
@@ -54,21 +67,26 @@ export function LoginForm() {
           onClick={loginWithKakao}
           disabled={isLoading}
         >
-          <svg
-            width="18"
-            height="18"
-            viewBox="0 0 18 18"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-            className="mr-2"
-          >
-            <path
-              d="M9 1.5C4.30875 1.5 0.5 4.4175 0.5 8C0.5 10.2 1.98625 12.1062 4.14375 13.2375C3.9775 13.8388 3.4925 15.5463 3.39125 15.9275C3.26875 16.4138 3.58125 16.4125 3.8125 16.2562C3.98625 16.1412 6.10625 14.7138 7.0075 14.1275C7.6525 14.2312 8.3175 14.2875 9 14.2875C13.6912 14.2875 17.5 11.37 17.5 7.7875C17.5 4.4175 13.6912 1.5 9 1.5Z"
-              fill="black"
-            />
-
-          </svg>
-          카카오톡으로 로그인
+          {isLoading ? (
+            "로그인 중..."
+          ) : (
+            <>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 18 18"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                className="mr-2"
+              >
+                <path
+                  d="M9 1.5C4.30875 1.5 0.5 4.4175 0.5 8C0.5 10.2 1.98625 12.1062 4.14375 13.2375C3.9775 13.8388 3.4925 15.5463 3.39125 15.9275C3.26875 16.4138 3.58125 16.4125 3.8125 16.2562C3.98625 16.1412 6.10625 14.7138 7.0075 14.1275C7.6525 14.2312 8.3175 14.2875 9 14.2875C13.6912 14.2875 17.5 11.37 17.5 7.7875C17.5 4.4175 13.6912 1.5 9 1.5Z"
+                  fill="black"
+                />
+              </svg>
+              카카오톡으로 로그인
+            </>
+          )}
         </Button>
       </CardContent>
       <CardFooter className="flex justify-center">
