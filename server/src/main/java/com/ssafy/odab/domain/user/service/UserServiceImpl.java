@@ -131,5 +131,10 @@ public class UserServiceImpl implements UserService {
          */
 
     }
+
+    @Override
+    public User findById(Integer userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
 }
 

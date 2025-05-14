@@ -26,8 +26,6 @@ public class QQuestionSolution extends EntityPathBase<QuestionSolution> {
 
     public final QQuestion question;
 
-    public final StringPath solution = createString("solution");
-
     public final StringPath solutionContent = createString("solutionContent");
 
     public final NumberPath<Byte> step = createNumber("step", Byte.class);

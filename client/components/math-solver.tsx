@@ -1,20 +1,22 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Calculator, BookOpen, History, PenLine } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calculator, BookOpen, History, PenLine } from "lucide-react";
 
 export function MathSolver() {
-  const [problem, setProblem] = useState("")
-  const [solution, setSolution] = useState("")
+  const [problem, setProblem] = useState("");
+  const [solution, setSolution] = useState("");
 
   const handleSolve = () => {
     // 실제 구현에서는 여기에 수학 문제 해결 로직이 들어갑니다
-    setSolution(`문제: ${problem}\n\n해결 과정:\n1. 문제 분석\n2. 공식 적용\n3. 계산 수행\n\n답: 계산된 결과`)
-  }
+    setSolution(
+      `문제: ${problem}\n\n해결 과정:\n1. 문제 분석\n2. 공식 적용\n3. 계산 수행\n\n답: 계산된 결과`
+    );
+  };
 
   return (
     <div className="grid grid-cols-1 gap-8 max-w-4xl mx-auto">
@@ -37,7 +39,7 @@ export function MathSolver() {
             <span>노트</span>
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="calculator">
           <Card>
             <CardHeader>
@@ -69,7 +71,7 @@ export function MathSolver() {
             </Card>
           )}
         </TabsContent>
-        
+
         <TabsContent value="formulas">
           <Card>
             <CardHeader>
@@ -84,7 +86,6 @@ export function MathSolver() {
                   <CardContent>
                     <ul className="list-disc pl-5 space-y-2">
                       <li>이차방정식: $ax^2 + bx + c = 0$</li>
-                      <li>근의 공식: $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$</li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -95,7 +96,10 @@ export function MathSolver() {
                   <CardContent>
                     <ul className="list-disc pl-5 space-y-2">
                       <li>원의 넓이: $A = \pi r^2$</li>
-                      <li>삼각형 넓이: $A = \frac{1}{2} \times b \times h$</li>
+                      <li>
+                        삼각형 넓이: $A = \frac{1}
+                        {2} \times b \times h$
+                      </li>
                     </ul>
                   </CardContent>
                 </Card>
@@ -103,18 +107,20 @@ export function MathSolver() {
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="history">
           <Card>
             <CardHeader>
               <CardTitle>문제 해결 기록</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-gray-500 text-center py-8">아직 해결한 문제가 없습니다.</p>
+              <p className="text-gray-500 text-center py-8">
+                아직 해결한 문제가 없습니다.
+              </p>
             </CardContent>
           </Card>
         </TabsContent>
-        
+
         <TabsContent value="notes">
           <Card>
             <CardHeader>
@@ -126,7 +132,9 @@ export function MathSolver() {
                 className="min-h-[200px]"
               />
               <div className="flex justify-end mt-4">
-                <Button variant="outline" className="mr-2">초기화</Button>
+                <Button variant="outline" className="mr-2">
+                  초기화
+                </Button>
                 <Button>저장</Button>
               </div>
             </CardContent>
@@ -134,5 +142,5 @@ export function MathSolver() {
         </TabsContent>
       </Tabs>
     </div>
-  )
+  );
 }

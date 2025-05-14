@@ -56,4 +56,8 @@ public class LastLearningTime {
         }
     }
 
+    public void updateLastLearningDate(LocalDateTime lastLearningDate) {
+        this.lastLearningDate = lastLearningDate;
+    }
+
 }

@@ -1,9 +1,5 @@
 package com.ssafy.odab.domain.question.controller;
-
-import com.ssafy.odab.domain.question.dto.RetryQuestionResponseDto;
-import com.ssafy.odab.domain.question.dto.SubConceptRelatedQuestionResponseDto;
-import com.ssafy.odab.domain.question.dto.VerifyAnswerRequestDto;
-import com.ssafy.odab.domain.question.dto.VerifyAnswerResponseDto;
+import com.ssafy.odab.domain.question.dto.*;
 import com.ssafy.odab.domain.question.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,39 +13,44 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
+import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/question/")
 public class QuestionController {
 
-    private final QuestionService questionService;
+  private final QuestionService questionService;
 
-    @PatchMapping("anwser")
-    public ResponseEntity<VerifyAnswerResponseDto> verifyAnswer(
-            @RequestBody VerifyAnswerRequestDto verifyAnswerRequestDto) {
+  @PatchMapping("anwser")
+  public ResponseEntity<VerifyAnswerResponseDto> verifyAnswer(
+      @RequestBody VerifyAnswerRequestDto verifyAnswerRequestDto) {
 
-        Boolean isCorrect = questionService.verifyAnswer(verifyAnswerRequestDto);
-        String message = isCorrect ? "정답입니다." : "오답입니다.";
-        VerifyAnswerResponseDto verifyAnswerResponseDto = VerifyAnswerResponseDto.builder()
-                .correct(isCorrect)
-                .message(message)
-                .build();
-        return ResponseEntity.ok(verifyAnswerResponseDto);
-    }
+    Boolean isCorrect = questionService.verifyAnswer(verifyAnswerRequestDto);
+    String message = isCorrect ? "정답입니다." : "오답입니다.";
+    VerifyAnswerResponseDto verifyAnswerResponseDto = VerifyAnswerResponseDto.builder()
+        .correct(isCorrect)
+        .message(message)
+        .build();
+    return ResponseEntity.ok(verifyAnswerResponseDto);
+  }
 
-    @GetMapping("/{questionId}/retry")
-    public ResponseEntity<RetryQuestionResponseDto> findRetryQuestion(
-            @PathVariable("questionId") Integer questionId) {
-        return ResponseEntity.ok(questionService.findRetryQuestionByQuestionId(questionId));
-    }
+  @GetMapping("/{questionId}/retry")
+  public ResponseEntity<RetryQuestionResponseDto> findRetryQuestion(@PathVariable("questionId") Integer questionId) {
+    return ResponseEntity.ok(questionService.findRetryQuestionByQuestionId(questionId));
+  }
+  //개념선택 - 수학개념 목록 조회
+  @GetMapping("/concept")
+  public ResponseEntity<ConceptResponseDto> findConceptList() {
+    return ResponseEntity.ok(questionService.findConceptList());
+  }
+  @GetMapping("{subConceptId}/related")
+  public ResponseEntity<Page<SubConceptRelatedQuestionResponseDto>> findSubConceptRelatedQuestion(
+      @PathVariable("subConceptId") Integer subConceptId,
+      @PageableDefault(size = 20, sort = "registedAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    return ResponseEntity.ok(
+        questionService.findSubConceptRelatedQuestionBySubConceptId(subConceptId, pageable));
+  }
 
-    @GetMapping("{subConceptId}/related")
-    public ResponseEntity<Page<SubConceptRelatedQuestionResponseDto>> findSubConceptRelatedQuestion(
-            @PathVariable("subConceptId") Integer subConceptId,
-            @PageableDefault(size = 20, sort = "registedAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(
-                questionService.findSubConceptRelatedQuestionBySubConceptId(subConceptId, pageable));
-    }
+
 
 }

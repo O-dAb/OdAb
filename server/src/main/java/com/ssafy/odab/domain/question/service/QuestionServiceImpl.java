@@ -11,6 +11,7 @@ import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question.repository.QuestionRepository;
 import com.ssafy.odab.domain.question_result.entity.QuestionResult;
 import com.ssafy.odab.domain.question_result.repository.QuestionResultRepository;
+   import com.ssafy.odab.domain.question.dto.ConceptResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,11 +19,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.io.File;
 import java.time.LocalDateTime;
+import java.util.UUID;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+
+
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +67,7 @@ public class QuestionServiceImpl implements QuestionService {
         // 문제id에 해당하는 문제 찾아오기
         Question question = questionRepository.findById(questionId).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
         // 문제별 정답 여부에서 가장 최근 정답기록 찾아오기
-        List<RetryQuestionResponseDto> retryQuestionResponseDtos = questionResultRepository.findRecentQuestionResultByQuestionId(questionId);
+        List<RetryQuestionResponseDto> retryQuestionResponseDtos = questionResultRepository.findRetryQuestionResultByQuestionId(questionId);
         RetryQuestionResponseDto retryQuestionResponseDto = retryQuestionResponseDtos.get(0);
         List<SubConcept> subConcepts = subConceptRepository.findByQuestionId(questionId);
         Set<RetryQuestionSubConceptDto> retryQuestionSubConceptDtoSet = subConcepts.stream().map(RetryQuestionSubConceptDto::from).collect(Collectors.toSet());
@@ -78,5 +88,20 @@ public class QuestionServiceImpl implements QuestionService {
         Page<Question> questions = questionRepository.findSubConceptRelatedQuestionBySubConceptId(subConceptId, pageable);
 
         return questions.map(SubConceptRelatedQuestionResponseDto::from);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public ConceptResponseDto findConceptList() {
+        List<SubConcept> subConcepts = subConceptRepository.findAll();
+        List<ConceptResponseDto.SubConceptSimpleDto> subConceptList = subConcepts.stream()
+                .map(sc -> new ConceptResponseDto.SubConceptSimpleDto(sc.getId(), sc.getConceptType()))
+                .toList();
+        ConceptResponseDto.Data data = ConceptResponseDto.Data.builder()
+                .subConceptList(subConceptList)
+                .build();
+        return ConceptResponseDto.builder()
+                .data(data)
+                .build();
     }
 }

@@ -16,7 +16,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { getReviewDetail } from "@/lib/curriculum-data";
-import type { EducationLevel, Grade } from "@/components/profile/user-profile";
+type EducationLevel = "middle" | "high"
+type Grade = "1" | "2" | "3"
 
 // 복습 단계별 레이블
 const REVIEW_STAGES = {
@@ -24,7 +25,7 @@ const REVIEW_STAGES = {
   2: "4일차",
   3: "6일차",
   4: "13일차",
-};
+} as const;
 
 // 경과일 계산 함수
 const getDaysAgo = (dateString: string) => {
@@ -143,7 +144,7 @@ export default function ReviewDetailPage() {
           <CardTitle className="flex justify-between items-center">
             <span>{review.topic} 복습</span>
             <Badge className="bg-purple-500">
-              {REVIEW_STAGES[review.reviewStage]} 복습
+              {REVIEW_STAGES[review.reviewStage as keyof typeof REVIEW_STAGES]} 복습
             </Badge>
           </CardTitle>
         </CardHeader>

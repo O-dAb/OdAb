@@ -1,3 +1,6 @@
+claude-api:
+  api-key: ${CLAUDE_APIKEY}
+  base-url: https://api.anthropic.com/v1/messages
 spring:
   application:
     name: server
@@ -50,7 +53,10 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
-
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 5MB
 
 
 logging.level:
