@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/badge";
-import type { EducationLevel, Grade } from "@/components/profile/user-profile";
+import type { EducationLevel, Grade } from "@/types/profile";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
