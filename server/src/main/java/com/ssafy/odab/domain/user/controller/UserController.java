@@ -151,4 +151,16 @@ public class UserController {
         Integer userId = jwtService.getUserIdFromToken(token);
         return ResponseEntity.ok(userId);
     }
+    // Postman 등 테스트용 토큰 발급 API (실서비스 미사용)
+    @GetMapping("/api/v1/test-token")
+    public ResponseEntity<String> getTestToken(@RequestParam("userId") Integer userId) {
+        // UserService에서 User 조회
+        var user = userService.findById(userId);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 userId의 사용자가 존재하지 않습니다.");
+        }
+        // JwtService로 토큰 발급
+        String token = jwtService.createToken(user);
+        return ResponseEntity.ok(token);
+    }
 }
