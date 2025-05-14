@@ -12,6 +12,17 @@ import {
 import { Camera, FileText, Upload } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
+import { useRouter } from "next/navigation";
+import axios from "axios";
+
+// API 응답 타입 정의
+interface ProblemApiResponse {
+  questionText: string;
+  answer: string;
+  imageUrl: string;
+  questionSolution: string[];
+  subConcepts: string[];
+}
 
 export default function ProblemUploaderPage() {
   const [manualInput, setManualInput] = useState("");
@@ -20,6 +31,7 @@ export default function ProblemUploaderPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,22 +69,56 @@ export default function ProblemUploaderPage() {
     }
   };
 
-  const handleImageSubmit = () => {
+  const handleImageSubmit = async () => {
     if (selectedFile) {
       setIsUploading(true);
-      toast({
-        title: "이미지 업로드 완료",
-        description: selectedFile.name,
-        variant: "default",
-      });
-      setTimeout(() => {
+      
+      try {
+        // FormData 객체 생성
+        const formData = new FormData();
+        formData.append("imageData", selectedFile, "math_problem.png");
+        
+        // API 요청 보내기
+        const response = await axios.post<ProblemApiResponse>(
+          "http://localhost:8080/api/claude",
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
+        
+        // 응답 데이터 처리
+        const { questionText, answer, imageUrl, questionSolution, subConcepts } = response.data;
+        
+        // 성공 메시지 표시
+        toast({
+          title: "문제 분석 완료",
+          description: "문제와 해설이 준비되었습니다.",
+          variant: "default",
+        });
+        
+        // 문제 정보를 로컬 스토리지에 저장
+        localStorage.setItem("problemData", JSON.stringify(response.data));
+        
+        // 문제 풀이 페이지로 이동
+        router.push("/problem-solver");
+      } catch (error) {
+        console.error("API 요청 오류:", error);
+        toast({
+          title: "문제 분석 실패",
+          description: "서버 연결에 문제가 발생했습니다. 다시 시도해주세요.",
+          variant: "destructive",
+        });
+      } finally {
         setIsUploading(false);
         setPreviewImage(null);
         setSelectedFile(null);
         if (fileInputRef.current) {
           fileInputRef.current.value = "";
         }
-      }, 1000);
+      }
     }
   };
 
