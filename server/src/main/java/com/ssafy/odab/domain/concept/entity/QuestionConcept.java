@@ -21,41 +21,41 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class QuestionConcept {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "question_concept_id")
-  private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "question_concept_id")
+    private Integer id;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "question_id")
-  private Question question;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "question_id")
+    private Question question;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "sub_concept_id")
-  private SubConcept subConcept;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "sub_concept_id")
+    private SubConcept subConcept;
 
-  public void changeQuestion(Question question) {
-    if(this.question != null) {
-      this.question.getQuestionConcepts().remove(this);
+    public void changeQuestion(Question question) {
+        if (this.question != null) {
+            this.question.getQuestionConcepts().remove(this);
+        }
+
+        this.question = question;
+
+        if (question != null) {
+            question.getQuestionConcepts().add(this);
+        }
     }
 
-    this.question = question;
+    public void changeSubConcept(Question question) {
+        if (this.question != null) {
+            this.question.getQuestionConcepts().remove(this);
+        }
 
-    if(question != null) {
-      question.getQuestionConcepts().add(this);
+        this.question = question;
+
+        if (question != null) {
+            question.getQuestionConcepts().add(this);
+        }
     }
-  }
-
-  public void changeSubConcept(Question question) {
-    if(this.question != null) {
-      this.question.getQuestionConcepts().remove(this);
-    }
-
-    this.question = question;
-
-    if(question != null) {
-      question.getQuestionConcepts().add(this);
-    }
-  }
 
 }

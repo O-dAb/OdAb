@@ -1,9 +1,16 @@
-"use client"
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { BarChart, CalendarIcon, TrendingUp, TrendingDown, Clock, GraduationCap } from "lucide-react"
-import type { EducationLevel, Grade } from "@/components/user-profile"
+"use client";
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import {
+  BarChart,
+  CalendarIcon,
+  TrendingUp,
+  TrendingDown,
+  Clock,
+  GraduationCap,
+} from "lucide-react";
+import type { EducationLevel, Grade } from "@/components/user-profile";
 import {
   getCurriculumTopics,
   getAllCurriculumTopics,
@@ -13,71 +20,78 @@ import {
   getAllTopicLastStudyDate,
   getTopicStudyCount,
   getAllTopicStudyCount,
-} from "@/lib/curriculum-data"
-import { Button } from "@/components/ui/button"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+} from "@/lib/curriculum-data";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface LearningStatsProps {
-  educationLevel: EducationLevel
-  grade: Grade
+  educationLevel: EducationLevel;
+  grade: Grade;
 }
 
 export function LearningStats({ educationLevel, grade }: LearningStatsProps) {
-  const [showAllGrades, setShowAllGrades] = useState(false)
-  const [selectedGrade, setSelectedGrade] = useState<Grade>(grade)
+  const [showAllGrades, setShowAllGrades] = useState(false);
+  const [selectedGrade, setSelectedGrade] = useState<Grade>(grade);
 
   const topics = showAllGrades
     ? getAllCurriculumTopics(educationLevel)
-    : getCurriculumTopics(educationLevel, selectedGrade)
+    : getCurriculumTopics(educationLevel, selectedGrade);
 
   // 약점 주제 (오답률 30% 이상)
   const weakTopics = topics.filter((topic) =>
     showAllGrades
       ? getAllTopicErrorRate(topic, educationLevel) >= 30
-      : getTopicErrorRate(topic, educationLevel, selectedGrade) >= 30,
-  )
+      : getTopicErrorRate(topic, educationLevel, selectedGrade) >= 30
+  );
 
   // 강점 주제 (오답률 10% 이하이면서 학습 횟수 5회 이상)
   const strongTopics = topics.filter((topic) =>
     showAllGrades
-      ? getAllTopicErrorRate(topic, educationLevel) <= 10 && getAllTopicStudyCount(topic, educationLevel) >= 5
+      ? getAllTopicErrorRate(topic, educationLevel) <= 10 &&
+        getAllTopicStudyCount(topic, educationLevel) >= 5
       : getTopicErrorRate(topic, educationLevel, selectedGrade) <= 10 &&
-        getTopicStudyCount(topic, educationLevel, selectedGrade) >= 5,
-  )
+        getTopicStudyCount(topic, educationLevel, selectedGrade) >= 5
+  );
 
   // 최근 학습한 주제 (최근 7일 이내)
   const recentTopics = topics.filter((topic) => {
     const lastStudyDate = showAllGrades
       ? getAllTopicLastStudyDate(topic, educationLevel)
-      : getTopicLastStudyDate(topic, educationLevel, selectedGrade)
-    if (!lastStudyDate) return false
+      : getTopicLastStudyDate(topic, educationLevel, selectedGrade);
+    if (!lastStudyDate) return false;
 
-    const lastStudy = new Date(lastStudyDate)
-    const today = new Date()
-    const diffTime = Math.abs(today.getTime() - lastStudy.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    const lastStudy = new Date(lastStudyDate);
+    const today = new Date();
+    const diffTime = Math.abs(today.getTime() - lastStudy.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    return diffDays <= 7
-  })
+    return diffDays <= 7;
+  });
 
   // 오랫동안 학습하지 않은 주제 (30일 이상)
   const neglectedTopics = topics.filter((topic) => {
     const lastStudyDate = showAllGrades
       ? getAllTopicLastStudyDate(topic, educationLevel)
-      : getTopicLastStudyDate(topic, educationLevel, selectedGrade)
-    if (!lastStudyDate) return true // 한 번도 학습하지 않은 주제
+      : getTopicLastStudyDate(topic, educationLevel, selectedGrade);
+    if (!lastStudyDate) return true; // 한 번도 학습하지 않은 주제
 
-    const lastStudy = new Date(lastStudyDate)
-    const today = new Date()
-    const diffTime = Math.abs(today.getTime() - lastStudy.getTime())
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+    const lastStudy = new Date(lastStudyDate);
+    const today = new Date();
+    const diffTime = Math.abs(today.getTime() - lastStudy.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    return diffDays >= 30
-  })
+    return diffDays >= 30;
+  });
 
   const handleGradeChange = (value: string) => {
-    setSelectedGrade(value as Grade)
-  }
+    setSelectedGrade(value as Grade);
+  };
 
   return (
     <div className="space-y-6">
@@ -109,8 +123,8 @@ export function LearningStats({ educationLevel, grade }: LearningStatsProps) {
               variant="outline"
               size="sm"
               onClick={() => {
-                setShowAllGrades(false)
-                setSelectedGrade(grade)
+                setShowAllGrades(false);
+                setSelectedGrade(grade);
               }}
             >
               내 학년으로
@@ -185,11 +199,19 @@ export function LearningStats({ educationLevel, grade }: LearningStatsProps) {
             {recentTopics.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {recentTopics.map((topic) => (
-                  <Badge key={topic} variant="outline" className="border-purple-300">
+                  <Badge
+                    key={topic}
+                    variant="outline"
+                    className="border-purple-300"
+                  >
                     {topic} (
                     {showAllGrades
                       ? getAllTopicLastStudyDate(topic, educationLevel)
-                      : getTopicLastStudyDate(topic, educationLevel, selectedGrade)}
+                      : getTopicLastStudyDate(
+                          topic,
+                          educationLevel,
+                          selectedGrade
+                        )}
                     )
                   </Badge>
                 ))}
@@ -211,17 +233,29 @@ export function LearningStats({ educationLevel, grade }: LearningStatsProps) {
             {neglectedTopics.length > 0 ? (
               <div className="flex flex-wrap gap-2">
                 {neglectedTopics.map((topic) => (
-                  <Badge key={topic} variant="outline" className="border-orange-300">
+                  <Badge
+                    key={topic}
+                    variant="outline"
+                    className="border-orange-300"
+                  >
                     {topic}{" "}
                     {(
                       showAllGrades
                         ? getAllTopicLastStudyDate(topic, educationLevel)
-                        : getTopicLastStudyDate(topic, educationLevel, selectedGrade)
+                        : getTopicLastStudyDate(
+                            topic,
+                            educationLevel,
+                            selectedGrade
+                          )
                     )
                       ? `(${
                           showAllGrades
                             ? getAllTopicLastStudyDate(topic, educationLevel)
-                            : getTopicLastStudyDate(topic, educationLevel, selectedGrade)
+                            : getTopicLastStudyDate(
+                                topic,
+                                educationLevel,
+                                selectedGrade
+                              )
                         })`
                       : "(미학습)"}
                   </Badge>
@@ -246,24 +280,33 @@ export function LearningStats({ educationLevel, grade }: LearningStatsProps) {
             {topics.map((topic) => {
               const errorRate = showAllGrades
                 ? getAllTopicErrorRate(topic, educationLevel)
-                : getTopicErrorRate(topic, educationLevel, selectedGrade)
-              const height = errorRate ? `${errorRate}%` : "10%"
+                : getTopicErrorRate(topic, educationLevel, selectedGrade);
+              const height = errorRate ? `${errorRate}%` : "10%";
               return (
-                <div key={topic} className="flex flex-col items-center min-w-[60px]">
+                <div
+                  key={topic}
+                  className="flex flex-col items-center min-w-[60px]"
+                >
                   <div
                     className={`w-full rounded-t-sm ${
-                      errorRate >= 30 ? "bg-red-500" : errorRate <= 10 ? "bg-green-500" : "bg-purple-600"
+                      errorRate >= 30
+                        ? "bg-red-500"
+                        : errorRate <= 10
+                        ? "bg-green-500"
+                        : "bg-purple-600"
                     }`}
                     style={{ height }}
                   ></div>
-                  <div className="text-xs mt-1 text-center truncate w-full">{topic}</div>
+                  <div className="text-xs mt-1 text-center truncate w-full">
+                    {topic}
+                  </div>
                   <div className="text-xs font-medium">{errorRate}%</div>
                 </div>
-              )
+              );
             })}
           </div>
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

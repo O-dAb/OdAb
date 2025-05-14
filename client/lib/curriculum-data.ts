@@ -1,4 +1,4 @@
-import type { EducationLevel, Grade } from "@/components/profile/user-profile"
+import type { EducationLevel, Grade } from "@/components/problem-solver"
 
 // 교육과정 데이터 - 실제 제공된 데이터 기반
 const CURRICULUM = {
