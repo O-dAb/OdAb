@@ -42,7 +42,7 @@ public class JwtService {
         claims.put("userName", user.getUserName());
 
         Date now = new Date();
-        Date validity = new Date(now.getTime() + accessTokenValidity);
+        Date validity = new Date(now.getTime() + accessTokenValidity*1000);
 
         return Jwts.builder()
                 .setClaims(claims)
