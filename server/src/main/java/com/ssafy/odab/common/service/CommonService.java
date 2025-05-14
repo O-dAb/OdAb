@@ -8,5 +8,6 @@ public interface CommonService {
     GradeConceptResponseDto getGradeConceptDetail(Byte grade, Integer userId);
     // 개념별 문제 조회
     ConceptQuestionResponseDto getConceptQuestionList(Integer subConceptId);
-    
+    // 전체 개념 조회
+    Object getAllConcepts();
 } 
