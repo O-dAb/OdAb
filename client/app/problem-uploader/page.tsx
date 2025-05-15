@@ -77,17 +77,17 @@ export default function ProblemUploaderPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 flex flex-col items-center justify-center py-10">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-pink-950 dark:via-blue-950 dark:to-purple-950 flex flex-col items-center justify-center py-10">
       <div className="flex items-center gap-3 mb-6">
         <span className="text-4xl">🦦</span>
-        <span className="px-4 py-2 bg-white/80 rounded-full shadow text-brown-700 font-bold text-lg border border-brown-200 animate-bounce">
+        <span className="px-4 py-2 bg-white/80 dark:bg-gray-800/80 rounded-full shadow text-brown-700 dark:text-gray-300 font-bold text-lg border border-brown-200 dark:border-gray-700 animate-bounce">
           수달이: 사진이나 텍스트로 문제를 올려보세요!
         </span>
       </div>
-      <Card className="w-full max-w-7xl border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100">
-        <CardHeader className="bg-blue-50/60 border-b-0 rounded-t-2xl">
-          <CardTitle className="flex items-center gap-2 text-blue-700">
-            <FileText className="h-6 w-6 text-purple-500" />
+      <Card className="w-full max-w-7xl border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-blue-900 dark:via-purple-900 dark:to-pink-900">
+        <CardHeader className="bg-blue-50/60 dark:bg-blue-950/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
+            <FileText className="h-6 w-6 text-purple-500 dark:text-purple-400" />
             <span>문제 업로드</span>
           </CardTitle>
         </CardHeader>
@@ -104,23 +104,23 @@ export default function ProblemUploaderPage() {
               />
               <label
                 htmlFor="file-upload"
-                className="flex flex-col items-center justify-center border-2 border-dashed border-purple-300 rounded-xl p-6 h-full cursor-pointer hover:bg-purple-50 transition-colors shadow"
+                className="flex flex-col items-center justify-center border-2 border-dashed border-purple-300 dark:border-purple-700 rounded-xl p-6 h-full cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/50 transition-colors shadow"
               >
-                <FileText className="h-10 w-10 text-purple-400 mb-2" />
+                <FileText className="h-10 w-10 text-purple-400 dark:text-purple-300 mb-2" />
                 <span className="text-base font-semibold">이미지 업로드</span>
-                <span className="text-xs text-gray-500 mt-1">
+                <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   클릭하여 파일 선택
                 </span>
               </label>
             </div>
             <Button
               variant="outline"
-              className="h-auto flex flex-col items-center justify-center py-6 rounded-xl bg-blue-100 hover:bg-blue-200 border-blue-200 shadow"
+              className="h-auto flex flex-col items-center justify-center py-6 rounded-xl bg-blue-100 dark:bg-blue-900 hover:bg-blue-200 dark:hover:bg-blue-800 border-blue-200 dark:border-blue-700 shadow"
               onClick={handleCameraCapture}
             >
-              <Camera className="h-10 w-10 text-blue-400 mb-2" />
+              <Camera className="h-10 w-10 text-blue-400 dark:text-blue-300 mb-2" />
               <span className="text-base font-semibold">카메라로 촬영</span>
-              <span className="text-xs text-gray-500 mt-1">
+              <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                 클릭하여 촬영 시작
               </span>
             </Button>
@@ -133,10 +133,10 @@ export default function ProblemUploaderPage() {
                 <img
                   src={previewImage}
                   alt="문제 이미지"
-                  className="w-full h-auto max-h-[300px] object-contain border rounded-xl shadow"
+                  className="w-full h-auto max-h-[300px] object-contain border rounded-xl shadow dark:border-gray-700"
                 />
                 <Button
-                  className="mt-2 bg-purple-500 hover:bg-purple-600 w-full rounded-xl font-bold"
+                  className="mt-2 bg-purple-500 hover:bg-purple-600 dark:bg-purple-700 dark:hover:bg-purple-600 w-full rounded-xl font-bold"
                   onClick={handleImageSubmit}
                   disabled={isUploading}
                 >
@@ -150,10 +150,10 @@ export default function ProblemUploaderPage() {
         {isUploading && (
           <CardFooter>
             <div className="w-full">
-              <div className="w-full bg-gray-200 rounded-full h-2.5">
-                <div className="bg-purple-600 h-2.5 rounded-full animate-pulse w-3/4"></div>
+              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                <div className="bg-purple-600 dark:bg-purple-500 h-2.5 rounded-full animate-pulse w-3/4"></div>
               </div>
-              <p className="text-sm text-center mt-2">문제 인식 중...</p>
+              <p className="text-sm text-center mt-2 dark:text-gray-300">문제 인식 중...</p>
             </div>
           </CardFooter>
         )}
