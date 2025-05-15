@@ -22,13 +22,17 @@ public class QQuestionResult extends EntityPathBase<QuestionResult> {
 
     public static final QQuestionResult questionResult = new QQuestionResult("questionResult");
 
-    public final NumberPath<Long> id = createNumber("id", Long.class);
+    public final NumberPath<Integer> id = createNumber("id", Integer.class);
 
     public final BooleanPath isCorrect = createBoolean("isCorrect");
 
     public final com.ssafy.odab.domain.question.entity.QQuestion question;
 
-    public final DatePath<java.time.LocalDate> solveDate = createDate("solveDate", java.time.LocalDate.class);
+    public final StringPath solutionImage = createString("solutionImage");
+
+    public final DateTimePath<java.time.LocalDateTime> solvedAt = createDateTime("solvedAt", java.time.LocalDateTime.class);
+
+    public final NumberPath<Integer> times = createNumber("times", Integer.class);
 
     public final com.ssafy.odab.domain.user.entity.QUser user;
 
