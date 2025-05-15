@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import type { EducationLevel, Grade } from "@/components/profile/user-profile"
+import type { EducationLevel, Grade } from "@/types/profile"
 
 export function SignupForm() {
   const [name, setName] = useState("")

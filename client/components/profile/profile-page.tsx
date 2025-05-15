@@ -12,7 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Camera } from "lucide-react"
-import type { EducationLevel, Grade } from "@/components/profile/user-profile"
+type EducationLevel = "middle" | "high"
+type Grade = "1" | "2" | "3"
 import axios from "axios"
 
 export function ProfilePage() {

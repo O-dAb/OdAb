@@ -18,6 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -31,6 +35,8 @@ public class KakaoService {
 
     private final UserRepository userRepository;
     private final JwtService jwtService;
+    private final StringRedisTemplate redisTemplate;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
@@ -106,41 +112,47 @@ public class KakaoService {
      */
     @Transactional
     public Map<String, Object> loginOrSignup(KakaoUserInfo userInfo) {
-        // 이미 가입된 사용자인지 확인
+        // 1. 회원가입/로그인 처리
         Optional<User> existingUser = userRepository.findBykakaoId(userInfo.getId());
-
         User user;
         boolean isNewUser = false;
 
         if (existingUser.isPresent()) {
-            // 기존 사용자라면 정보 업데이트 (필요한 경우)
             user = existingUser.get();
-            System.out.println("[KakaoService] 기존 사용자: userId=" + user.getId() + ", kakaoId=" + user.getKakaoId());
         } else {
-            // 신규 사용자라면 회원가입
             user = new User();
             user.updateKakaoId(userInfo.getId());
             user.updateUserName(userInfo.getNickname());
             user.updateCreatedAt(LocalDateTime.now());
             user.updateStatus(true);
-            user.updateGrade(1); // 학년 일단 1로 설정
-
+            user.updateGrade(1);
             userRepository.save(user);
             isNewUser = true;
-            System.out.println("[KakaoService] 신규 사용자 회원가입: kakaoId=" + user.getKakaoId() + ", userName=" + user.getUserName());
         }
 
-        // JWT 토큰 생성
+        // 2. JWT 토큰 생성
         String token = jwtService.createToken(user);
-        System.out.println("[KakaoService] JWT token: " + token);
 
-        // 응답 데이터 구성
+        // 3. uuid 생성
+        String uuid = UUID.randomUUID().toString();
+
+        // 4. Redis에 JSON으로 저장 (3분 유효)
+        Map<String, Object> redisData = Map.of(
+            "token", token,
+            "userId", user.getId(),
+            "nickname", user.getUserName()
+        );
+        try {
+            String redisValue = objectMapper.writeValueAsString(redisData);
+            redisTemplate.opsForValue().set(uuid, redisValue, 3, TimeUnit.MINUTES);
+        } catch (Exception e) {
+            throw new RuntimeException("Redis 저장 실패", e);
+        }
+
+        // 5. uuid만 반환
         Map<String, Object> response = new HashMap<>();
-        response.put("token", token);
-        response.put("userId", user.getId());
-        response.put("userName", user.getUserName());
+        response.put("auth_code", uuid);
         response.put("isNewUser", isNewUser);
-
         return response;
     }
 
