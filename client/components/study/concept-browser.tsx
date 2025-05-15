@@ -144,14 +144,14 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
   };
 
   return (
-    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 min-h-screen p-6 flex flex-col items-center">
+    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-pink-950 dark:via-blue-950 dark:to-purple-950 min-h-screen p-6 flex flex-col items-center">
       {/* 검색 및 필터 영역 */}
       <div className="flex justify-between items-center w-full max-w-6xl">
         <div className="relative flex-1 mr-4">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4" />
           <Input
             placeholder="개념 검색..."
-            className="pl-10 border-blue-100 rounded-xl shadow"
+            className="pl-10 border-blue-100 dark:border-blue-800 dark:bg-gray-800 dark:text-gray-200 rounded-xl shadow"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -161,14 +161,14 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
             variant={showAllGrades ? "default" : "outline"}
             size="sm"
             onClick={() => setShowAllGrades(true)}
-            className="flex items-center gap-1 bg-blue-400 hover:bg-blue-500 rounded-xl font-bold"
+            className="flex items-center gap-1 bg-blue-400 hover:bg-blue-500 dark:bg-blue-700 dark:hover:bg-blue-600 rounded-xl font-bold"
           >
             <GraduationCap className="h-4 w-4" />
             <span>전체 학년</span>
           </Button>
           {!showAllGrades && (
             <Select value={selectedGrade} onValueChange={handleGradeChange}>
-              <SelectTrigger className="w-[100px] bg-blue-50 border-blue-100 rounded-xl">
+              <SelectTrigger className="w-[100px] bg-blue-50 dark:bg-blue-900 border-blue-100 dark:border-blue-700 rounded-xl">
                 <SelectValue placeholder="학년 선택" />
               </SelectTrigger>
               <SelectContent>
@@ -186,7 +186,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
                 setShowAllGrades(false);
                 setSelectedGrade(grade);
               }}
-              className="border-blue-100 text-blue-500 hover:bg-blue-50 rounded-xl font-bold"
+              className="border-blue-100 dark:border-blue-700 text-blue-500 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900 rounded-xl font-bold"
             >
               내 학년으로
             </Button>
@@ -200,33 +200,33 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
           filteredConcepts.map((concept) => (
             <Card
               key={concept.id}
-              className={`cursor-pointer border-0 shadow-lg rounded-2xl bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 hover:scale-105 transition-transform duration-200 ${
+              className={`cursor-pointer border-0 shadow-lg rounded-2xl bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 dark:from-blue-900 dark:via-purple-900 dark:to-pink-900 hover:scale-105 transition-transform duration-200 ${
                 educationLevel === "middle"
-                  ? "border-green-100"
-                  : "border-blue-100"
+                  ? "border-green-100 dark:border-green-900"
+                  : "border-blue-100 dark:border-blue-900"
               } ${
                 selectedConcept?.id === concept.id
                   ? educationLevel === "middle"
-                    ? "ring-4 ring-green-200"
-                    : "ring-4 ring-blue-200"
+                    ? "ring-4 ring-green-200 dark:ring-green-700"
+                    : "ring-4 ring-blue-200 dark:ring-blue-700"
                   : ""
               }`}
               onClick={() => setSelectedConcept(concept)}
             >
               <CardContent className="p-6">
-                <h3 className="font-extrabold text-xl text-blue-700 mb-1 flex items-center gap-2">
+                <h3 className="font-extrabold text-xl text-blue-700 dark:text-blue-300 mb-1 flex items-center gap-2">
                   <span className="text-2xl">📚</span>
                   {concept.title}
                 </h3>
-                <p className="text-gray-600 text-base mt-1 mb-2">
+                <p className="text-gray-600 dark:text-gray-300 text-base mt-1 mb-2">
                   {concept.description}
                 </p>
                 <Badge
                   variant="outline"
                   className={`mt-2 px-3 py-1 rounded-full font-bold text-base shadow ${
                     educationLevel === "middle"
-                      ? "border-green-200 text-green-600 bg-white/80"
-                      : "border-blue-200 text-blue-600 bg-white/80"
+                      ? "border-green-200 dark:border-green-700 text-green-600 dark:text-green-400 bg-white/80 dark:bg-gray-800/80"
+                      : "border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 bg-white/80 dark:bg-gray-800/80"
                   }`}
                 >
                   {educationLevel === "middle" ? "중" : "고"}
@@ -238,7 +238,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
             </Card>
           ))
         ) : (
-          <div className="col-span-2 text-center py-10 text-gray-500">
+          <div className="col-span-2 text-center py-10 text-gray-500 dark:text-gray-400">
             검색 결과가 없습니다.
           </div>
         )}
@@ -246,30 +246,30 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
 
       {/* 선택한 개념 상세 정보 */}
       {selectedConcept && (
-        <Card className="border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-yellow-100 via-pink-50 to-purple-50 w-full max-w-4xl mt-8">
-          <CardHeader className="bg-yellow-50/60 border-b-0 rounded-t-2xl">
-            <CardTitle className="flex items-center gap-2 text-yellow-700 text-2xl font-extrabold">
+        <Card className="border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-yellow-100 via-pink-50 to-purple-50 dark:from-yellow-900 dark:via-pink-950 dark:to-purple-950 w-full max-w-4xl mt-8">
+          <CardHeader className="bg-yellow-50/60 dark:bg-yellow-950/60 border-b-0 rounded-t-2xl">
+            <CardTitle className="flex items-center gap-2 text-yellow-700 dark:text-yellow-300 text-2xl font-extrabold">
               <span className="text-3xl">🦦</span>
               {selectedConcept.title}
             </CardTitle>
           </CardHeader>
           <CardContent className="pt-6 space-y-6">
             <div>
-              <h3 className="text-base font-bold mb-1 text-yellow-700">설명</h3>
-              <p className="text-lg text-gray-700">
+              <h3 className="text-base font-bold mb-1 text-yellow-700 dark:text-yellow-300">설명</h3>
+              <p className="text-lg text-gray-700 dark:text-gray-300">
                 {selectedConcept.description}
               </p>
             </div>
 
             <div>
-              <h3 className="text-base font-bold mb-1 text-yellow-700">공식</h3>
-              <div className="bg-yellow-50 p-4 rounded-xl font-mono text-lg shadow">
+              <h3 className="text-base font-bold mb-1 text-yellow-700 dark:text-yellow-300">공식</h3>
+              <div className="bg-yellow-50 dark:bg-yellow-950 p-4 rounded-xl font-mono text-lg shadow">
                 {selectedConcept.formula}
               </div>
             </div>
 
             <div>
-              <h3 className="text-base font-bold mb-1 text-yellow-700">예시</h3>
+              <h3 className="text-base font-bold mb-1 text-yellow-700 dark:text-yellow-300">예시</h3>
               <ul className="list-disc pl-5 space-y-1 text-lg">
                 {selectedConcept.examples.map(
                   (example: string, index: number) => (
@@ -284,7 +284,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
               href={`/study/related?subConceptId=${selectedConcept.id}`}
               className="w-full block"
             >
-              <Button className="w-full bg-yellow-400 hover:bg-yellow-500 rounded-xl font-bold text-lg mt-4">
+              <Button className="w-full bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-700 dark:hover:bg-yellow-600 rounded-xl font-bold text-lg mt-4">
                 관련 문제 풀어보기
               </Button>
             </Link>
