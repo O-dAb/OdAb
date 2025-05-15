@@ -19,6 +19,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import Link from "next/link"; // useRouter 대신 Link 사용
+import { authApi } from "@/lib/api";
+
 
 /**
  * 개념 학습 컴포넌트
@@ -53,6 +55,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
   const [conceptData, setConceptData] = useState<any>(null);
   const [selectedSubConcept, setSelectedSubConcept] = useState<any | null>(null);
   const [selectedMajorId, setSelectedMajorId] = useState<number | null>(null);
+  const [subConceptContent, setSubConceptContent] = useState<string>("");
 
   // 교육과정에 맞는 개념 데이터 가져오기
   const concepts = useMemo(() => {
@@ -71,12 +74,12 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
 
   // API에서 개념 데이터 불러오기
   useEffect(() => {
-    fetch("http://localhost:8080/api/v1/common/concept")
-      .then((res) => res.json())
-      .then((data) => {
-        setConceptData(data.data);
+    authApi.get("/api/v1/common/concept")
+      .then((res) => {
+        setConceptData(res.data);
       });
   }, []);
+  
 
   // 선택한 학년의 대주제 리스트
   const majorConcepts =
@@ -135,6 +138,19 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
     ? (conceptData?.grades.flatMap((g: any) => g.majorConceptList) || [])
     : majorConcepts;
   const majorRows = chunkArray(filteredMajorConcepts, 2);
+
+  // 카드 클릭 시 개념 설명 API 호출 (axios 사용)
+  useEffect(() => {
+    if (selectedConcept && selectedConcept.id) {
+      authApi.get(`/api/v1/common/${selectedConcept.id}/content`)
+        .then((res) => {
+          setSubConceptContent(res.data.data?.subConceptContent || "");
+        })
+        .catch(() => setSubConceptContent(""));
+    } else {
+      setSubConceptContent("");
+    }
+  }, [selectedConcept]);
 
   return (
     <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 min-h-screen p-6 flex flex-col items-center">
