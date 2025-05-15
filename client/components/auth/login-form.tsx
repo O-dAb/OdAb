@@ -13,20 +13,14 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
-  const [showForm, setShowForm] = useState(false)
 
-  // 이미 로그인된 상태인지 확인 (무한 리다이렉트 방지)
+  // 이미 로그인된 상태인지 확인
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
       router.push('/');
-    } else {
-      setShowForm(true); // 토큰이 없을 때만 폼을 보여줌
     }
   }, [router]);
-
-  // 폼이 준비될 때까지 아무것도 렌더링하지 않음
-  if (!showForm) return null;
 
   // 카카오 로그인 시작
   const loginWithKakao = async () => {

@@ -18,7 +18,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { EducationLevel } from "@/components/user-profile";
 
-
 export default function HomePage() {
   // AuthContext에서 사용자 정보 가져오기
   const { userProfile } = useAuth();
@@ -37,7 +36,7 @@ export default function HomePage() {
 
   // 오늘의 복습 (예시 데이터)
   const todayReviews = [
-    { topic: "수와 연산", stage: "987654일차" },
+    { topic: "수와 연산", stage: "1일차" },
     { topic: "변화와 관계", stage: "4일차" },
   ];
 
