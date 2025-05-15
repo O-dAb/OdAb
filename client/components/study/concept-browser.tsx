@@ -39,14 +39,7 @@ const MIDDLE_SCHOOL_CONCEPTS = [
     examples: ["3/4", "-5/2", "7"],
     grade: "1",
   },
-  {
-    id: 102,
-    title: "일차방정식",
-    description: "미지수가 1제곱으로 표현된 방정식을 해결하는 방법을 배웁니다.",
-    formula: "ax + b = c",
-    examples: ["2x + 3 = 7", "x - 5 = 10"],
-    grade: "1",
-  },
+
   
 ];
 
@@ -70,10 +63,11 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
 
   // 중학교 개념 데이터 추가
   const allConcepts = useMemo(() => {
-    return educationLevel === "middle"
-      ? [...concepts, ...MIDDLE_SCHOOL_CONCEPTS]
-      : concepts;
-  }, [educationLevel, concepts]);
+    // curriculum-data에서 해당 카드가 반환될 경우 필터로 제거
+    return concepts.filter((concept: any) =>
+      !["분수와 소수", "일차방정식", "정수와 유리수", "연립방정식", "이차방정식"].includes(concept.title)
+    );
+  }, [concepts]);
 
   // API에서 개념 데이터 불러오기
   useEffect(() => {
