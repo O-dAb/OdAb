@@ -6,9 +6,7 @@ import { MainHeader } from "@/components/main-header";
 
 export function ClientHeader() {
   const { userProfile } = useAuth();
-  const { isProfileSet, educationLevel, grade, userName } = userProfile;
-
-  if (!isProfileSet) return null;
+  const { educationLevel, grade, userName } = userProfile;
 
   return (
     <MainHeader

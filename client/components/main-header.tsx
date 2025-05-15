@@ -16,7 +16,7 @@ interface MainHeaderProps {
 
 type User = {
   userId: string;
-  token: string;
+  accessToken: string;
   nickname?: string;
 } | null;
 
@@ -34,19 +34,19 @@ export function MainHeader({ educationLevel, grade }: MainHeaderProps) {
         try {
           // 2. auth_code로 토큰/유저정보 요청
           const response = await axios.get<{
-            token: string;
+            accessToken: string;
             userId: string;
             nickname: string;
           }>(`http://localhost:8080/api/auth/result?auth_code=${authCode}`);
 
           // 3. 받은 정보 저장
-          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("accessToken", response.data.accessToken);
           localStorage.setItem("userId", response.data.userId);
           localStorage.setItem("nickname", response.data.nickname);
 
           setUser({
             userId: response.data.userId,
-            token: response.data.token,
+            accessToken: response.data.accessToken,
             nickname: response.data.nickname,
           });
 
@@ -62,14 +62,14 @@ export function MainHeader({ educationLevel, grade }: MainHeaderProps) {
         }
       } else {
         // 5. localStorage에서 기존 로그인 정보 복원
-        const token = localStorage.getItem("token");
+        const accessToken = localStorage.getItem("accessToken");
         const userId = localStorage.getItem("userId");
         const nickname = localStorage.getItem("nickname");
 
-        if (token && userId) {
+        if (accessToken && userId) {
           setUser({
             userId,
-            token,
+            accessToken,
             nickname: nickname || undefined,
           });
         }
@@ -81,7 +81,10 @@ export function MainHeader({ educationLevel, grade }: MainHeaderProps) {
 
   // 로그아웃 처리
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    if (!window.confirm("정말 로그아웃 하시겠습니까?")) {
+      return;
+    }
+    localStorage.removeItem("accessToken");
     localStorage.removeItem("userId");
     localStorage.removeItem("nickname");
     setUser(null);
