@@ -6,6 +6,8 @@ import type { EducationLevel, Grade } from "@/components/user-profile";
 import { GraduationCap, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 interface MainHeaderProps {
   educationLevel: EducationLevel;
@@ -21,6 +23,8 @@ type User = {
 
 export function MainHeader({ educationLevel, grade }: MainHeaderProps) {
   const [user, setUser] = useState<User>(null);
+  const router = useRouter();
+  const { toast } = useToast();
 
   // 로그인 상태 확인 및 처리
   useEffect(() => {
@@ -49,15 +53,13 @@ export function MainHeader({ educationLevel, grade }: MainHeaderProps) {
             nickname: response.data.nickname,
           });
 
-          // 4. URL에서 auth_code 제거
-          window.history.replaceState(
-            {},
-            document.title,
-            window.location.pathname
-          );
+
+          // 4. URL에서 auth_code 제거 및 메인화면으로 이동
+          router.replace("/");
         } catch (error) {
           console.error("로그인 처리 중 오류:", error);
           alert("로그인 인증이 만료되었거나 잘못되었습니다.");
+          router.replace("/login");
         }
       } else {
         // 5. localStorage에서 기존 로그인 정보 복원
@@ -76,10 +78,13 @@ export function MainHeader({ educationLevel, grade }: MainHeaderProps) {
     };
 
     checkLoginStatus();
-  }, []);
+  }, [router]);
 
   // 로그아웃 처리
   const handleLogout = () => {
+    if (!window.confirm("정말 로그아웃 하시겠습니까?")) {
+      return;
+    }
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("nickname");
