@@ -4,6 +4,8 @@ import "@/styles/globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
 import { ClientHeader } from "@/components/client-header";
 import { ClientSideNav } from "@/components/client-sidenav";
+import { ThemeProvider } from "@/components/theme-provider";
+import Script from "next/script";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,17 +20,38 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
+      <head>
+        <Script id="theme-script" strategy="beforeInteractive">
+          {`
+            (function() {
+              try {
+                const savedTheme = localStorage.getItem('theme');
+                
+                if (savedTheme === 'dark') {
+                  document.documentElement.classList.add('dark');
+                } else {
+                  document.documentElement.classList.remove('dark');
+                }
+              } catch (e) {
+                console.error('다크 모드 초기화 오류:', e);
+              }
+            })();
+          `}
+        </Script>
+      </head>
       <body className={inter.className}>
-        <AuthProvider>
-          <div className="flex flex-col h-screen">
-            <ClientHeader />
-            <div className="flex flex-1 overflow-hidden">
-              <ClientSideNav />
-              <div className="flex-1 overflow-y-auto">{children}</div>
+        <ThemeProvider attribute="class" defaultTheme="light">
+          <AuthProvider>
+            <div className="flex flex-col h-screen">
+              <ClientHeader />
+              <div className="flex flex-1 overflow-hidden">
+                <ClientSideNav />
+                <div className="flex-1 overflow-y-auto">{children}</div>
+              </div>
             </div>
-          </div>
-        </AuthProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

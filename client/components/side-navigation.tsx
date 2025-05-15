@@ -56,7 +56,7 @@ export function SideNavigation() {
   ];
 
   return (
-    <nav className="w-56 border-r bg-gradient-to-b from-blue-50 via-purple-50 to-pink-50 p-6 min-h-screen shadow-md">
+    <nav className="w-56 border-r bg-gradient-to-b from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950 dark:border-gray-700 p-6 min-h-screen shadow-md">
       <ul className="space-y-3">
         {navItems.map((item) => (
           <li key={item.value}>
@@ -65,12 +65,12 @@ export function SideNavigation() {
               className={`flex items-center gap-3 p-3 rounded-xl font-semibold transition-all text-base shadow-sm
                 ${
                   pathname === item.path
-                    ? "bg-gradient-to-r from-purple-200 to-pink-200 text-purple-700 scale-105 shadow-lg border-2 border-purple-300"
-                    : "hover:bg-blue-100 hover:scale-105 text-blue-700"
+                    ? "bg-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-800 dark:to-pink-800 text-purple-700 dark:text-purple-200 scale-105 shadow-lg border-2 border-purple-300 dark:border-purple-700"
+                    : "hover:bg-blue-100 dark:hover:bg-blue-900 hover:scale-105 text-blue-700 dark:text-blue-300"
                 }
               `}
             >
-              <span className="bg-white/80 rounded-full p-1 shadow-sm flex items-center justify-center">
+              <span className="bg-white/80 dark:bg-gray-800/80 rounded-full p-1 shadow-sm flex items-center justify-center">
                 {item.icon}
               </span>
               <span>{item.name}</span>

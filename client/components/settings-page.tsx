@@ -34,6 +34,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useRef } from "react";
+import { useTheme } from "next-themes";
 
 export default function SettingsPage() {
   // AuthContext에서 사용자 정보 가져오기
@@ -42,6 +43,7 @@ export default function SettingsPage() {
 
   const [level, setLevel] = useState<EducationLevel>(educationLevel);
   const [selectedGrade, setSelectedGrade] = useState<Grade>(grade);
+  const { theme, setTheme } = useTheme();
   const [darkMode, setDarkMode] = useState(false);
   const [profileImageUrl, setProfileImageUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
@@ -60,19 +62,9 @@ export default function SettingsPage() {
       setProfileImageUrl(savedImageUrl);
     }
 
-    // 앱 설정 로드
-    const savedSettings = localStorage.getItem("appSettings");
-    if (savedSettings) {
-      try {
-        const settings = JSON.parse(savedSettings);
-        if (settings.darkMode !== undefined) {
-          setDarkMode(settings.darkMode);
-        }
-      } catch (e) {
-        console.error("앱 설정 로드 실패:", e);
-      }
-    }
-  }, []);
+    // 다크 모드 상태 설정
+    setDarkMode(theme === 'dark');
+  }, [theme]);
 
   const handleSaveProfile = async () => {
     try {
@@ -124,14 +116,9 @@ export default function SettingsPage() {
   };
 
   const handleSaveSettings = () => {
-    // 설정 저장
-    localStorage.setItem(
-      "appSettings",
-      JSON.stringify({
-        darkMode,
-      })
-    );
-
+    // 테마 설정
+    setTheme(darkMode ? "dark" : "light");
+    
     // 모달 표시
     setShowSettingsModal(true);
   };
@@ -249,7 +236,7 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 min-h-screen p-6">
+    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-pink-950 dark:via-blue-950 dark:to-purple-950 min-h-screen p-6">
       {/* 프로필 성공 확인 모달 */}
       <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
         <DialogContent className="sm:max-w-md">
@@ -288,7 +275,7 @@ export default function SettingsPage() {
           <DialogFooter className="sm:justify-center">
             <Button
               onClick={handleCloseSettingsModal}
-              className="bg-yellow-400 hover:bg-yellow-500"
+              className="bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-600 dark:hover:bg-yellow-700"
             >
               확인
             </Button>
@@ -299,20 +286,20 @@ export default function SettingsPage() {
       {/* 프로필 이미지 카드 */}
       <Card
         id="profile-image"
-        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100"
+        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 dark:from-purple-900 dark:via-pink-900 dark:to-blue-900"
       >
-        <CardHeader className="bg-purple-50/60 border-b-0 rounded-t-2xl">
-          <CardTitle>프로필 이미지</CardTitle>
-          <CardDescription>프로필 이미지를 설정합니다</CardDescription>
+        <CardHeader className="bg-purple-50/60 dark:bg-purple-950/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="dark:text-white">프로필 이미지</CardTitle>
+          <CardDescription className="dark:text-gray-300">프로필 이미지를 설정합니다</CardDescription>
         </CardHeader>
         <CardContent className="pt-6 flex flex-col items-center">
           <div
             className="relative cursor-pointer group"
             onClick={handleImageClick}
           >
-            <Avatar className="w-32 h-32 border-2 border-purple-200">
+            <Avatar className="w-32 h-32 border-2 border-purple-200 dark:border-purple-700">
               <AvatarImage src={imageUrl} alt="프로필 이미지" />
-              <AvatarFallback className="text-2xl bg-purple-100 text-purple-500">
+              <AvatarFallback className="text-2xl bg-purple-100 dark:bg-purple-800 text-purple-500 dark:text-purple-300">
                 {level === "middle" ? "중" : "고"}
               </AvatarFallback>
             </Avatar>
@@ -323,7 +310,7 @@ export default function SettingsPage() {
 
             {isUploading && (
               <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
-                <div className="w-8 h-8 border-4 border-t-purple-500 border-purple-200 rounded-full animate-spin"></div>
+                <div className="w-8 h-8 border-4 border-t-purple-500 border-purple-200 dark:border-t-purple-400 dark:border-purple-700 rounded-full animate-spin"></div>
               </div>
             )}
           </div>
@@ -336,7 +323,7 @@ export default function SettingsPage() {
             className="hidden"
           />
 
-          <p className="text-sm text-gray-500 mt-4 text-center">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-4 text-center">
             프로필 이미지를 클릭하여 새 이미지를 업로드하세요
             <br />
             (900KB 이하의 JPG, PNG 파일)
@@ -346,21 +333,21 @@ export default function SettingsPage() {
 
       <Card
         id="profile"
-        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-blue-100 via-green-100 to-yellow-100"
+        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-blue-100 via-green-100 to-yellow-100 dark:from-blue-900 dark:via-green-900 dark:to-yellow-900"
       >
         <CardHeader
           className={`${
             level === "middle"
-              ? "bg-green-50/60 border-b-0 rounded-t-2xl"
-              : "bg-blue-50/60 border-b-0 rounded-t-2xl"
+              ? "bg-green-50/60 dark:bg-green-950/60 border-b-0 rounded-t-2xl"
+              : "bg-blue-50/60 dark:bg-blue-950/60 border-b-0 rounded-t-2xl"
           }`}
         >
-          <CardTitle>프로필 설정</CardTitle>
-          <CardDescription>학습 프로필 정보를 관리합니다</CardDescription>
+          <CardTitle className="dark:text-white">프로필 설정</CardTitle>
+          <CardDescription className="dark:text-gray-300">학습 프로필 정보를 관리합니다</CardDescription>
         </CardHeader>
         <CardContent className="pt-6 space-y-6">
           <div className="space-y-4">
-            <h3 className="text-sm font-medium">학교 구분</h3>
+            <h3 className="text-sm font-medium dark:text-white">학교 구분</h3>
             <RadioGroup
               defaultValue={level}
               value={level}
@@ -371,31 +358,31 @@ export default function SettingsPage() {
                 <RadioGroupItem
                   value="middle"
                   id="middle"
-                  className="text-green-500"
+                  className="text-green-500 dark:text-green-400"
                 />
-                <Label htmlFor="middle">중학교</Label>
+                <Label htmlFor="middle" className="dark:text-gray-300">중학교</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem
                   value="high"
                   id="high"
-                  className="text-blue-500"
+                  className="text-blue-500 dark:text-blue-400"
                 />
-                <Label htmlFor="high">고등학교</Label>
+                <Label htmlFor="high" className="dark:text-gray-300">고등학교</Label>
               </div>
             </RadioGroup>
-            <p className="text-sm text-gray-500 mt-2">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
               중학교 선택 시 녹색, 고등학교 선택 시 파란색 테마로 적용됩니다.
             </p>
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-sm font-medium">학년</h3>
+            <h3 className="text-sm font-medium dark:text-white">학년</h3>
             <Select
               value={selectedGrade}
               onValueChange={(value) => setSelectedGrade(value as Grade)}
             >
-              <SelectTrigger className="w-full border-blue-200">
+              <SelectTrigger className="w-full border-blue-200 dark:border-blue-700">
                 <SelectValue placeholder="학년 선택" />
               </SelectTrigger>
               <SelectContent>
@@ -408,7 +395,7 @@ export default function SettingsPage() {
 
           <Button
             onClick={handleSaveProfile}
-            className="w-full bg-blue-400 hover:bg-blue-500 rounded-xl font-bold"
+            className="w-full bg-blue-400 hover:bg-blue-500 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-xl font-bold"
           >
             프로필 저장
           </Button>
@@ -417,30 +404,30 @@ export default function SettingsPage() {
 
       <Card
         id="app-settings"
-        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-yellow-100 via-pink-100 to-purple-100"
+        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-yellow-100 via-pink-100 to-purple-100 dark:from-yellow-900 dark:via-pink-900 dark:to-purple-900"
       >
-        <CardHeader className="bg-yellow-50/60 border-b-0 rounded-t-2xl">
-          <CardTitle>앱 설정</CardTitle>
-          <CardDescription>앱 사용 환경을 설정합니다</CardDescription>
+        <CardHeader className="bg-yellow-50/60 dark:bg-yellow-950/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="dark:text-white">앱 설정</CardTitle>
+          <CardDescription className="dark:text-gray-300">앱 사용 환경을 설정합니다</CardDescription>
         </CardHeader>
         <CardContent className="pt-6 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-medium">다크 모드</h3>
-              <p className="text-sm text-gray-500">
+              <h3 className="font-medium dark:text-white">다크 모드</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 어두운 테마로 앱을 사용합니다
               </p>
             </div>
             <Switch
               checked={darkMode}
               onCheckedChange={setDarkMode}
-              className="data-[state=checked]:bg-blue-400"
+              className="data-[state=checked]:bg-blue-400 dark:data-[state=checked]:bg-blue-600"
             />
           </div>
 
           <Button
             onClick={handleSaveSettings}
-            className="w-full bg-yellow-400 hover:bg-yellow-500 rounded-xl font-bold"
+            className="w-full bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-600 dark:hover:bg-yellow-700 rounded-xl font-bold"
           >
             설정 저장
           </Button>
@@ -449,16 +436,16 @@ export default function SettingsPage() {
 
       <Card
         id="data-management"
-        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-orange-100 via-red-100 to-pink-100"
+        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-orange-100 via-red-100 to-pink-100 dark:from-orange-900 dark:via-red-900 dark:to-pink-900"
       >
-        <CardHeader className="bg-orange-50/60 border-b-0 rounded-t-2xl">
-          <CardTitle>데이터 관리</CardTitle>
-          <CardDescription>학습 데이터를 관리합니다</CardDescription>
+        <CardHeader className="bg-orange-50/60 dark:bg-orange-950/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="dark:text-white">데이터 관리</CardTitle>
+          <CardDescription className="dark:text-gray-300">학습 데이터를 관리합니다</CardDescription>
         </CardHeader>
         <CardContent className="pt-6 space-y-6">
           <div className="space-y-2">
-            <h3 className="font-medium">데이터 초기화</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="font-medium dark:text-white">데이터 초기화</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               모든 학습 데이터를 초기화합니다. 이 작업은 되돌릴 수 없습니다.
             </p>
           </div>
@@ -466,7 +453,7 @@ export default function SettingsPage() {
           <Button
             variant="outline"
             onClick={handleResetData}
-            className="w-full border-orange-200 text-orange-600 hover:bg-orange-50 rounded-xl font-bold"
+            className="w-full border-orange-200 dark:border-orange-700 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/50 rounded-xl font-bold"
           >
             데이터 초기화
           </Button>

@@ -6,6 +6,7 @@ import type { EducationLevel, Grade } from "@/components/user-profile";
 import { GraduationCap, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 interface MainHeaderProps {
   educationLevel: EducationLevel;
@@ -100,30 +101,31 @@ export function MainHeader({ educationLevel, grade }: MainHeaderProps) {
       : "";
 
   return (
-    <header className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 shadow-md rounded-b-2xl px-6 py-4 flex items-center justify-between">
+    <header className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-blue-900 dark:via-purple-900 dark:to-pink-900 shadow-md rounded-b-2xl px-6 py-4 flex items-center justify-between">
       <div className="flex items-center space-x-4">
         <Link
           href="/"
-          className="font-extrabold text-2xl text-blue-700 flex items-center gap-2"
+          className="font-extrabold text-2xl text-blue-700 dark:text-blue-300 flex items-center gap-2"
         >
-          <GraduationCap className="h-7 w-7 text-purple-500" />
-          O! dab
+          <GraduationCap className="h-7 w-7 text-purple-500 dark:text-purple-300" />
+          O! dAb
         </Link>
       </div>
       <div className="flex items-center space-x-2">
-        <span className="px-3 py-1 rounded-full bg-white/80 shadow text-blue-700 font-semibold text-sm border border-blue-200">
+        <ThemeToggle />
+        <span className="px-3 py-1 rounded-full bg-white/80 dark:bg-gray-800/80 shadow text-blue-700 dark:text-blue-300 font-semibold text-sm border border-blue-200 dark:border-blue-700">
           {user?.nickname ?? "사용자"}
         </span>
-        <span className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-200 to-pink-200 text-purple-700 font-semibold text-sm border border-purple-200">
+        <span className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-700 dark:to-pink-700 text-purple-700 dark:text-purple-200 font-semibold text-sm border border-purple-200 dark:border-purple-700">
           {schoolLabel} {grade}학년
         </span>
         {user && (
           <button
             onClick={handleLogout}
             title="로그아웃"
-            className="p-2 rounded-full hover:bg-red-100 transition"
+            className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900 transition"
           >
-            <LogOut className="h-5 w-5 text-red-500" />
+            <LogOut className="h-5 w-5 text-red-500 dark:text-red-400" />
           </button>
         )}
       </div>
