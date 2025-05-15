@@ -47,38 +47,7 @@ const MIDDLE_SCHOOL_CONCEPTS = [
     examples: ["2x + 3 = 7", "x - 5 = 10"],
     grade: "1",
   },
-  {
-    id: 103,
-    title: "좌표평면과 그래프",
-    description: "좌표평면에서 점의 위치와 그래프를 표현하는 방법을 배웁니다.",
-    formula: "(x, y)",
-    examples: ["점 (3, 4)", "원점 (0, 0)"],
-    grade: "2",
-  },
-  {
-    id: 104,
-    title: "도형의 합동",
-    description: "두 도형이 합동인 조건과 성질을 배웁니다.",
-    formula: "SSS, SAS, ASA, AAS 합동 조건",
-    examples: ["삼각형의 합동", "합동인 도형의 성질"],
-    grade: "2",
-  },
-  {
-    id: 105,
-    title: "확률",
-    description: "사건이 일어날 가능성을 수치로 표현하는 방법을 배웁니다.",
-    formula: "P(사건) = 사건이 일어나는 경우의 수 / 전체 경우의 수",
-    examples: ["동전 던지기", "주사위 던지기"],
-    grade: "3",
-  },
-  {
-    id: 106,
-    title: "이차방정식1231231",
-    description: "미지수가 2제곱으로 표현된 방정식을 해결하는 방법을 배웁니다.",
-    formula: "ax² + bx + c = 0",
-    examples: ["x² - 5x + 6 = 0", "2x² - 3x - 5 = 0"],
-    grade: "3",
-  },
+  
 ];
 
 export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
@@ -88,6 +57,9 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
   const [showAllGrades, setShowAllGrades] = useState(false);
   const [selectedGrade, setSelectedGrade] = useState<Grade>(grade);
   const [filteredConcepts, setFilteredConcepts] = useState<any[]>([]);
+  const [conceptData, setConceptData] = useState<any>(null);
+  const [selectedSubConcept, setSelectedSubConcept] = useState<any | null>(null);
+  const [selectedMajorId, setSelectedMajorId] = useState<number | null>(null);
 
   // 교육과정에 맞는 개념 데이터 가져오기
   const concepts = useMemo(() => {
@@ -102,6 +74,19 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
       ? [...concepts, ...MIDDLE_SCHOOL_CONCEPTS]
       : concepts;
   }, [educationLevel, concepts]);
+
+  // API에서 개념 데이터 불러오기
+  useEffect(() => {
+    fetch("http://localhost:8080/api/v1/common/concept")
+      .then((res) => res.json())
+      .then((data) => {
+        setConceptData(data.data);
+      });
+  }, []);
+
+  // 선택한 학년의 대주제 리스트
+  const majorConcepts =
+    conceptData?.grades.find((g: any) => String(g.grade) === String(selectedGrade))?.majorConceptList || [];
 
   // 학년에 맞는 개념만 필터링하는 함수
   const filterConceptsByGrade = (concepts: any[], grade: Grade): any[] => {
@@ -143,55 +128,74 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
     setSelectedGrade(value as Grade);
   };
 
+  // 2개씩 묶어서 row로 나누는 함수
+  function chunkArray(array: any[], size: number) {
+    const result = [];
+    for (let i = 0; i < array.length; i += size) {
+      result.push(array.slice(i, i + size));
+    }
+    return result;
+  }
+  // majorRows는 showAllGrades, selectedGrade에 따라 filteredMajorConcepts로만 선언
+  const filteredMajorConcepts = showAllGrades
+    ? (conceptData?.grades.flatMap((g: any) => g.majorConceptList) || [])
+    : majorConcepts;
+  const majorRows = chunkArray(filteredMajorConcepts, 2);
+
   return (
     <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 min-h-screen p-6 flex flex-col items-center">
-      {/* 검색 및 필터 영역 */}
-      <div className="flex justify-between items-center w-full max-w-6xl">
-        <div className="relative flex-1 mr-4">
+      {/* 검색창 */}
+      <div className="w-full max-w-6xl flex justify-center mb-4">
+        <div className="relative flex-1 max-w-2xl">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
           <Input
             placeholder="개념 검색..."
-            className="pl-10 border-blue-100 rounded-xl shadow"
+            className="pl-10 border-blue-100 rounded-xl shadow w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant={showAllGrades ? "default" : "outline"}
-            size="sm"
-            onClick={() => setShowAllGrades(true)}
-            className="flex items-center gap-1 bg-blue-400 hover:bg-blue-500 rounded-xl font-bold"
-          >
-            <GraduationCap className="h-4 w-4" />
-            <span>전체 학년</span>
-          </Button>
-          {!showAllGrades && (
-            <Select value={selectedGrade} onValueChange={handleGradeChange}>
-              <SelectTrigger className="w-[100px] bg-blue-50 border-blue-100 rounded-xl">
-                <SelectValue placeholder="학년 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">1학년</SelectItem>
-                <SelectItem value="2">2학년</SelectItem>
-                <SelectItem value="3">3학년</SelectItem>
-              </SelectContent>
-            </Select>
-          )}
-          {showAllGrades && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setShowAllGrades(false);
-                setSelectedGrade(grade);
-              }}
-              className="border-blue-100 text-blue-500 hover:bg-blue-50 rounded-xl font-bold"
-            >
-              내 학년으로
-            </Button>
-          )}
-        </div>
+      </div>
+
+      {/* 학년 선택 버튼 */}
+      <div className="flex justify-center mb-8 gap-2">
+        <Button
+          variant={showAllGrades ? "default" : "outline"}
+          className={`rounded-xl font-bold px-6 py-2 text-lg ${showAllGrades ? "bg-blue-400 text-white" : "bg-white text-blue-500 border-blue-200"}`}
+          onClick={() => setShowAllGrades(true)}
+        >
+          전체학년
+        </Button>
+        <Button
+          variant={!showAllGrades && selectedGrade === "1" ? "default" : "outline"}
+          className={`rounded-xl font-bold px-6 py-2 text-lg ${!showAllGrades && selectedGrade === "1" ? "bg-blue-400 text-white" : "bg-white text-blue-500 border-blue-200"}`}
+          onClick={() => {
+            setShowAllGrades(false);
+            setSelectedGrade("1");
+          }}
+        >
+          1학년
+        </Button>
+        <Button
+          variant={!showAllGrades && selectedGrade === "2" ? "default" : "outline"}
+          className={`rounded-xl font-bold px-6 py-2 text-lg ${!showAllGrades && selectedGrade === "2" ? "bg-blue-400 text-white" : "bg-white text-blue-500 border-blue-200"}`}
+          onClick={() => {
+            setShowAllGrades(false);
+            setSelectedGrade("2");
+          }}
+        >
+          2학년
+        </Button>
+        <Button
+          variant={!showAllGrades && selectedGrade === "3" ? "default" : "outline"}
+          className={`rounded-xl font-bold px-6 py-2 text-lg ${!showAllGrades && selectedGrade === "3" ? "bg-blue-400 text-white" : "bg-white text-blue-500 border-blue-200"}`}
+          onClick={() => {
+            setShowAllGrades(false);
+            setSelectedGrade("3");
+          }}
+        >
+          3학년
+        </Button>
       </div>
 
       {/* 개념 목록 */}
@@ -291,6 +295,106 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
           </CardContent>
         </Card>
       )}
+
+      {/* 대주제/소주제 네모 박스 */}
+      <div className="w-full max-w-6xl flex flex-col gap-8 mt-8">
+        {majorRows.map((row, rowIdx) => {
+          // row(2개) 안에 선택된 소주제가 있는지 확인
+          const isSelectedInRow = row.some((major: any) => selectedSubConcept && selectedMajorId === major.majorConceptId);
+          return (
+            <div key={rowIdx} className="mb-2">
+              <div className="flex flex-col md:flex-row gap-8">
+                {row.map((major: any) => (
+                  <Card
+                    key={major.majorConceptId}
+                    className="flex-1 rounded-2xl shadow-lg bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 border-0 p-0 min-w-[320px]"
+                  >
+                    <CardHeader className="bg-blue-100/60 rounded-t-2xl p-5 border-b-0">
+                      <CardTitle className="text-blue-700 text-xl font-extrabold flex items-center gap-2">
+                        <span className="text-2xl">📚</span>
+                        {major.majorConceptType}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="pt-4 pb-6 px-5">
+                      <div className="flex flex-wrap gap-3">
+                        {major.subConceptList.map((sub: any) => (
+                          <button
+                            key={sub.subConceptId}
+                            type="button"
+                            className="text-left"
+                            onClick={() => {
+                              if (selectedSubConcept && selectedSubConcept.subConceptId === sub.subConceptId) {
+                                setSelectedSubConcept(null);
+                                setSelectedMajorId(null);
+                              } else {
+                                setSelectedSubConcept(sub);
+                                setSelectedMajorId(major.majorConceptId);
+                              }
+                            }}
+                          >
+                            <div className={`bg-white/80 border border-yellow-200 rounded-xl shadow px-5 py-3 font-bold text-base text-yellow-800 hover:bg-yellow-100 transition cursor-pointer min-w-[140px] text-center ${selectedSubConcept && selectedSubConcept.subConceptId === sub.subConceptId ? "ring-2 ring-yellow-300" : ""}`}
+                            >
+                              {sub.subConceptType}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              {/* row 아래에 노란색 설명 카드 */}
+              {isSelectedInRow && selectedSubConcept && (
+                <div className="flex justify-center mt-3">
+                  <div className="w-full max-w-3xl">
+                    <div className="rounded-2xl shadow-2xl bg-gradient-to-r from-yellow-100 via-pink-50 to-purple-50 border-0 p-0">
+                      <div className="bg-yellow-50/60 rounded-t-2xl px-8 py-6 border-b-0">
+                        <div className="flex items-center gap-2 text-yellow-700 text-2xl font-extrabold">
+                          <span className="text-3xl">🦦</span>
+                          {selectedSubConcept.subConceptType}
+                        </div>
+                      </div>
+                      <div className="pt-6 space-y-6 px-8 pb-8">
+                        <div>
+                          <h3 className="text-base font-bold mb-1 text-yellow-700">설명</h3>
+                          <p className="text-lg text-gray-700">
+                            {selectedSubConcept.description || `${selectedSubConcept.subConceptType}에 대한 설명이 여기에 표시됩니다.`}
+                          </p>
+                        </div>
+                        {selectedSubConcept.formula && (
+                          <div>
+                            <h3 className="text-base font-bold mb-1 text-yellow-700">공식</h3>
+                            <div className="bg-yellow-50 p-4 rounded-xl font-mono text-lg shadow">
+                              {selectedSubConcept.formula}
+                            </div>
+                          </div>
+                        )}
+                        {selectedSubConcept.examples && selectedSubConcept.examples.length > 0 && (
+                          <div>
+                            <h3 className="text-base font-bold mb-1 text-yellow-700">예시</h3>
+                            <ul className="list-disc pl-5 space-y-1 text-lg">
+                              {selectedSubConcept.examples.map((example: string, idx: number) => (
+                                <li key={idx}>{example}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                        <div className="pt-2">
+                          <a href={`/study/related?subConceptId=${selectedSubConcept.subConceptId}`} className="block">
+                            <Button className="w-full bg-yellow-400 hover:bg-yellow-500 rounded-xl font-bold text-lg mt-4" variant="outline">
+                              관련 문제 풀어보기
+                            </Button>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
