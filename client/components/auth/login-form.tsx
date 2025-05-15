@@ -16,7 +16,7 @@ export function LoginForm() {
 
   // 이미 로그인된 상태인지 확인
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     if (token) {
       router.push('/');
     }

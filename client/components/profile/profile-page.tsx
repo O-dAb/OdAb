@@ -58,7 +58,7 @@ export function ProfilePage() {
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('accesstoken')}`,
           },
         }
       );
@@ -93,7 +93,7 @@ export function ProfilePage() {
         {
           headers: {
             'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('accesstoken')}`,
           },
         }
       );

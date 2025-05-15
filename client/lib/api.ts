@@ -64,7 +64,7 @@ const publicInstance = axios.create({
     "Content-Type": "application/json",
   },
 });
-
+  
 publicInstance.interceptors.response.use(
   (response) => {
     return response.data;

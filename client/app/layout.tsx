@@ -2,10 +2,9 @@
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
-import { ClientHeader } from "@/components/client-header";
-import { ClientSideNav } from "@/components/client-sidenav";
 import { ThemeProvider } from "@/components/theme-provider";
 import Script from "next/script";
+import AppShell from "@/components/Appshell";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +22,7 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <head>
         <Script id="theme-script" strategy="beforeInteractive">
-          {`
+          {`=
             (function() {
               try {
                 const savedTheme = localStorage.getItem('theme');
@@ -43,13 +42,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light">
           <AuthProvider>
-            <div className="flex flex-col h-screen">
-              <ClientHeader />
-              <div className="flex flex-1 overflow-hidden">
-                <ClientSideNav />
-                <div className="flex-1 overflow-y-auto">{children}</div>
-              </div>
-            </div>
+            <AppShell>{children}</AppShell>
           </AuthProvider>
         </ThemeProvider>
       </body>
