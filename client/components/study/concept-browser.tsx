@@ -56,7 +56,9 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
   const [selectedSubConcept, setSelectedSubConcept] = useState<any | null>(null);
   const [selectedMajorId, setSelectedMajorId] = useState<number | null>(null);
   const [subConceptContent, setSubConceptContent] = useState<string>("");
+  const [subConceptDetailContent, setSubConceptDetailContent] = useState<string>("");
 
+  
   // 교육과정에 맞는 개념 데이터 가져오기
   const concepts = useMemo(() => {
     return showAllGrades
@@ -144,7 +146,8 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
     if (selectedConcept && selectedConcept.id) {
       authApi.get(`/api/v1/common/${selectedConcept.id}/content`)
         .then((res) => {
-          setSubConceptContent(res.data.data?.subConceptContent || "");
+          setSubConceptContent(res.data.data?.subConceptContent || "내용이 없습니다.");
+          console.log(res.data.data?.subConceptContent);
         })
         .catch(() => setSubConceptContent(""));
     } else {
@@ -336,9 +339,18 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
                               if (selectedSubConcept && selectedSubConcept.subConceptId === sub.subConceptId) {
                                 setSelectedSubConcept(null);
                                 setSelectedMajorId(null);
+                                setSubConceptDetailContent("");
                               } else {
                                 setSelectedSubConcept(sub);
                                 setSelectedMajorId(major.majorConceptId);
+                                authApi.get(`/api/v1/common/${sub.subConceptId}/content`)
+                                  .then((res) => {
+                                    setSubConceptDetailContent(res.data.subConceptContent || "");
+                                    console.log("소주제 설명:", res.data.subConceptContent);
+                                  })
+                                  .catch((err) => {
+                                    setSubConceptDetailContent("");
+                                  });
                               }
                             }}
                           >
@@ -367,8 +379,10 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
                       <div className="pt-6 space-y-6 px-8 pb-8">
                         <div>
                           <h3 className="text-base font-bold mb-1 text-yellow-700">설명</h3>
-                          <p className="text-lg text-gray-700">
-                            {selectedSubConcept.description || `${selectedSubConcept.subConceptType}에 대한 설명이 여기에 표시됩니다.`}
+                          <p className="text-2xl text-gray-700">
+                            {subConceptDetailContent && subConceptDetailContent.trim() !== ""
+                              ? subConceptDetailContent
+                              : "데이터가 없습니다."}
                           </p>
                         </div>
                         {selectedSubConcept.formula && (
