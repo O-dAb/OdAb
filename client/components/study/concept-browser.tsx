@@ -78,8 +78,15 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
   useEffect(() => {
     authApi.get("/api/v1/common/concept")
       .then((res) => {
-        setConceptData(res.data);
-      });
+        console.log(res.data);
+        // grades가 없거나 객체가 아니면 null로 처리
+        if (res.data && typeof res.data === "object" && Array.isArray(res.data.grades)) {
+          setConceptData(res.data);
+        } else {
+          setConceptData(null);
+        }
+      })
+      .catch(() => setConceptData(null));
   }, []);
   
 
