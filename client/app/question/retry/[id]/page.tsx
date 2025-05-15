@@ -192,6 +192,13 @@ export default function RetryQuestionPage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // 현재 상태 출력 (디버깅용)
+    console.log("Drawing state updated:", {
+      isEraser,
+      lineWidth: drawingState.lineWidth,
+      eraserWidth: drawingState.eraserWidth,
+    });
+
     ctx.strokeStyle = isEraser ? "#FFFFFF" : drawingState.color;
     // 지우개 모드이면 지우개 두께 사용, 아니면 펜 두께 사용
     ctx.lineWidth = isEraser
@@ -253,22 +260,6 @@ export default function RetryQuestionPage() {
     }));
   };
 
-  // 펜 두께 변경 함수
-  const changeLineWidth = (width: number) => {
-    // 현재 모드에 따라 펜 두께 또는 지우개 두께를 변경
-    if (isEraser) {
-      setDrawingState((prev) => ({
-        ...prev,
-        eraserWidth: width,
-      }));
-    } else {
-      setDrawingState((prev) => ({
-        ...prev,
-        lineWidth: width,
-      }));
-    }
-  };
-
   // 좌표 변환 함수 - 캔버스 크기에 맞게 조정
   const getCanvasCoordinates = (clientX: number, clientY: number) => {
     const canvas = canvasRef.current;
@@ -318,9 +309,17 @@ export default function RetryQuestionPage() {
     const ctx = canvas.getContext("2d");
     if (ctx) {
       ctx.beginPath();
+      // 현재 모드에 따라 적절한 두께 사용
       const currentWidth = isEraser
         ? drawingState.eraserWidth
         : drawingState.lineWidth;
+
+      console.log(
+        "Drawing dot with width:",
+        currentWidth,
+        isEraser ? "(eraser)" : "(pen)"
+      );
+
       ctx.arc(x, y, currentWidth / 2, 0, Math.PI * 2);
       ctx.fill();
     }
@@ -578,7 +577,7 @@ export default function RetryQuestionPage() {
             <CardContent className="pt-6 space-y-4">
               <div className="flex justify-between items-center">
                 <div className="flex gap-2">
-                  {/* 색상 선택기 */}
+                  {/* 색상 및 펜 두께 선택기 */}
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
@@ -591,8 +590,16 @@ export default function RetryQuestionPage() {
                             : drawingState.color,
                           borderColor: "rgb(216, 180, 254)",
                         }}
+                        onClick={(e) => {
+                          e.preventDefault(); // 팝오버가 바로 닫히는 것 방지
+                          if (isEraser) {
+                            // 지우개 모드에서 펜 모드로 전환
+                            console.log("Switching to pen mode");
+                            setIsEraser(false);
+                          }
+                        }}
                       >
-                        <Circle
+                        <Pen
                           className="h-4 w-4"
                           style={{
                             color: isEraser ? drawingState.color : "white",
@@ -601,67 +608,104 @@ export default function RetryQuestionPage() {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-64 p-2">
-                      {!isEraser && (
-                        <div className="grid grid-cols-4 gap-2">
-                          {availableColors.map((color) => (
-                            <Button
-                              key={color}
-                              variant="outline"
-                              className="w-10 h-10 p-0 rounded-full"
-                              style={{
-                                backgroundColor: color,
-                                borderColor:
-                                  color === drawingState.color
-                                    ? "black"
-                                    : "transparent",
-                                borderWidth:
-                                  color === drawingState.color ? "2px" : "0",
-                              }}
-                              onClick={() => changeColor(color)}
-                            />
-                          ))}
-                        </div>
-                      )}
+                      <div className="grid grid-cols-4 gap-2">
+                        {availableColors.map((color) => (
+                          <Button
+                            key={color}
+                            variant="outline"
+                            className="w-10 h-10 p-0 rounded-full"
+                            style={{
+                              backgroundColor: color,
+                              borderColor:
+                                color === drawingState.color
+                                  ? "black"
+                                  : "transparent",
+                              borderWidth:
+                                color === drawingState.color ? "2px" : "0",
+                            }}
+                            onClick={() => changeColor(color)}
+                          />
+                        ))}
+                      </div>
                       <div className="mt-4 space-y-2">
                         <div className="flex justify-between">
+                          <span className="text-sm">펜 두께</span>
                           <span className="text-sm">
-                            {isEraser ? "지우개 두께" : "펜 두께"}
-                          </span>
-                          <span className="text-sm">
-                            {isEraser
-                              ? drawingState.eraserWidth
-                              : drawingState.lineWidth}
-                            px
+                            {drawingState.lineWidth}px
                           </span>
                         </div>
                         <Slider
-                          defaultValue={[
-                            isEraser
-                              ? drawingState.eraserWidth
-                              : drawingState.lineWidth,
-                          ]}
-                          min={isEraser ? 5 : 1}
-                          max={isEraser ? 50 : 20}
+                          defaultValue={[drawingState.lineWidth]}
+                          min={1}
+                          max={20}
                           step={1}
-                          value={[
-                            isEraser
-                              ? drawingState.eraserWidth
-                              : drawingState.lineWidth,
-                          ]}
-                          onValueChange={(value) => changeLineWidth(value[0])}
+                          value={[drawingState.lineWidth]}
+                          onValueChange={(value) => {
+                            console.log("Changing pen width to:", value[0]);
+                            setDrawingState((prev) => ({
+                              ...prev,
+                              lineWidth: value[0],
+                            }));
+                          }}
                         />
                       </div>
                     </PopoverContent>
                   </Popover>
 
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={toggleEraser}
-                    className={isEraser ? "bg-purple-100" : ""}
-                  >
-                    <Eraser className="h-4 w-4" />
-                  </Button>
+                  {/* 지우개 두께 선택기 - 새로 추가 */}
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.preventDefault(); // 팝오버가 바로 닫히는 것 방지
+                          if (!isEraser) {
+                            // 펜 모드에서 지우개 모드로 전환
+                            console.log("Switching to eraser mode");
+                            setIsEraser(true);
+                          }
+                        }}
+                        className={isEraser ? "bg-purple-100" : ""}
+                      >
+                        <Eraser className="h-4 w-4" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-64 p-2">
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-sm">지우개 두께</span>
+                          <span className="text-sm">
+                            {drawingState.eraserWidth}px
+                          </span>
+                        </div>
+                        <Slider
+                          defaultValue={[drawingState.eraserWidth]}
+                          min={5}
+                          max={50}
+                          step={1}
+                          value={[drawingState.eraserWidth]}
+                          onValueChange={(value) => {
+                            console.log("Changing eraser width to:", value[0]);
+                            setDrawingState((prev) => ({
+                              ...prev,
+                              eraserWidth: value[0],
+                            }));
+                          }}
+                        />
+                        <div className="mt-3 flex justify-end">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => setIsEraser(false)}
+                            className="text-xs"
+                          >
+                            펜 모드로 전환
+                          </Button>
+                        </div>
+                      </div>
+                    </PopoverContent>
+                  </Popover>
 
                   <Button
                     variant="outline"
@@ -675,6 +719,77 @@ export default function RetryQuestionPage() {
                   <Button variant="outline" size="sm" onClick={clearCanvas}>
                     <Trash2 className="h-4 w-4" />
                   </Button>
+                </div>
+
+                {/* 빠른 굵기 조절 */}
+                <div className="flex items-center gap-2 mt-2">
+                  <span className="text-xs text-gray-500">
+                    {isEraser ? "지우개" : "펜"} 굵기:
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-6 px-2 py-0 text-xs"
+                      onClick={() => {
+                        if (isEraser) {
+                          const newWidth = Math.max(
+                            5,
+                            drawingState.eraserWidth - 5
+                          );
+                          setDrawingState((prev) => ({
+                            ...prev,
+                            eraserWidth: newWidth,
+                          }));
+                        } else {
+                          const newWidth = Math.max(
+                            1,
+                            drawingState.lineWidth - 1
+                          );
+                          setDrawingState((prev) => ({
+                            ...prev,
+                            lineWidth: newWidth,
+                          }));
+                        }
+                      }}
+                    >
+                      -
+                    </Button>
+                    <span className="text-xs min-w-[30px] text-center">
+                      {isEraser
+                        ? drawingState.eraserWidth
+                        : drawingState.lineWidth}
+                      px
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-6 px-2 py-0 text-xs"
+                      onClick={() => {
+                        if (isEraser) {
+                          const newWidth = Math.min(
+                            50,
+                            drawingState.eraserWidth + 5
+                          );
+                          setDrawingState((prev) => ({
+                            ...prev,
+                            eraserWidth: newWidth,
+                          }));
+                        } else {
+                          const newWidth = Math.min(
+                            20,
+                            drawingState.lineWidth + 1
+                          );
+                          setDrawingState((prev) => ({
+                            ...prev,
+                            lineWidth: newWidth,
+                          }));
+                        }
+                      }}
+                    >
+                      +
+                    </Button>
+                  </div>
                 </div>
               </div>
               <div
