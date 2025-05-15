@@ -26,7 +26,7 @@ authInstance.interceptors.request.use(
 
 authInstance.interceptors.response.use(
   (response) => {
-    return response.data;
+    return response;
   },
   async (error) => {
     const originalRequest = error.config;
@@ -67,12 +67,12 @@ const publicInstance = axios.create({
 
 publicInstance.interceptors.response.use(
   (response) => {
-    return response.data;
+    return response;
   },
   (error) => {
     return Promise.reject(error);
   }
 );
 
-export const authApi = authInstance;
-export const publicApi = publicInstance;
+export const authApi = authInstance; // 토큰필요 api
+export const publicApi = publicInstance; // 토큰 필요 x api
