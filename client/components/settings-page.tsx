@@ -45,26 +45,23 @@ export default function SettingsPage() {
   const [selectedGrade, setSelectedGrade] = useState<Grade>(grade);
   const { theme, setTheme } = useTheme();
   const [darkMode, setDarkMode] = useState(false);
-  const [profileImageUrl, setProfileImageUrl] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [imageUrl, setImageUrl] = useState(userProfile.profileUrl || "");
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
-  // 컴포넌트 마운트 시 localStorage에서 데이터 로드
+  // 컴포넌트 마운트 시 데이터 로드
   useEffect(() => {
     // 프로필 이미지 로드
-    const savedImageUrl = localStorage.getItem("profileImageUrl");
-    if (savedImageUrl) {
-      setImageUrl(savedImageUrl);
-      setProfileImageUrl(savedImageUrl);
+    if (userProfile.profileUrl) {
+      setImageUrl(userProfile.profileUrl);
     }
 
     // 다크 모드 상태 설정
     setDarkMode(theme === 'dark');
-  }, [theme]);
+  }, [theme, userProfile.profileUrl]);
 
   const handleSaveProfile = async () => {
     try {
@@ -76,6 +73,7 @@ export default function SettingsPage() {
         throw new Error("로그인이 필요합니다");
       }
 
+      // 서버에 학년 정보 업데이트 요청
       const response = await fetch(`${apiUrl}/api/v1/profile_grade`, {
         method: "PUT",
         headers: {
@@ -89,21 +87,24 @@ export default function SettingsPage() {
         throw new Error("학년 정보 업데이트에 실패했습니다");
       }
 
-      // 로컬 상태 업데이트
-      localStorage.setItem(
-        "userProfile",
-        JSON.stringify({ level, grade: selectedGrade })
-      );
+      // 서버 응답 데이터 받기
+      const data = await response.json();
+
+      // Context를 통해 프로필 업데이트
       updateProfile(level, selectedGrade);
 
       // 모달 표시
       setShowSuccessModal(true);
+
+      toast({
+        title: "저장 성공",
+        description: "학년 정보가 성공적으로 업데이트되었습니다.",
+      });
     } catch (error) {
       console.error("학년 업데이트 에러:", error);
       toast({
         title: "저장 실패",
-        description:
-          "학년 정보 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.",
+        description: "학년 정보 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.",
         variant: "destructive",
       });
     }
@@ -218,10 +219,8 @@ export default function SettingsPage() {
 
       if (imageUrlFromServer) {
         setImageUrl(imageUrlFromServer);
-
-        // localStorage에 저장
-        localStorage.setItem("profileImageUrl", imageUrlFromServer);
-        setProfileImageUrl(imageUrlFromServer);
+        // userProfile 업데이트
+        updateProfile(level, selectedGrade, imageUrlFromServer);
 
         toast({
           title: "프로필 이미지 업로드 완료",

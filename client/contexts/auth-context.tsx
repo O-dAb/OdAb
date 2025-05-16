@@ -20,6 +20,7 @@ type UserProfile = {
   educationLevel: EducationLevel;
   grade: Grade;
   isProfileSet: boolean;
+  profileUrl: string;
 };
 
 const defaultUserProfile: UserProfile = {
@@ -27,6 +28,7 @@ const defaultUserProfile: UserProfile = {
   educationLevel: "middle",
   grade: "1",
   isProfileSet: false,
+  profileUrl: "",
 };
 
 // 인증 컨텍스트 타입
@@ -34,7 +36,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   userProfile: UserProfile;
-  updateProfile: (level: EducationLevel, grade: Grade) => void;
+  updateProfile: (level: EducationLevel, grade: Grade, profileUrl?: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -78,22 +80,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           localStorage.setItem("nickname", data.nickname);
           localStorage.setItem("grade", data.grade);
           // 3. 프로필 정보 저장
-          localStorage.setItem("userProfile", JSON.stringify({
+          const userProfile: UserProfile = {
             userName: data.nickname,
-            educationLevel: "middle",
-            grade: data.grade,
+            educationLevel: "middle" as EducationLevel,
+            grade: String(data.grade) as Grade,
             isProfileSet: true,
-          }));
-          // userProfile이 없으면 기본값 저장
-          if (!localStorage.getItem("userProfile")) {
-            localStorage.setItem(
-              "userProfile",
-              JSON.stringify({
-                level: "middle",
-                grade: "1",
-              })
-            );
-          }
+            profileUrl: data.profileUrl || "",
+          };
+          localStorage.setItem("userProfile", JSON.stringify(userProfile));
+          setUserProfile(userProfile);
 
           setIsAuthenticated(true);
           setIsLoading(false);
@@ -136,15 +131,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const updateProfile = (level: EducationLevel, grade: Grade) => {
-    const newProfile: UserProfile = {
-      userName: userProfile?.userName || "사용자",
+  const updateProfile = (level: EducationLevel, grade: Grade, profileUrl?: string) => {
+    setUserProfile((prev) => ({
+      ...prev,
       educationLevel: level,
       grade: grade,
       isProfileSet: true,
-    };
-    setUserProfile(newProfile);
-    localStorage.setItem("userProfile", JSON.stringify(newProfile));
+      ...(profileUrl && { profileUrl }),
+    }));
   };
 
   if (isLoading) {

@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from "@/contexts/auth-context";
 
 /**
  * 메인 헤더 컴포넌트
@@ -36,18 +37,9 @@ export function MainHeader({
   userName = "사용자",
 }: MainHeaderProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
   const router = useRouter();
   const { toast } = useToast();
-
-  useEffect(() => {
-    // 로컬 스토리지에서 사용자 정보 불러오기
-    const userJson = localStorage.getItem("user");
-    if (userJson) {
-      const user = JSON.parse(userJson);
-      setProfileImage(user.profileImage || null);
-    }
-  }, []);
+  const { userProfile } = useAuth();
 
   const getTitle = () => {
     switch (activeTab) {
@@ -78,7 +70,10 @@ export function MainHeader({
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("userProfile");
+    
     toast({
       title: "로그아웃 되었습니다",
       description: "다음에 또 만나요!",
@@ -183,16 +178,12 @@ export function MainHeader({
                 size="sm"
                 className="flex items-center gap-1 border-white text-white hover:bg-opacity-20 hover:bg-white"
               >
-                {profileImage ? (
-                  <Avatar className="h-6 w-6">
-                    <AvatarImage src={profileImage || "/placeholder.svg"} />
-                    <AvatarFallback className="bg-white text-blue-500 text-xs">
-                      {userName?.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                ) : (
-                  <User className="h-4 w-4" />
-                )}
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={userProfile.profileUrl || "/placeholder.svg"} />
+                  <AvatarFallback className="bg-white text-blue-500 text-xs">
+                    {userName?.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
                 <span className="hidden md:inline">프로필</span>
               </Button>
             </DropdownMenuTrigger>
