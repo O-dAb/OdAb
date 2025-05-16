@@ -9,4 +9,7 @@ import reactor.core.publisher.Mono;
 @Service
 public interface ClaudeService {
     Mono<ApiResponseDto> sendMathProblem(ApiRequestDto apiRequestDto);
+
+    Mono<ApiResponseDto> extractProblem(ApiRequestDto apiRequestDto);
+
 }

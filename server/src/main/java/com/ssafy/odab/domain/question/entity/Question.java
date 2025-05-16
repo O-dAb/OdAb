@@ -54,7 +54,7 @@ public class Question {
     private List<QuestionConcept> questionConcepts = new ArrayList<>();
 
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
-    private Set<QuestionSolution> questionSolutions = new HashSet<>();
+    private List<QuestionSolution> questionSolutions = new ArrayList<>();
 
     public void changeUser(User user) {
         if (this.user != null) {
