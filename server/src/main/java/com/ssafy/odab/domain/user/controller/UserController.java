@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Map;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +33,9 @@ public class UserController {
     private final JwtService jwtService;
     private final StringRedisTemplate redisTemplate;
 
+    @Value("${client-base-url}")
+    private String clientBaseUrl;
+    
     /**
      * 토큰에서 사용자 ID를 추출합니다.
      */
@@ -67,7 +71,7 @@ public class UserController {
         Map<String, Object> responseData = kakaoService.loginOrSignup(userInfo);
         String refreshToken = (String) responseData.get("refreshToken");
         String uuid = (String) responseData.get("auth_code");
-        String redirectUrl = String.format("http://localhost:3000/?auth_code=%s", uuid);
+        String redirectUrl = String.format(clientBaseUrl + "/?auth_code=%s", uuid);
         // 쿠키로 내려주기
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
             .httpOnly(true)

@@ -106,3 +106,5 @@ cloud:
 app:
   health-controller:
     enabled: true
+
+client-base-url: ${CLIENT_BASE_URL}
