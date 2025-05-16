@@ -33,7 +33,7 @@ public class UserController {
     private final JwtService jwtService;
     private final StringRedisTemplate redisTemplate;
 
-    @Value("${client-base-url}")
+    @Value("${CLIENT_BASE_URL}")
     private String clientBaseUrl;
     
     /**
