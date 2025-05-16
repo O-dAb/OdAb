@@ -69,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (pathname === "/" && authCode) {
       // 1. 서버에 auth_code로 토큰 요청
-      fetch(`http://localhost:8080/api/auth/result?auth_code=${authCode}`)
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/result?auth_code=${authCode}`)
         .then((res) => res.json())
         .then((data) => {
           // 2. 토큰/유저정보 저장

@@ -81,7 +81,7 @@ export function ReviewSchedule({
       try {
         // 실제 서버로 요청 (프록시 미설정 시 http://localhost:8080 명시)
         const res = await axios.get(
-          "http://localhost:8080/api/v1/learning/review",
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/learning/review`,
           {
             params: { date: today },
           }

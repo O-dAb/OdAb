@@ -117,7 +117,7 @@ export default function RetryQuestionPage() {
     const fetchQuestion = async () => {
       try {
         const response = await axios.get<Question>(
-          `http://localhost:8080/api/v1/question/${numericQuestionId}/retry`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/question/${numericQuestionId}/retry`
         );
         console.log(response.data);
         setQuestion(response.data);

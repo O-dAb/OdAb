@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { BrainCircuit } from "lucide-react"
-import axios from "axios"
+import { publicApi } from "@/lib/api"
 import { useAuth } from "@/contexts/auth-context"
 
 export function LoginForm() {
@@ -27,16 +27,13 @@ export function LoginForm() {
   const loginWithKakao = async () => {
     setIsLoading(true)
     try {
-      const response = await axios.get<{ url: string }>('http://localhost:8080/api/v1/auth/kakao')
-      const kakaoUrl = response.data.url
+      const kakaoRes: { url: string } = await publicApi.get("/api/v1/auth/kakao");
+      const kakaoUrl = kakaoRes.url;
       
       if (!kakaoUrl) {
         throw new Error('카카오 로그인 URL이 없습니다.')
       }
 
-      // 로그인 시도 로그
-      console.log('카카오 로그인 시도:', kakaoUrl)
-      
       window.location.href = kakaoUrl
     } catch (error) {
       console.error('카카오 로그인 에러:', error)
@@ -90,14 +87,6 @@ export function LoginForm() {
           )}
         </Button>
       </CardContent>
-      <CardFooter className="flex justify-center">
-        <div className="text-center text-sm">
-          계정이 없으신가요?{" "}
-          <Link href="/signup" className="text-blue-500 hover:underline">
-            회원가입
-          </Link>
-        </div>
-      </CardFooter>
     </Card>
   )
 }
