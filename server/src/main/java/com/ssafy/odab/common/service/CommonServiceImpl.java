@@ -4,6 +4,7 @@ import com.ssafy.odab.common.dto.GradeConceptResponseDto;
 import com.ssafy.odab.domain.concept.entity.MajorConcept;
 import com.ssafy.odab.domain.concept.entity.SubConcept;
 import com.ssafy.odab.domain.concept.repository.MajorConceptRepository;
+import com.ssafy.odab.domain.concept.repository.SubConceptRepository;
 import com.ssafy.odab.domain.question.dto.ConceptQuestionResponseDto;
 import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question.repository.QuestionRepository;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 public class CommonServiceImpl implements CommonService {
     private final MajorConceptRepository majorConceptRepository;
     private final QuestionRepository questionRepository;
+    private final SubConceptRepository subConceptRepository;
 
     //학년별 개념 조회 
     @Override
@@ -118,5 +120,25 @@ public class CommonServiceImpl implements CommonService {
         Map<String, Object> data = new HashMap<>();
         data.put("grades", grades);
         return data;
+    }
+
+    // 개념별 내용 조회
+    @Override
+    public Map<String, Object> getSubConceptContent(Integer subConceptId) {
+        Map<String, Object> result = new HashMap<>();
+        SubConcept subConcept = subConceptRepository.findById(subConceptId).orElse(null);
+        if (subConcept == null) {
+            result.put("httpStatus", 404);
+            result.put("message", "해당 소개념이 존재하지 않습니다.");
+            return result;
+        }
+        result.put("httpStatus", 200);
+        result.put("message", "개념별 내용 조회 성공");
+        Map<String, Object> data = new HashMap<>();
+        data.put("subConceptId", subConcept.getId());
+        data.put("subConceptOrder", subConcept.getConceptOrder());
+        data.put("subConceptContent", subConcept.getConceptContent());
+        result.put("data", data);
+        return result;
     }
 }

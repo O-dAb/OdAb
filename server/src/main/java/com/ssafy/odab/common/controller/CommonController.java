@@ -46,7 +46,12 @@ public class CommonController {
         response.put("data", data);
         return ResponseEntity.ok(response);
     }
-
+    
+    // 개념별 내용 조회
+    @GetMapping("{subConceptId}/content")
+    public ResponseEntity<?> getSubConceptContent(@PathVariable("subConceptId") Integer subConceptId) {
+        return ResponseEntity.ok(commonService.getSubConceptContent(subConceptId));
+    }
     
 
 
