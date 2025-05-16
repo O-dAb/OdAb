@@ -14,12 +14,12 @@ import com.ssafy.odab.domain.user.service.JwtService;
 @RequestMapping("/api/v1/main")
 public class MainController {
     private final MainService mainService;
-
+    private final JwtService jwtService;
     @GetMapping
     public ResponseEntity<?> getMainPage() {
         
         // Integer userId = 1; // TODO: 실제 로그인 유저로 교체
-        JwtService jwtService = new JwtService();
+        
         Integer userId = jwtService.getUserId(); // 만드는중. 
         MainPageResponseDto data = mainService.getMainPage(userId);
         return ResponseEntity.ok(

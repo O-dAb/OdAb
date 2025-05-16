@@ -152,11 +152,13 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
 
       if (selectedTopic) {
         // 주제별 오답 API 응답 처리
-        const response = await authApi.get<SubConceptResponseDto>(apiUrl);
-        console.log("주제별 오답 응답:", response.data);
+        const response = (await authApi.get<SubConceptResponseDto>(
+          apiUrl
+        )) as unknown as SubConceptResponseDto;
+        console.log("주제별 오답 응답:", response);
 
         // 응답 데이터를 WrongQuestionDto 형식으로 변환
-        const formattedQuestions = response.data.wrongQuestionDtos.map((q) => {
+        const formattedQuestions = response.wrongQuestionDtos.map((q) => {
           // 소주제 API에서 배열 형태로 날짜가 오면 처리
           const formattedDate = Array.isArray(q.registedAt)
             ? formatArrayDate(q.registedAt)
@@ -168,8 +170,8 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
             formattedDate: formattedDate,
             wrongQuestionSubconceptList: [
               {
-                subConceptId: response.data.subConceptId,
-                subConceptType: response.data.subConceptType,
+                subConceptId: response.subConceptId,
+                subConceptType: response.subConceptType,
               },
             ],
           };
@@ -178,11 +180,13 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
         setAllTabQuestions(formattedQuestions);
       } else {
         // 일반 오답 API 응답 처리
-        const response = await authApi.get<WrongQuestionResponseDto>(apiUrl);
-        console.log("일반 오답 응답:", response.data);
+        const response = (await authApi.get<WrongQuestionResponseDto>(
+          apiUrl
+        )) as unknown as WrongQuestionResponseDto;
+        console.log("일반 오답 응답:", response);
 
-        const questions = response.data?.gradeWrongQuestionDtos || [];
-        const majors = response.data?.majorConcepts || [];
+        const questions = response?.gradeWrongQuestionDtos || [];
+        const majors = response?.majorConcepts || [];
 
         setAllTabQuestions(questions);
         setMajorConcepts(majors);
@@ -222,11 +226,13 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
 
       console.log("최근 학습 API 요청 URL:", apiUrl);
 
-      const response = await authApi.get<WrongQuestionResponseDto>(apiUrl);
-      console.log("최근 학습 응답:", response.data);
+      const response = (await authApi.get<WrongQuestionResponseDto>(
+        apiUrl
+      )) as unknown as WrongQuestionResponseDto;
+      console.log("최근 학습 응답:", response);
 
-      const questions = response.data?.gradeWrongQuestionDtos || [];
-      const majors = response.data?.majorConcepts || [];
+      const questions = response?.gradeWrongQuestionDtos || [];
+      const majors = response?.majorConcepts || [];
 
       setRecentTabQuestions(questions);
       setMajorConcepts(majors);

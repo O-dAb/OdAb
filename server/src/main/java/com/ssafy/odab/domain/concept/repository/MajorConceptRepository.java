@@ -21,4 +21,13 @@ public interface MajorConceptRepository extends JpaRepository<MajorConcept, Inte
     @Query("SELECT m FROM MajorConcept m LEFT JOIN FETCH m.subConcepts")
     List<MajorConcept> findAllWithSubConcepts();
 
+    @Query("SELECT m FROM MajorConcept m JOIN FETCH m.gradeLevel")
+    List<MajorConcept> findAllWithGradeLevel();
+
+    @Query("SELECT DISTINCT m FROM MajorConcept m JOIN FETCH m.gradeLevel LEFT JOIN FETCH m.subConcepts")
+    List<MajorConcept> findAllWithGradeLevelAndSubConcepts();
+
+    
+
+
 }

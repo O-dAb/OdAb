@@ -18,6 +18,9 @@ import com.ssafy.odab.domain.user.repository.UserRepository;
 import com.ssafy.odab.mcpLLM.config.ClaudeConfig;
 import com.ssafy.odab.mcpLLM.dto.*;
 import com.ssafy.odab.mcpLLM.image.ImageEncode;
+import com.ssafy.odab.mcpLLM.rag.entity.RagQuestion;
+import com.ssafy.odab.mcpLLM.rag.entity.RagQuestionSolution;
+import com.ssafy.odab.mcpLLM.rag.repository.RagQuestionRepository;
 import com.ssafy.odab.mcpLLM.toolFactory.SequentialThinkingFactory;
 import com.ssafy.odab.mcpLLM.toolFactory.ToolUtil;
 import lombok.RequiredArgsConstructor;
@@ -26,12 +29,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -48,6 +55,7 @@ public class ClaudeServiceImpl implements ClaudeService {
     private final SubConceptRepository subConceptRepository;
     private final QuestionConceptRepository questionConceptRepository;
     private final LastLearningDateRepository lastLearningDateRepository;
+    private final RagQuestionRepository ragQuestionRepository;
     private String modelVersion = "claude-3-5-sonnet-20240620";    //사용할 모델명
     //    private String modelVersion = "claude-3-7-sonnet-20250219";	//사용할 모델명
     private int maxTokens = 4000;                    //최대 사용 가능한 토큰 수
@@ -55,40 +63,131 @@ public class ClaudeServiceImpl implements ClaudeService {
     private final int REQUEST_TIMEOUT_SECONDS = 30; // 타임아웃 시간 (초)
     private final int MAX_RETRIES = 3; // 최대 재시도 횟수
 
+
+
+    @Transactional
+    public Mono<ApiResponseDto> extractProblem(ApiRequestDto apiRequestDto) {
+        List<Object> contents = new ArrayList<>();
+        String prompt = """
+                해당 이미지를 텍스트로 변환해줘.
+                텍스트 이외의 다른 대답은 하지마.
+                """;
+        // 유저 대화내용 content 생성후 contents 에 넣음.
+        contents.add(ClaudeRequestApiDto.TextContent.builder()
+                .type("text")
+                .text(prompt)
+                .build());
+        try {
+            String base64Image = imageEncode.encodeImageToBase64(apiRequestDto.getImageData());
+            String mimeType = apiRequestDto.getImageData().getContentType();
+            ClaudeRequestApiDto.ImageContent content = ClaudeRequestApiDto.ImageContent.builder()
+                    .type("image")
+                    .source(ClaudeRequestApiDto.Source.builder()
+                            .type("base64")
+                            .media_type(mimeType)
+                            .data(base64Image)
+                            .build()
+                    )
+                    .build();
+            contents.add(content);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new RuntimeException("이미지 인코딩 실패", e);
+        }
+        // 보낼 메시지 생성
+        List<ClaudeRequestApiDto.Message> sendMessages = new ArrayList<>();
+        sendMessages.add(ClaudeRequestApiDto.Message.builder()
+                .role("user")
+                .content(contents)
+                .build());
+        ClaudeRequestApiDto request = ClaudeRequestApiDto.builder()
+                .model(modelVersion)
+                .max_tokens(maxTokens)
+                .messages(sendMessages)
+                .build();
+
+
+        return sendClaudeApi(request, sendMessages, 0, true)
+                .flatMap(response -> {
+                    String problem = response.getContent().get(0).getText();
+                    apiRequestDto.setUserAsk(problem);
+                    return searchSimilarQuestions(apiRequestDto);
+                });
+    }
+
+    @Transactional
+    // FAISS 서버에 질문을 보내고 유사한 문제 ID와 유사도 점수를 받는 메소드 (동기 방식)
+    public Mono<ApiResponseDto> searchSimilarQuestions(ApiRequestDto apiRequestDto) {
+        try {
+            // RestTemplate 생성
+            RestTemplate restTemplate = new RestTemplate();
+
+            // 요청 헤더 설정
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(org.springframework.http.MediaType.APPLICATION_JSON);
+            String problem = apiRequestDto.getUserAsk();
+            // 요청 본문 생성
+            FaissRequest request = new FaissRequest(problem);
+
+            // HTTP 요청 엔티티 생성
+            HttpEntity<FaissRequest> entity = new HttpEntity<>(request, headers);
+
+            // FAISS 서버에 POST 요청 보내기
+            ResponseEntity<FaissResponse> response = restTemplate.exchange(
+                    "https://k12b103.p.ssafy.io/api/python/search",
+                    HttpMethod.POST,
+                    entity,
+                    FaissResponse.class
+            );
+            Integer questionId = Objects.requireNonNull(response.getBody()).getQuestion_id();
+            RagQuestion question = ragQuestionRepository.findByIdWithSolutions(questionId).orElseThrow(
+                    () -> new RuntimeException("not find question by questionId")
+            );
+            StringBuilder sb = new StringBuilder();
+            sb.append("너는 최고의 선생님이야 다음 로직을 따라서 문제를 풀어줘.\n")
+                    .append("문제 : \n")
+                    .append(problem)
+                    .append("\n")
+                    .append("다음은 기존 데이터 베이스에서 유사한 문제를 찾아서 보여주는거야.\n")
+                    .append("필요하다면 활용해서 풀어도 돼.\n");
+            sb.append(String.format("""
+                                문제 : %s
+                                다음은 기존 데이터 베이스에서 유사한 문제를 찾아서 보여주는거야. 필요하다면 활용해서 풀어도 돼.
+                                참고문제 : %s
+                                """, problem, question.getQuestionText()));
+
+            for (RagQuestionSolution solution : question.getQuestionSolutions()) {
+                sb.append(String.format("""
+                                참고 문제 풀이
+                                step %d : %s
+                                """, solution.getStep(), solution.getSolutionContent()));
+            }
+            ApiRequestDto requestDto = new ApiRequestDto();
+            requestDto.setUserAsk(sb.toString());
+            requestDto.setImageData(apiRequestDto.getImageData());
+
+            return sendMathProblem(requestDto);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("FAISS 서버 요청 오류: " + e.getMessage());
+            return null;
+        }
+    }
+
+
+
+
     /**
      * historyMessages 에는 과거 메시지와 내가 현재 질문할
      */
     @Transactional
     public Mono<ApiResponseDto> sendMathProblem(ApiRequestDto apiRequestDto) {
         List<Object> contents = new ArrayList<>();
-        if (apiRequestDto.getUserAsk() != null) {
-            String userAsk = apiRequestDto.getUserAsk();
-            // 유저 대화내용 content 생성후 contents 에 넣음.
-            contents.add(ClaudeRequestApiDto.TextContent.builder()
-                    .type("text")
-                    .text(userAsk)
-                    .build());
-        }
-
-        if (apiRequestDto.getImageData() != null) {
-            try {
-                String base64Image = imageEncode.encodeImageToBase64(apiRequestDto.getImageData());
-                String mimeType = apiRequestDto.getImageData().getContentType();
-                ClaudeRequestApiDto.ImageContent content = ClaudeRequestApiDto.ImageContent.builder()
-                        .type("image")
-                        .source(ClaudeRequestApiDto.Source.builder()
-                                .type("base64")
-                                .media_type(mimeType)
-                                .data(base64Image)
-                                .build()
-                        )
-                        .build();
-                contents.add(content);
-            } catch (IOException e) {
-                e.printStackTrace();
-                throw new RuntimeException("이미지 인코딩 실패", e);
-            }
-        }
+        // 유저 대화내용 content 생성후 contents 에 넣음.
+        contents.add(ClaudeRequestApiDto.TextContent.builder()
+                .type("text")
+                .text(apiRequestDto.getUserAsk())
+                .build());
 
         // 보낼 메시지 생성
         List<ClaudeRequestApiDto.Message> sendMessages = new ArrayList<>();
@@ -96,7 +195,6 @@ public class ClaudeServiceImpl implements ClaudeService {
                 .role("user")
                 .content(contents)
                 .build());
-
 
         // tool 추가해주기
         List<ClaudeRequestApiDto.Tool> tools = new ArrayList<>();
@@ -108,7 +206,7 @@ public class ClaudeServiceImpl implements ClaudeService {
                 .tools(tools)
                 .messages(sendMessages)
                 .build();
-        return sendClaudeApi(request, sendMessages, 0)
+        return sendClaudeApi(request, sendMessages, 0, false)
                 .flatMap(response -> {
                     // 유저 찾기
                     Integer userId = 1;
@@ -195,7 +293,9 @@ public class ClaudeServiceImpl implements ClaudeService {
     public Mono<ClaudeResponseApiDto> sendClaudeApi(
             ClaudeRequestApiDto request,
             List<ClaudeRequestApiDto.Message> sendMessages,
-            int depth) {
+            int depth,
+            boolean isFirst) {
+        System.out.println("request = " + request);
         ArrayDeque<Integer> toolUseIndexQueue = new ArrayDeque<>();
 //        System.out.println("request = " + request.getMessages());
         return claudeConfig.getWebClient().post()
@@ -244,10 +344,12 @@ public class ClaudeServiceImpl implements ClaudeService {
                         return Mono.error(new RuntimeException("메시지가 너무 많습니다"));
                     }
                     if (isToolUse) {
-                        return sendClaudeApi(request, sendMessages, depth + 1);
-                    } else {
+                        return sendClaudeApi(request, sendMessages, depth + 1, false);
+                    } else if (!isFirst) {
                         // toolUse가 없을 때 마지막으로 요청을 한 번 더 보내 총 정리를 수행
                         return sendClaudeApiForSummary(request, sendMessages);
+                    } else {
+                        return Mono.just(response);
                     }
                 })
                 .retry(MAX_RETRIES)

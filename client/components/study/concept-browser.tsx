@@ -21,7 +21,6 @@ import {
 import Link from "next/link"; // useRouter 대신 Link 사용
 import { authApi } from "@/lib/api";
 
-
 /**
  * 개념 학습 컴포넌트
  * 학생이 수학 개념을 학년별로 탐색하고 학습할 수 있는 기능 제공
@@ -41,8 +40,6 @@ const MIDDLE_SCHOOL_CONCEPTS = [
     examples: ["3/4", "-5/2", "7"],
     grade: "1",
   },
-
-  
 ];
 
 export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
@@ -53,12 +50,14 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
   const [selectedGrade, setSelectedGrade] = useState<Grade>(grade);
   const [filteredConcepts, setFilteredConcepts] = useState<any[]>([]);
   const [conceptData, setConceptData] = useState<any>(null);
-  const [selectedSubConcept, setSelectedSubConcept] = useState<any | null>(null);
+  const [selectedSubConcept, setSelectedSubConcept] = useState<any | null>(
+    null
+  );
   const [selectedMajorId, setSelectedMajorId] = useState<number | null>(null);
   const [subConceptContent, setSubConceptContent] = useState<string>("");
-  const [subConceptDetailContent, setSubConceptDetailContent] = useState<string>("");
+  const [subConceptDetailContent, setSubConceptDetailContent] =
+    useState<string>("");
 
-  
   // 교육과정에 맞는 개념 데이터 가져오기
   const concepts = useMemo(() => {
     return showAllGrades
@@ -69,18 +68,30 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
   // 중학교 개념 데이터 추가
   const allConcepts = useMemo(() => {
     // curriculum-data에서 해당 카드가 반환될 경우 필터로 제거
-    return concepts.filter((concept: any) =>
-      !["분수와 소수", "일차방정식", "정수와 유리수", "연립방정식", "이차방정식"].includes(concept.title)
+    return concepts.filter(
+      (concept: any) =>
+        ![
+          "분수와 소수",
+          "일차방정식",
+          "정수와 유리수",
+          "연립방정식",
+          "이차방정식",
+        ].includes(concept.title)
     );
   }, [concepts]);
 
   // API에서 개념 데이터 불러오기
   useEffect(() => {
-    authApi.get("/api/v1/common/concept")
+    authApi
+      .get("/api/v1/common/concept")
       .then((res) => {
         console.log(res.data);
         // grades가 없거나 객체가 아니면 null로 처리
-        if (res.data && typeof res.data === "object" && Array.isArray(res.data.grades)) {
+        if (
+          res.data &&
+          typeof res.data === "object" &&
+          Array.isArray(res.data.grades)
+        ) {
           setConceptData(res.data);
         } else {
           setConceptData(null);
@@ -88,11 +99,12 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
       })
       .catch(() => setConceptData(null));
   }, []);
-  
 
   // 선택한 학년의 대주제 리스트
   const majorConcepts =
-    conceptData?.grades.find((g: any) => String(g.grade) === String(selectedGrade))?.majorConceptList || [];
+    conceptData?.grades.find(
+      (g: any) => String(g.grade) === String(selectedGrade)
+    )?.majorConceptList || [];
 
   // 학년에 맞는 개념만 필터링하는 함수
   const filterConceptsByGrade = (concepts: any[], grade: Grade): any[] => {
@@ -144,16 +156,19 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
   }
   // majorRows는 showAllGrades, selectedGrade에 따라 filteredMajorConcepts로만 선언
   const filteredMajorConcepts = showAllGrades
-    ? (conceptData?.grades.flatMap((g: any) => g.majorConceptList) || [])
+    ? conceptData?.grades.flatMap((g: any) => g.majorConceptList) || []
     : majorConcepts;
   const majorRows = chunkArray(filteredMajorConcepts, 2);
 
   // 카드 클릭 시 개념 설명 API 호출 (axios 사용)
   useEffect(() => {
     if (selectedConcept && selectedConcept.id) {
-      authApi.get(`/api/v1/common/${selectedConcept.id}/content`)
+      authApi
+        .get(`/api/v1/common/${selectedConcept.id}/content`)
         .then((res) => {
-          setSubConceptContent(res.data.data?.subConceptContent || "내용이 없습니다.");
+          setSubConceptContent(
+            res.data.data?.subConceptContent || "내용이 없습니다."
+          );
           console.log(res.data.data?.subConceptContent);
         })
         .catch(() => setSubConceptContent(""));
@@ -181,14 +196,24 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
       <div className="flex justify-center mb-8 gap-2">
         <Button
           variant={showAllGrades ? "default" : "outline"}
-          className={`rounded-xl font-bold px-6 py-2 text-lg ${showAllGrades ? "bg-blue-400 text-white" : "bg-white text-blue-500 border-blue-200"}`}
+          className={`rounded-xl font-bold px-6 py-2 text-lg ${
+            showAllGrades
+              ? "bg-blue-400 text-white"
+              : "bg-white text-blue-500 border-blue-200"
+          }`}
           onClick={() => setShowAllGrades(true)}
         >
           전체학년
         </Button>
         <Button
-          variant={!showAllGrades && selectedGrade === "1" ? "default" : "outline"}
-          className={`rounded-xl font-bold px-6 py-2 text-lg ${!showAllGrades && selectedGrade === "1" ? "bg-blue-400 text-white" : "bg-white text-blue-500 border-blue-200"}`}
+          variant={
+            !showAllGrades && selectedGrade === "1" ? "default" : "outline"
+          }
+          className={`rounded-xl font-bold px-6 py-2 text-lg ${
+            !showAllGrades && selectedGrade === "1"
+              ? "bg-blue-400 text-white"
+              : "bg-white text-blue-500 border-blue-200"
+          }`}
           onClick={() => {
             setShowAllGrades(false);
             setSelectedGrade("1");
@@ -197,8 +222,14 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
           1학년
         </Button>
         <Button
-          variant={!showAllGrades && selectedGrade === "2" ? "default" : "outline"}
-          className={`rounded-xl font-bold px-6 py-2 text-lg ${!showAllGrades && selectedGrade === "2" ? "bg-blue-400 text-white" : "bg-white text-blue-500 border-blue-200"}`}
+          variant={
+            !showAllGrades && selectedGrade === "2" ? "default" : "outline"
+          }
+          className={`rounded-xl font-bold px-6 py-2 text-lg ${
+            !showAllGrades && selectedGrade === "2"
+              ? "bg-blue-400 text-white"
+              : "bg-white text-blue-500 border-blue-200"
+          }`}
           onClick={() => {
             setShowAllGrades(false);
             setSelectedGrade("2");
@@ -207,8 +238,14 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
           2학년
         </Button>
         <Button
-          variant={!showAllGrades && selectedGrade === "3" ? "default" : "outline"}
-          className={`rounded-xl font-bold px-6 py-2 text-lg ${!showAllGrades && selectedGrade === "3" ? "bg-blue-400 text-white" : "bg-white text-blue-500 border-blue-200"}`}
+          variant={
+            !showAllGrades && selectedGrade === "3" ? "default" : "outline"
+          }
+          className={`rounded-xl font-bold px-6 py-2 text-lg ${
+            !showAllGrades && selectedGrade === "3"
+              ? "bg-blue-400 text-white"
+              : "bg-white text-blue-500 border-blue-200"
+          }`}
           onClick={() => {
             setShowAllGrades(false);
             setSelectedGrade("3");
@@ -320,7 +357,10 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
       <div className="w-full max-w-6xl flex flex-col gap-8 mt-8">
         {majorRows.map((row, rowIdx) => {
           // row(2개) 안에 선택된 소주제가 있는지 확인
-          const isSelectedInRow = row.some((major: any) => selectedSubConcept && selectedMajorId === major.majorConceptId);
+          const isSelectedInRow = row.some(
+            (major: any) =>
+              selectedSubConcept && selectedMajorId === major.majorConceptId
+          );
           return (
             <div key={rowIdx} className="mb-2">
               <div className="flex flex-col md:flex-row gap-8">
@@ -343,17 +383,29 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
                             type="button"
                             className="text-left"
                             onClick={() => {
-                              if (selectedSubConcept && selectedSubConcept.subConceptId === sub.subConceptId) {
+                              if (
+                                selectedSubConcept &&
+                                selectedSubConcept.subConceptId ===
+                                  sub.subConceptId
+                              ) {
                                 setSelectedSubConcept(null);
                                 setSelectedMajorId(null);
                                 setSubConceptDetailContent("");
                               } else {
                                 setSelectedSubConcept(sub);
                                 setSelectedMajorId(major.majorConceptId);
-                                authApi.get(`/api/v1/common/${sub.subConceptId}/content`)
+                                authApi
+                                  .get(
+                                    `/api/v1/common/${sub.subConceptId}/content`
+                                  )
                                   .then((res) => {
-                                    setSubConceptDetailContent(res.data.subConceptContent || "");
-                                    console.log("소주제 설명:", res.data.subConceptContent);
+                                    setSubConceptDetailContent(
+                                      res.data.subConceptContent || ""
+                                    );
+                                    console.log(
+                                      "소주제 설명:",
+                                      res.data.subConceptContent
+                                    );
                                   })
                                   .catch((err) => {
                                     setSubConceptDetailContent("");
@@ -361,7 +413,14 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
                               }
                             }}
                           >
-                            <div className={`bg-white/80 border border-yellow-200 rounded-xl shadow px-5 py-3 font-bold text-base text-yellow-800 hover:bg-yellow-100 transition cursor-pointer min-w-[140px] text-center ${selectedSubConcept && selectedSubConcept.subConceptId === sub.subConceptId ? "ring-2 ring-yellow-300" : ""}`}
+                            <div
+                              className={`bg-white/80 border border-yellow-200 rounded-xl shadow px-5 py-3 font-bold text-base text-yellow-800 hover:bg-yellow-100 transition cursor-pointer min-w-[140px] text-center ${
+                                selectedSubConcept &&
+                                selectedSubConcept.subConceptId ===
+                                  sub.subConceptId
+                                  ? "ring-2 ring-yellow-300"
+                                  : ""
+                              }`}
                             >
                               {sub.subConceptType}
                             </div>
@@ -385,34 +444,50 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
                       </div>
                       <div className="pt-6 space-y-6 px-8 pb-8">
                         <div>
-                          <h3 className="text-base font-bold mb-1 text-yellow-700">설명</h3>
+                          <h3 className="text-base font-bold mb-1 text-yellow-700">
+                            설명
+                          </h3>
                           <p className="text-2xl text-gray-700">
-                            {subConceptDetailContent && subConceptDetailContent.trim() !== ""
+                            {subConceptDetailContent &&
+                            subConceptDetailContent.trim() !== ""
                               ? subConceptDetailContent
                               : "데이터가 없습니다."}
                           </p>
                         </div>
                         {selectedSubConcept.formula && (
                           <div>
-                            <h3 className="text-base font-bold mb-1 text-yellow-700">공식</h3>
+                            <h3 className="text-base font-bold mb-1 text-yellow-700">
+                              공식
+                            </h3>
                             <div className="bg-yellow-50 p-4 rounded-xl font-mono text-lg shadow">
                               {selectedSubConcept.formula}
                             </div>
                           </div>
                         )}
-                        {selectedSubConcept.examples && selectedSubConcept.examples.length > 0 && (
-                          <div>
-                            <h3 className="text-base font-bold mb-1 text-yellow-700">예시</h3>
-                            <ul className="list-disc pl-5 space-y-1 text-lg">
-                              {selectedSubConcept.examples.map((example: string, idx: number) => (
-                                <li key={idx}>{example}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
+                        {selectedSubConcept.examples &&
+                          selectedSubConcept.examples.length > 0 && (
+                            <div>
+                              <h3 className="text-base font-bold mb-1 text-yellow-700">
+                                예시
+                              </h3>
+                              <ul className="list-disc pl-5 space-y-1 text-lg">
+                                {selectedSubConcept.examples.map(
+                                  (example: string, idx: number) => (
+                                    <li key={idx}>{example}</li>
+                                  )
+                                )}
+                              </ul>
+                            </div>
+                          )}
                         <div className="pt-2">
-                          <a href={`/study/related?subConceptId=${selectedSubConcept.subConceptId}`} className="block">
-                            <Button className="w-full bg-yellow-400 hover:bg-yellow-500 rounded-xl font-bold text-lg mt-4" variant="outline">
+                          <a
+                            href={`/study/related?subConceptId=${selectedSubConcept.subConceptId}`}
+                            className="block"
+                          >
+                            <Button
+                              className="w-full bg-yellow-400 hover:bg-yellow-500 rounded-xl font-bold text-lg mt-4"
+                              variant="outline"
+                            >
                               관련 문제 풀어보기
                             </Button>
                           </a>

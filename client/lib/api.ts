@@ -13,7 +13,7 @@ const authInstance = axios.create({
 
 authInstance.interceptors.request.use(
   (config) => {
-    const accessToken = localStorage.getItem("accessToken");
+    const accessToken = localStorage.getItem("token");
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
@@ -41,7 +41,7 @@ authInstance.interceptors.response.use(
         });
 
         const { accessToken } = response.data;
-        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("token", accessToken);
 
         originalRequest.headers.Authorization = `Bearer ${accessToken}`;
         return authInstance(originalRequest);
@@ -64,7 +64,7 @@ const publicInstance = axios.create({
     "Content-Type": "application/json",
   },
 });
-  
+
 publicInstance.interceptors.response.use(
   (response) => {
     return response.data;

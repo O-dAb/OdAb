@@ -27,6 +27,6 @@ public class ClaudeController {
         if (imageData != null) {
             apiRequestDto.setImageData(imageData);
         }
-        return claudeService.sendMathProblem(apiRequestDto);
+        return claudeService.extractProblem(apiRequestDto);
     }
 }
