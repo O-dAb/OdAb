@@ -12,7 +12,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Camera } from "lucide-react"
-import type { EducationLevel, Grade } from "@/components/profile/user-profile"
+type EducationLevel = "middle" | "high"
+type Grade = "1" | "2" | "3"
+import axios from "axios"
 
 export function ProfilePage() {
   const [name, setName] = useState("")
@@ -43,61 +45,71 @@ export function ProfilePage() {
   }, [])
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
     try {
-      // 실제 구현에서는 여기에 프로필 업데이트 API 호출 로직이 들어갑니다
-      // 임시로 로컬 스토리지에 저장
-      setTimeout(() => {
-        // 사용자 정보 업데이트
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            id: "user123",
-            name,
-            email,
-            profileImage,
-          }),
-        )
+      // 예시: 백엔드에 프로필 정보 저장
+      await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/profile_grade`,
+        {
+          profileImage, // 이미지 업로드 후 받은 URL
+          grade,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
 
-        // 프로필 정보 업데이트
-        localStorage.setItem(
-          "userProfile",
-          JSON.stringify({
-            level: educationLevel,
-            grade,
-          }),
-        )
-
-        toast({
-          title: "프로필 업데이트 성공",
-          description: "프로필 정보가 성공적으로 업데이트되었습니다.",
-        })
-      }, 500)
+      toast({
+        title: "프로필 업데이트 성공",
+        description: "프로필 정보가 성공적으로 업데이트되었습니다.",
+      });
     } catch (error) {
       toast({
         title: "프로필 업데이트 실패",
         description: "프로필 업데이트 중 오류가 발생했습니다. 다시 시도해주세요.",
         variant: "destructive",
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (event) => {
-        if (event.target?.result) {
-          setProfileImage(event.target.result as string)
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // 서버에 업로드
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/v1/profile_img`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
         }
-      }
-      reader.readAsDataURL(file)
+      );
+      setProfileImage(response.data.imageUrl); // 서버에서 받은 이미지 URL로 상태 업데이트
+      toast({
+        title: "프로필 이미지 업로드 성공",
+        description: "프로필 이미지가 변경되었습니다.",
+      });
+    } catch (err) {
+      toast({
+        title: "업로드 실패",
+        description: "이미지 업로드 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
     }
-  }
+  };
 
   return (
     <div className="max-w-2xl mx-auto">

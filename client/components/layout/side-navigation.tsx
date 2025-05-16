@@ -39,7 +39,7 @@ export function SideNavigation({ activeTab, onTabChange }: SideNavigationProps) 
           onClick={() => onTabChange("solve")}
         >
           <Calculator className="h-6 w-6" />
-          <span className="text-xs font-medium">문제 풀이</span>
+          <span className="text-xs font-medium">문제 업로드</span>
         </Button>
 
         <Button

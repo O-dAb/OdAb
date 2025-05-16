@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import type { EducationLevel, Grade } from "@/components/profile/user-profile"
+import type { EducationLevel, Grade } from "@/types/profile"
 
 export function SignupForm() {
   const [name, setName] = useState("")
@@ -38,48 +38,6 @@ export function SignupForm() {
     }
 
     setIsLoading(true)
-
-    try {
-      // 실제 구현에서는 여기에 회원가입 API 호출 로직이 들어갑니다
-      // 임시로 자동 회원가입 처리
-      setTimeout(() => {
-        // 사용자 정보 저장
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            id: "user123",
-            name: name || "김수학",
-            email: email || "user@example.com",
-            profileImage: null,
-          }),
-        )
-
-        // 프로필 정보 저장
-        localStorage.setItem(
-          "userProfile",
-          JSON.stringify({
-            level: educationLevel,
-            grade: grade,
-          }),
-        )
-
-        toast({
-          title: "회원가입 성공",
-          description: "수학 학습 도우미에 오신 것을 환영합니다!",
-        })
-
-        // 홈으로 리다이렉트
-        router.push("/")
-      }, 1000)
-    } catch (error) {
-      toast({
-        title: "회원가입 실패",
-        description: "회원가입 중 오류가 발생했습니다. 다시 시도해주세요.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
   }
 
   return (
