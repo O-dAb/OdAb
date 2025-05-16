@@ -61,7 +61,7 @@ public class UserController {
         throw new RuntimeException("유효한 인증 토큰이 없습니다.");
     }
 
-    @GetMapping("/login/oauth2/code/kakao")
+    @GetMapping("/api/login/oauth2/code/kakao")
     public void kakaoOauth2Callback(@RequestParam("code") String code, HttpServletResponse response) throws IOException {
         String accessToken = kakaoService.getKakaoAccessToken(code);
         KakaoUserInfo userInfo = kakaoService.getKakaoUserInfo(accessToken);
