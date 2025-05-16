@@ -27,8 +27,8 @@ export function LoginForm() {
   const loginWithKakao = async () => {
     setIsLoading(true)
     try {
-      const response = await publicApi.get("/api/v1/auth/kakao")
-      const kakaoUrl = response.url
+      const response = await publicApi.get<{ url: string }>("/api/v1/auth/kakao")
+      const kakaoUrl = response.data.url
       
       if (!kakaoUrl) {
         throw new Error('카카오 로그인 URL이 없습니다.')
