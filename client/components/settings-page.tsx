@@ -71,7 +71,7 @@ export default function SettingsPage() {
       // API URL 설정 (환경 변수 또는 기본값)
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
-      const accessToken = localStorage.getItem("AccessToken");
+      const accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {
         throw new Error("로그인이 필요합니다");
       }
@@ -165,7 +165,7 @@ export default function SettingsPage() {
       formData.append("file", file);
 
       // 저장된 액세스 토큰 사용
-      const accessToken = localStorage.getItem("AccessToken");
+      const accessToken = localStorage.getItem("accessToken");
       if (!accessToken) {
         throw new Error("로그인이 필요합니다");
       }
