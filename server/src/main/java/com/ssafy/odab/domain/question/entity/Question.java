@@ -6,7 +6,9 @@ import com.ssafy.odab.domain.user.entity.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -52,7 +54,7 @@ public class Question {
     private List<QuestionConcept> questionConcepts = new ArrayList<>();
 
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
-    private List<QuestionSolution> questionSolutions = new ArrayList<>();
+    private Set<QuestionSolution> questionSolutions = new HashSet<>();
 
     public void changeUser(User user) {
         if (this.user != null) {
