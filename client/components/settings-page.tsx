@@ -71,14 +71,18 @@ export default function SettingsPage() {
       // API URL 설정 (환경 변수 또는 기본값)
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
-      // 백엔드 API 호출
+      const accessToken = localStorage.getItem("AccessToken");
+      if (!accessToken) {
+        throw new Error("로그인이 필요합니다");
+      }
+
       const response = await fetch(`${apiUrl}/api/v1/profile_grade`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("AccessToken")}`, // 토큰 추가
+          Authorization: `Bearer ${accessToken}`,
         },
-        body: JSON.stringify({ grade: parseInt(selectedGrade) }), // 학년을 숫자로 변환
+        body: JSON.stringify({ grade: parseInt(selectedGrade) }),
       });
 
       if (!response.ok) {
@@ -160,14 +164,17 @@ export default function SettingsPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      // 하드코딩된 userId 사용
-      const userId = 1;
+      // 저장된 액세스 토큰 사용
+      const accessToken = localStorage.getItem("AccessToken");
+      if (!accessToken) {
+        throw new Error("로그인이 필요합니다");
+      }
 
       const response = await fetch(`${apiUrl}/api/v1/profile_img`, {
         method: "PUT",
         body: formData,
         headers: {
-          Authorization: `Bearer ${userId}`,
+          Authorization: `Bearer ${accessToken}`,  // 이미 저장된 변수 사용
         },
       });
 
