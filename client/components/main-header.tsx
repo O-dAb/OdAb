@@ -26,7 +26,7 @@ export function MainHeader({ educationLevel, grade, userName, nickname }: MainHe
     localStorage.removeItem("grade");
     // 카카오 로그아웃
     const KAKAO_CLIENT_ID = "8a48914bf786805cc4d0e1087b0e03a9";
-    const LOGOUT_REDIRECT_URI = "http://localhost:3000/login";
+    const LOGOUT_REDIRECT_URI = `${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}/login`;
     window.location.href = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_CLIENT_ID}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`;
   };
 

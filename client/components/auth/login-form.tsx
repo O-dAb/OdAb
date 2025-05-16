@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { BrainCircuit } from "lucide-react"
-import axios from "axios"
+import { publicApi } from "@/lib/api"
 import { useAuth } from "@/contexts/auth-context"
 
 export function LoginForm() {
@@ -27,8 +27,8 @@ export function LoginForm() {
   const loginWithKakao = async () => {
     setIsLoading(true)
     try {
-      const response = await axios.get<{ url: string }>('http://localhost:8080/api/v1/auth/kakao')
-      const kakaoUrl = response.data.url
+      const response = await publicApi.get("/api/v1/auth/kakao")
+      const kakaoUrl = response.url
       
       if (!kakaoUrl) {
         throw new Error('카카오 로그인 URL이 없습니다.')

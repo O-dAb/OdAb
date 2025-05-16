@@ -90,7 +90,7 @@ export default function RelatedProblemsPage() {
       try {
         setLoading(true);
         const response = await fetch(
-          `http://localhost:8080/api/v1/question/${subConceptId}/related`
+          `${process.env.NEXT_PUBLIC_API_URL}/api/v1/question/${subConceptId}/related`
         );
         if (!response.ok) {
           throw new Error("문제를 불러오는데 실패했습니다.");
