@@ -7,6 +7,7 @@ import {
   useState,
   useEffect,
   ReactNode,
+  Suspense,
 } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
@@ -30,6 +31,22 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// SearchParams를 처리하는 컴포넌트
+function AuthParamsHandler({
+  onAuthCode,
+}: {
+  onAuthCode: (authCode: string | null) => void;
+}) {
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const authCode = searchParams.get("auth_code");
+    onAuthCode(authCode);
+  }, [searchParams, onAuthCode]);
+
+  return null;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,19 +56,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     grade: "1",
     isProfileSet: false,
   });
+  const [authCode, setAuthCode] = useState<string | null>(null);
 
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const { toast } = useToast();
 
+  // authCode 처리
   useEffect(() => {
-    const authCode = searchParams.get("auth_code");
     if (pathname === "/" && authCode) {
       // 1. 서버에 auth_code로 토큰 요청
       fetch(`http://localhost:8080/api/auth/result?auth_code=${authCode}`)
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           // 2. 토큰/유저정보 저장
           localStorage.setItem("accessToken", data.accessToken);
           localStorage.setItem("userId", data.userId);
@@ -59,10 +76,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           // userProfile이 없으면 기본값 저장
           if (!localStorage.getItem("userProfile")) {
-            localStorage.setItem("userProfile", JSON.stringify({
-              level: "middle",
-              grade: "1"
-            }));
+            localStorage.setItem(
+              "userProfile",
+              JSON.stringify({
+                level: "middle",
+                grade: "1",
+              })
+            );
           }
 
           setIsAuthenticated(true);
@@ -71,7 +91,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         })
         .catch(() => {
           setIsLoading(false);
-          toast({ title: "인증 실패", description: "로그인 인증이 만료되었거나 잘못되었습니다." });
+          toast({
+            title: "인증 실패",
+            description: "로그인 인증이 만료되었거나 잘못되었습니다.",
+          });
           router.replace("/login");
         });
       return;
@@ -91,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       setIsLoading(false);
     }
-  }, [router, toast, pathname, searchParams]);
+  }, [router, toast, pathname, authCode]);
 
   // 프로필 로딩 (리다이렉트 X)
   useEffect(() => {
@@ -119,7 +142,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, userProfile, updateProfile }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, isLoading, userProfile, updateProfile }}
+    >
+      <Suspense fallback={<div>인증 처리 중...</div>}>
+        <AuthParamsHandler onAuthCode={setAuthCode} />
+      </Suspense>
       {children}
     </AuthContext.Provider>
   );

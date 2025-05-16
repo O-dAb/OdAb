@@ -5,6 +5,7 @@ import { AuthProvider } from "@/contexts/auth-context";
 import { ThemeProvider } from "@/components/theme-provider";
 import Script from "next/script";
 import AppShell from "@/components/Appshell";
+import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -42,7 +43,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light">
           <AuthProvider>
-            <AppShell>{children}</AppShell>
+            <AppShell>
+              <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+            </AppShell>
           </AuthProvider>
         </ThemeProvider>
       </body>

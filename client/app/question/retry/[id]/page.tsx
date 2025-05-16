@@ -33,6 +33,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
+import { authApi } from "@/lib/api";
 
 interface SubConcept {
   subConceptId: number;
@@ -68,7 +69,8 @@ interface DrawingState {
   lastPoint: Point | null;
   color: string;
   lineWidth: number;
-  eraserWidth: number; // 지우개 두께 추가
+  eraserWidth: number;
+  answerCanvas: HTMLCanvasElement | null;
 }
 
 export default function RetryQuestionPage() {
@@ -92,9 +94,12 @@ export default function RetryQuestionPage() {
     lastPoint: null,
     color: "#000000",
     lineWidth: 2,
-    eraserWidth: 10, // 기본 지우개 두께
+    eraserWidth: 10,
+    answerCanvas: null,
   });
   const [isEraser, setIsEraser] = useState(false);
+  const answerCanvasRef = useRef<HTMLCanvasElement>(null);
+  const answerCanvasContainerRef = useRef<HTMLDivElement>(null);
 
   // 새로 추가된 상태들
   const [undoStack, setUndoStack] = useState<ImageData[]>([]);
@@ -154,7 +159,7 @@ export default function RetryQuestionPage() {
       canvas.style.width = `${rect.width}px`;
       canvas.style.height = `${rect.height}px`;
 
-      // 컨텍스트 스케일 조정
+      // 컨포넌트 스케일 조정
       ctx.scale(dpr, dpr);
 
       // 기본 그리기 스타일 설정
@@ -278,11 +283,14 @@ export default function RetryQuestionPage() {
   ) => {
     e.preventDefault(); // 모바일에서 스크롤 방지
 
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    const targetCanvas = e.currentTarget;
+    const ctx = targetCanvas.getContext("2d");
+    if (!ctx) return;
 
     // 캔버스 상태 저장 (undo를 위해)
-    saveCanvasState();
+    if (targetCanvas === canvasRef.current) {
+      saveCanvasState();
+    }
 
     // 마우스/터치 좌표 가져오기
     let clientX, clientY;
@@ -296,7 +304,9 @@ export default function RetryQuestionPage() {
       clientY = e.clientY;
     }
 
-    const { x, y } = getCanvasCoordinates(clientX, clientY);
+    const rect = targetCanvas.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
 
     // 그리기 상태 업데이트
     setDrawingState({
@@ -306,23 +316,19 @@ export default function RetryQuestionPage() {
     });
 
     // 점 찍기 (마우스 다운만 하고 움직이지 않을 경우를 위해)
-    const ctx = canvas.getContext("2d");
-    if (ctx) {
-      ctx.beginPath();
-      // 현재 모드에 따라 적절한 두께 사용
-      const currentWidth = isEraser
-        ? drawingState.eraserWidth
-        : drawingState.lineWidth;
+    ctx.beginPath();
+    const currentWidth = isEraser
+      ? drawingState.eraserWidth
+      : drawingState.lineWidth;
 
-      console.log(
-        "Drawing dot with width:",
-        currentWidth,
-        isEraser ? "(eraser)" : "(pen)"
-      );
+    ctx.strokeStyle = isEraser ? "#FFFFFF" : drawingState.color;
+    ctx.lineWidth = currentWidth;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.fillStyle = isEraser ? "#FFFFFF" : drawingState.color;
 
-      ctx.arc(x, y, currentWidth / 2, 0, Math.PI * 2);
-      ctx.fill();
-    }
+    ctx.arc(x, y, currentWidth / 2, 0, Math.PI * 2);
+    ctx.fill();
   };
 
   // 그리기 진행 함수 - 터치 & 마우스 지원
@@ -331,10 +337,8 @@ export default function RetryQuestionPage() {
   ) => {
     if (!drawingState.isDrawing || !drawingState.lastPoint) return;
 
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext("2d");
+    const targetCanvas = e.currentTarget;
+    const ctx = targetCanvas.getContext("2d");
     if (!ctx) return;
 
     // 마우스/터치 좌표 가져오기
@@ -349,7 +353,9 @@ export default function RetryQuestionPage() {
       clientY = e.clientY;
     }
 
-    const { x, y } = getCanvasCoordinates(clientX, clientY);
+    const rect = targetCanvas.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
 
     // 마지막 지점에서 현재 지점까지 선 그리기
     ctx.beginPath();
@@ -393,25 +399,97 @@ export default function RetryQuestionPage() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
-  const handleSubmitAnswer = () => {
-    if (!userAnswer.trim()) {
+  // 답변 캔버스 초기화
+  useEffect(() => {
+    const initializeAnswerCanvas = () => {
+      const canvas = answerCanvasRef.current;
+      if (!canvas) return;
+
+      const container = answerCanvasContainerRef.current;
+      if (!container) return;
+
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      const rect = container.getBoundingClientRect();
+
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+
+      ctx.scale(dpr, dpr);
+      ctx.strokeStyle = drawingState.color;
+      ctx.lineWidth = drawingState.lineWidth;
+      ctx.lineCap = "round";
+      ctx.lineJoin = "round";
+      ctx.fillStyle = drawingState.color;
+
+      setDrawingState((prev) => ({
+        ...prev,
+        answerCanvas: canvas,
+      }));
+    };
+
+    const timer = setTimeout(() => {
+      initializeAnswerCanvas();
+    }, 100);
+
+    const handleResize = () => {
+      initializeAnswerCanvas();
+    };
+
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const handleSubmitAnswer = async () => {
+    const canvas = answerCanvasRef.current;
+    if (!canvas) return;
+
+    // 캔버스 내용을 이미지로 변환
+    const imageData = canvas.toDataURL("image/png");
+
+    // base64 데이터 분리
+    const base64Data = imageData.split(",")[1]; // 실제 base64 데이터만 추출
+    console.log(base64Data);
+
+    try {
+      // 서버로 답변 전송
+      const response = await authApi.patch(
+        `/api/v1/question/${numericQuestionId}/answer`,
+        {
+          answerImg: base64Data,
+          imageType: "image/png", // 이미지 타입 정보도 함께 전송
+        }
+      );
+
+      // 답변 저장
+      setSubmittedAnswer(imageData);
+
+      // 정답 여부에 따른 토스트 메시지 표시
+      const isCorrect = response.data.isCorrect;
       toast({
-        title: "답변을 입력해주세요",
+        title: isCorrect ? "정답입니다!" : "오답입니다",
+        description: isCorrect
+          ? "정답을 맞추셨습니다."
+          : "다시 한번 생각해보세요.",
+        variant: isCorrect ? "default" : "destructive",
+      });
+    } catch (error) {
+      console.error("답변 제출 실패:", error);
+      toast({
+        title: "답변 제출 실패",
+        description: "답변을 제출하는 중 오류가 발생했습니다.",
         variant: "destructive",
       });
-      return;
     }
-
-    setSubmittedAnswer(userAnswer);
-    const isCorrect = userAnswer === question?.answer;
-
-    toast({
-      title: isCorrect ? "정답입니다!" : "오답입니다",
-      description: isCorrect
-        ? "정답을 맞추셨습니다."
-        : "다시 한번 생각해보세요.",
-      variant: isCorrect ? "default" : "destructive",
-    });
   };
 
   const handleBackToList = () => {
@@ -822,12 +900,31 @@ export default function RetryQuestionPage() {
 
               <div className="flex items-center gap-2">
                 <span className="font-bold text-purple-700">답:</span>
-                <Input
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  placeholder="답을 입력하세요"
-                  className="max-w-[200px] border-purple-100 focus-visible:ring-purple-500"
-                />
+                <div
+                  ref={answerCanvasContainerRef}
+                  className="border border-purple-100 rounded-lg overflow-hidden"
+                  style={{
+                    width: "200px",
+                    height: "100px",
+                    position: "relative",
+                  }}
+                >
+                  <canvas
+                    ref={answerCanvasRef}
+                    className="touch-none bg-white"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                    }}
+                    onMouseDown={startDrawing}
+                    onMouseMove={draw}
+                    onMouseUp={stopDrawing}
+                    onMouseLeave={stopDrawing}
+                    onTouchStart={startDrawing}
+                    onTouchMove={draw}
+                    onTouchEnd={stopDrawing}
+                  />
+                </div>
                 <Button
                   size="sm"
                   className="bg-purple-500 hover:bg-purple-600 rounded-xl font-bold"
