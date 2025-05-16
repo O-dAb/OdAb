@@ -14,13 +14,14 @@ import { useToast } from "@/hooks/use-toast";
 import type { EducationLevel, Grade } from "@/components/user-profile";
 import LoadingPage from "@/app/loading";
 
-// 프로필 타입 (필요하다면 유지)
+// 프로필 타입
 type UserProfile = {
   userName: string;
   educationLevel: EducationLevel;
   grade: Grade;
   isProfileSet: boolean;
   profileUrl: string;
+  userId?: string | number;  // userId 추가
 };
 
 const defaultUserProfile: UserProfile = {
@@ -37,6 +38,7 @@ interface AuthContextType {
   isLoading: boolean;
   userProfile: UserProfile;
   updateProfile: (level: EducationLevel, grade: Grade, profileUrl?: string) => void;
+  logout: () => void;  // 로그아웃 함수 추가
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -86,6 +88,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             grade: String(data.grade) as Grade,
             isProfileSet: true,
             profileUrl: data.profileUrl || "",
+            userId: data.userId,  // userId 저장
           };
           localStorage.setItem("userProfile", JSON.stringify(userProfile));
           setUserProfile(userProfile);
@@ -123,8 +126,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const savedProfile = localStorage.getItem("userProfile");
+    const currentUserId = localStorage.getItem("userId");
+    
     if (savedProfile) {
-      setUserProfile({ ...defaultUserProfile, ...JSON.parse(savedProfile) });
+      const parsedProfile = JSON.parse(savedProfile);
+      // 저장된 프로필의 userId와 현재 userId가 일치하는지 확인
+      if (!parsedProfile.userId || parsedProfile.userId === currentUserId) {
+        setUserProfile({ ...defaultUserProfile, ...parsedProfile });
+      } else {
+        // userId가 일치하지 않으면 기본값 사용
+        setUserProfile(defaultUserProfile);
+      }
     } else {
       setUserProfile(defaultUserProfile);
     }
@@ -132,13 +144,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const updateProfile = (level: EducationLevel, grade: Grade, profileUrl?: string) => {
-    setUserProfile((prev) => ({
-      ...prev,
+    const updatedProfile = {
+      ...userProfile,
       educationLevel: level,
       grade: grade,
       isProfileSet: true,
       ...(profileUrl && { profileUrl }),
-    }));
+    };
+    
+    setUserProfile(updatedProfile);
+    
+    // 로컬 스토리지에도 업데이트된 정보 저장
+    localStorage.setItem("userProfile", JSON.stringify(updatedProfile));
+  };
+  
+  // 로그아웃 함수
+  const logout = () => {
+    // 토큰 및 사용자 정보 제거
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("userProfile");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("nickname");
+    localStorage.removeItem("grade");
+    
+    // 상태 초기화
+    setIsAuthenticated(false);
+    setUserProfile(defaultUserProfile);
+    
+    // 로그인 페이지로 이동
+    router.push("/login");
   };
 
   if (isLoading) {
@@ -147,7 +181,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, isLoading, userProfile, updateProfile }}
+      value={{ isAuthenticated, isLoading, userProfile, updateProfile, logout }}
     >
       <Suspense fallback={<div>인증 처리 중...</div>}>
         <AuthParamsHandler onAuthCode={setAuthCode} />

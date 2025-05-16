@@ -40,6 +40,22 @@ export function MainHeader({
   const router = useRouter();
   const { toast } = useToast();
   const { userProfile } = useAuth();
+  const [profileImageUrl, setProfileImageUrl] = useState("");
+
+  useEffect(() => {
+    // 로컬스토리지에서 profileImageUrl 직접 가져오기
+    const storedProfile = localStorage.getItem("userProfile");
+    if (storedProfile) {
+      try {
+        const parsedProfile = JSON.parse(storedProfile);
+        if (parsedProfile.profileImageUrl) {
+          setProfileImageUrl(parsedProfile.profileImageUrl);
+        }
+      } catch (e) {
+        console.error("프로필 정보 파싱 에러:", e);
+      }
+    }
+  }, []);
 
   const getTitle = () => {
     switch (activeTab) {
@@ -179,7 +195,7 @@ export function MainHeader({
                 className="flex items-center gap-1 border-white text-white hover:bg-opacity-20 hover:bg-white"
               >
                 <Avatar className="h-6 w-6">
-                  <AvatarImage src={userProfile.profileUrl || "/placeholder.svg"} />
+                  <AvatarImage src={profileImageUrl || userProfile.profileUrl || "/placeholder.svg"} />
                   <AvatarFallback className="bg-white text-blue-500 text-xs">
                     {userName?.charAt(0).toUpperCase()}
                   </AvatarFallback>
