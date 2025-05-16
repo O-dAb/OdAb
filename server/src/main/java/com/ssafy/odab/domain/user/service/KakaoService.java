@@ -131,20 +131,26 @@ public class KakaoService {
         }
 
         // 2. JWT 토큰 생성
-        String token = jwtService.createToken(user);
+        String accessToken = jwtService.createAccessToken(user);
+        // refresh 토큰 생성
+        String refreshToken = jwtService.createRefreshToken(user);
 
         // 3. uuid 생성
         String uuid = UUID.randomUUID().toString();
 
         // 4. Redis에 JSON으로 저장 (3분 유효)
         Map<String, Object> redisData = Map.of(
-            "token", token,
+            "accessToken", accessToken,
+            "refreshToken", refreshToken,
             "userId", user.getId(),
             "nickname", user.getUserName()
         );
         try {
             String redisValue = objectMapper.writeValueAsString(redisData);
             redisTemplate.opsForValue().set(uuid, redisValue, 3, TimeUnit.MINUTES);
+            // refresh:userId 키로 refreshToken 저장 (유효기간: refreshTokenValidity)
+            String refreshKey = "refresh:" + user.getId();
+            redisTemplate.opsForValue().set(refreshKey, refreshToken, jwtService.getRefreshTokenValidity(), TimeUnit.SECONDS);
         } catch (Exception e) {
             throw new RuntimeException("Redis 저장 실패", e);
         }

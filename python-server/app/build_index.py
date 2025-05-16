@@ -8,7 +8,7 @@ from sentence_transformers import SentenceTransformer
 import os
 
 # 환경 변수에서 DB 접속 정보 가져오기
-db_host = 'localhost'  # Docker 네트워크 내에서 사용되는 서비스 이름
+db_host = 'my-db'  # Docker 네트워크 내에서 사용되는 서비스 이름
 db_user = os.environ.get('MYSQL_USER', 'root')
 db_password = os.environ.get('MYSQL_PASSWORD', 'root')
 db_name = os.environ.get('MYSQL_DATABASE', 'ddalggak')
