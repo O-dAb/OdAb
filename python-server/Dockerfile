@@ -24,5 +24,17 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # 실행 명령
+# EXPOSE 8000
+# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
+# 시작 스크립트 생성
+RUN echo '#!/bin/bash\n\
+echo "Building index..."\n\
+python build_index.py\n\
+echo "Starting FastAPI server..."\n\
+exec uvicorn faiss_server:app --host 0.0.0.0 --port 8000\n\
+' > /app/start.sh && chmod +x /app/start.sh
+
+# 실행 명령
 EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/app/start.sh"] 
