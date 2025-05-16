@@ -20,7 +20,9 @@ export function AuthCheck({ children }: AuthCheckProps) {
     // 로컬 스토리지에서 사용자 정보 확인
     const user = localStorage.getItem("user")
 
-    if (user) {
+    // 2. 토큰 체크
+    const token = localStorage.getItem("accessToken")
+    if (token) {
       setIsAuthenticated(true)
     } else {
       toast({
@@ -42,4 +44,8 @@ export function AuthCheck({ children }: AuthCheckProps) {
   }
 
   return isAuthenticated ? <>{children}</> : null
+
+
+
+
 }

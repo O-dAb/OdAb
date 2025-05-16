@@ -26,7 +26,7 @@ authInstance.interceptors.request.use(
 
 authInstance.interceptors.response.use(
   (response) => {
-    return response;
+    return response.data;
   },
   async (error) => {
     const originalRequest = error.config;
@@ -64,10 +64,10 @@ const publicInstance = axios.create({
     "Content-Type": "application/json",
   },
 });
-
+  
 publicInstance.interceptors.response.use(
   (response) => {
-    return response;
+    return response.data;
   },
   (error) => {
     return Promise.reject(error);
