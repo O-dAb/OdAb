@@ -100,6 +100,7 @@ public class UserController {
         }
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> result = objectMapper.readValue(redisValue, Map.class);
+        System.out.println("[getAuthResult] Redis에서 꺼낸 정보: " + result);
         return ResponseEntity.ok(result);
     }
 
