@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <head>
         <Script id="theme-script" strategy="beforeInteractive">
-          {`=
+          {`
             (function() {
               try {
                 const savedTheme = localStorage.getItem('theme');
