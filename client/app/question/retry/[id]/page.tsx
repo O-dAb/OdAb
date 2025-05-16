@@ -86,6 +86,7 @@ export default function RetryQuestionPage() {
     ? parseInt(questionId as string, 10)
     : null;
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const answerCanvasRef = useRef<HTMLCanvasElement>(null);
   const canvasContainerRef = useRef<HTMLDivElement>(null);
   const [drawingState, setDrawingState] = useState<DrawingState>({
     isDrawing: false,
@@ -107,6 +108,15 @@ export default function RetryQuestionPage() {
     "#800080", // 보라
     "#FF00FF", // 핑크
   ]);
+
+  // 답변 캔버스에 대한 별도의 그리기 상태 추가
+  const [answerDrawingState, setAnswerDrawingState] = useState<DrawingState>({
+    isDrawing: false,
+    lastPoint: null,
+    color: "#000000",
+    lineWidth: 2,
+    eraserWidth: 10,
+  });
 
   useEffect(() => {
     const fetchQuestion = async () => {
@@ -394,25 +404,173 @@ export default function RetryQuestionPage() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
-  const handleSubmitAnswer = () => {
-    if (!userAnswer.trim()) {
+  // 답변 캔버스 초기화 함수 추가
+  useEffect(() => {
+    const initializeAnswerCanvas = () => {
+      const canvas = answerCanvasRef.current;
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // 캔버스 크기 설정
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      
+      // 스케일 조정
+      ctx.scale(dpr, dpr);
+      
+      // 기본 스타일 설정
+      ctx.strokeStyle = '#000000';
+      ctx.lineWidth = 2;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+    };
+
+    const timer = setTimeout(() => {
+      initializeAnswerCanvas();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // 답변 캔버스 이벤트 핸들러 추가
+  const startAnswerDrawing = (
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
+  ) => {
+    e.preventDefault();
+
+    const canvas = answerCanvasRef.current;
+    if (!canvas) return;
+
+    let clientX, clientY;
+    if ("touches" in e) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+
+    setAnswerDrawingState({
+      ...answerDrawingState,
+      isDrawing: true,
+      lastPoint: { x, y },
+    });
+
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.beginPath();
+      ctx.arc(x, y, answerDrawingState.lineWidth / 2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  };
+
+  const drawAnswer = (
+    e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
+  ) => {
+    if (!answerDrawingState.isDrawing || !answerDrawingState.lastPoint) return;
+
+    const canvas = answerCanvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let clientX, clientY;
+    if ("touches" in e) {
+      clientX = e.touches[0].clientX;
+      clientY = e.touches[0].clientY;
+    } else {
+      clientX = e.clientX;
+      clientY = e.clientY;
+    }
+
+    const rect = canvas.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+
+    ctx.beginPath();
+    ctx.moveTo(answerDrawingState.lastPoint.x, answerDrawingState.lastPoint.y);
+    ctx.lineTo(x, y);
+    ctx.stroke();
+
+    setAnswerDrawingState({
+      ...answerDrawingState,
+      lastPoint: { x, y },
+    });
+  };
+
+  const stopAnswerDrawing = () => {
+    setAnswerDrawingState({
+      ...answerDrawingState,
+      isDrawing: false,
+      lastPoint: null,
+    });
+  };
+
+  // 답변 캔버스 초기화 함수
+  const clearAnswerCanvas = () => {
+    const canvas = answerCanvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const handleSubmitAnswer = async () => {
+    // 캔버스에서 그린 답변 이미지 가져오기
+    const canvas = answerCanvasRef.current;
+    if (!canvas) {
       toast({
-        title: "답변을 입력해주세요",
+        title: "오류가 발생했습니다",
+        description: "답변을 제출할 수 없습니다.",
         variant: "destructive",
       });
       return;
     }
 
-    setSubmittedAnswer(userAnswer);
-    const isCorrect = userAnswer === question?.answer;
+    // 캔버스 이미지를 데이터 URL로 변환
+    const dataURL = canvas.toDataURL("image/png");
 
-    toast({
-      title: isCorrect ? "정답입니다!" : "오답입니다",
-      description: isCorrect
-        ? "정답을 맞추셨습니다."
-        : "다시 한번 생각해보세요.",
-      variant: isCorrect ? "default" : "destructive",
-    });
+    try {
+      // 백엔드로 이미지 전송
+      const response = await axios.post(
+        `http://localhost:8080/api/v1/question/${numericQuestionId}/verify-answer`, 
+        {
+          imageData: dataURL,
+          questionId: numericQuestionId
+        }
+      );
+
+      // 백엔드에서 OCR 처리 후 반환한 결과
+      const { isCorrect, recognizedText } = response.data;
+      
+      setUserAnswer(recognizedText); // 인식된 텍스트 저장
+      setSubmittedAnswer(recognizedText);
+
+      toast({
+        title: isCorrect ? "정답입니다!" : "오답입니다",
+        description: isCorrect
+          ? "정답을 맞추셨습니다."
+          : `인식된 답변: "${recognizedText}" - 다시 한번 생각해보세요.`,
+        variant: isCorrect ? "default" : "destructive",
+      });
+    } catch (error) {
+      console.error("답변 검증 실패:", error);
+      toast({
+        title: "답변 검증 실패",
+        description: "서버와 통신 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleBackToList = () => {
@@ -707,19 +865,40 @@ export default function RetryQuestionPage() {
 
               <div className="flex items-center gap-2">
                 <span className="font-bold text-purple-700">답:</span>
-                <Input
-                  value={userAnswer}
-                  onChange={(e) => setUserAnswer(e.target.value)}
-                  placeholder="답을 입력하세요"
-                  className="max-w-[200px] border-purple-100 focus-visible:ring-purple-500"
-                />
-                <Button
-                  size="sm"
-                  className="bg-purple-500 hover:bg-purple-600 rounded-xl font-bold"
-                  onClick={handleSubmitAnswer}
-                >
-                  제출
-                </Button>
+                <div className="border border-purple-100 rounded-lg bg-white p-2" style={{ height: "80px", width: "200px" }}>
+                  <canvas
+                    ref={answerCanvasRef}
+                    className="touch-none bg-white"
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                    }}
+                    onMouseDown={startAnswerDrawing}
+                    onMouseMove={drawAnswer}
+                    onMouseUp={stopAnswerDrawing}
+                    onMouseLeave={stopAnswerDrawing}
+                    onTouchStart={startAnswerDrawing}
+                    onTouchMove={drawAnswer}
+                    onTouchEnd={stopAnswerDrawing}
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={clearAnswerCanvas}
+                    className="bg-white text-purple-600"
+                  >
+                    <Eraser className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="bg-purple-500 hover:bg-purple-600 rounded-xl font-bold"
+                    onClick={handleSubmitAnswer}
+                  >
+                    제출
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
