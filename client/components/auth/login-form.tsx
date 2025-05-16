@@ -34,9 +34,6 @@ export function LoginForm() {
         throw new Error('카카오 로그인 URL이 없습니다.')
       }
 
-      // 로그인 시도 로그
-      console.log('카카오 로그인 시도:', kakaoUrl)
-      
       window.location.href = kakaoUrl
     } catch (error) {
       console.error('카카오 로그인 에러:', error)

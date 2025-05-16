@@ -39,7 +39,6 @@ export function MainHeader({ educationLevel, grade, userName, nickname }: MainHe
         allLocalStorage[key] = localStorage.getItem(key) ?? "";
       }
     }
-    console.log("[MainHeader] localStorage 전체:", allLocalStorage);
   }, []);
 
   // 학년/학교명 한글 변환
