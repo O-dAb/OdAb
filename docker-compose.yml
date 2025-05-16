@@ -79,6 +79,8 @@ services:
     volumes:
       - ./python-server:/app
     depends_on:
+      server-stable:
+        condition: service_started
       my-db:
         condition: service_healthy
     restart: always
