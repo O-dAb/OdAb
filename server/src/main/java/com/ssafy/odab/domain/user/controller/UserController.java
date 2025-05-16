@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.ResponseCookie;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
 import java.util.UUID;
@@ -43,8 +44,8 @@ public class UserController {
             System.out.println("추출된 토큰: " + token); // 디버깅용 로그
 
             // 토큰 유효성 검증 추가
-            if (jwtService.validateToken(token)) {
-                Integer userId = jwtService.getUserIdFromToken(token);
+            if (jwtService.validateAccessToken(token)) {
+                Integer userId = jwtService.getUserIdFromAccessToken(token);
                 System.out.println("추출된 사용자 ID: " + userId); // 디버깅용 로그
                 return userId;
             } else {
@@ -57,15 +58,25 @@ public class UserController {
     }
 
     @GetMapping("/login/oauth2/code/kakao")
-    public void kakaoOauth2Callback(@RequestParam String code, HttpServletResponse response) throws IOException {
+    public void kakaoOauth2Callback(@RequestParam("code") String code, HttpServletResponse response) throws IOException {
         String accessToken = kakaoService.getKakaoAccessToken(code);
         KakaoUserInfo userInfo = kakaoService.getKakaoUserInfo(accessToken);
         System.out.println("[카카오 콜백] code: " + code);
         System.out.println("[카카오 콜백] accessToken: " + accessToken);
         System.out.println("[카카오 콜백] userInfo: id=" + userInfo.getId() + ", nickname=" + userInfo.getNickname());
         Map<String, Object> responseData = kakaoService.loginOrSignup(userInfo);
+        String refreshToken = (String) responseData.get("refreshToken");
         String uuid = (String) responseData.get("auth_code");
         String redirectUrl = String.format("http://localhost:3000/?auth_code=%s", uuid);
+        // 쿠키로 내려주기
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+            .httpOnly(true)
+            .secure(true)
+            .path("/")
+            .maxAge(60 * 60 * 24 * 14)
+            .sameSite("Strict")
+            .build();
+        response.addHeader("Set-Cookie", cookie.toString());
         response.sendRedirect(redirectUrl);
     }
 
@@ -112,7 +123,6 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
-
     /**
      * 사용자의 학년 정보를 업데이트합니다.
      *
@@ -147,20 +157,102 @@ public class UserController {
     }
 
     @GetMapping("/api/auth/user-id")
-    public ResponseEntity<Integer> getUserIdFromToken(@RequestParam("token") String token) {
-        Integer userId = jwtService.getUserIdFromToken(token);
+    public ResponseEntity<Integer> getUserIdFromAccessToken(@RequestParam("token") String token) {
+        Integer userId = jwtService.getUserIdFromAccessToken(token);
         return ResponseEntity.ok(userId);
     }
     // Postman 등 테스트용 토큰 발급 API (실서비스 미사용)
     @GetMapping("/api/v1/test-token")
-    public ResponseEntity<String> getTestToken(@RequestParam("userId") Integer userId) {
+    public ResponseEntity<String> getTestAccessToken(@RequestParam("userId") Integer userId) {
         // UserService에서 User 조회
         var user = userService.findById(userId);
         if (user == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 userId의 사용자가 존재하지 않습니다.");
         }
         // JwtService로 토큰 발급
-        String token = jwtService.createToken(user);
+        String token = jwtService.createAccessToken(user);
         return ResponseEntity.ok(token);
+    }
+
+    /**
+     * 클라이언트에서 리프레시 토큰을 받아 액세스/리프레시 토큰을 재발급합니다.
+     * @param requestBody {"refreshToken": "..."}
+     * @return 새 accessToken, refreshToken 또는 403
+     */
+    @PostMapping("/api/v1/refresh-token")
+    public ResponseEntity<?> ValidateRefreshToken(@RequestBody Map<String, String> requestBody, HttpServletResponse response) {
+        try {
+            String refreshToken = requestBody.get("refreshToken");
+            if (refreshToken == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "리프레시 토큰이 필요합니다."));
+            }
+
+            // 1. 리프레시 토큰에서 userId 추출
+            Integer userId;
+            try {
+                userId = jwtService.getUserIdFromAccessToken(refreshToken); // refreshToken도 같은 방식으로 userId 추출
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "유효하지 않은 리프레시 토큰입니다."));
+            }
+
+            // 2. Redis에서 해당 userId의 refreshToken을 가져옴 (key: "refresh:userId")
+            String redisKey = "refresh:" + userId;
+            String storedRefreshToken = redisTemplate.opsForValue().get(redisKey);
+            if (storedRefreshToken == null || !storedRefreshToken.equals(refreshToken)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "리프레시 토큰이 일치하지 않습니다."));
+            }
+
+            // 3. userId로 유저 조회
+            var user = userService.findById(userId);
+            if (user == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("message", "사용자를 찾을 수 없습니다."));
+            }
+
+            // 4. 새 토큰 발급
+            String newAccessToken = jwtService.createAccessToken(user);
+            String newRefreshToken = jwtService.createRefreshToken(user);
+
+            // 5. Redis에 새 refreshToken 저장 (기존 토큰 덮어쓰기)
+            redisTemplate.opsForValue().set(redisKey, newRefreshToken, jwtService.getRefreshTokenValidity(), TimeUnit.SECONDS);
+
+            // 6. 응답 반환
+            Map<String, String> responseData = Map.of(
+                "accessToken", newAccessToken,
+                "refreshToken", newRefreshToken
+            );
+
+            // 새 refreshToken 발급 후
+            ResponseCookie cookie = ResponseCookie.from("refreshToken", newRefreshToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(60 * 60 * 24 * 14)
+                .sameSite("Strict")
+                .build();
+            response.addHeader("Set-Cookie", cookie.toString());
+
+            return ResponseEntity.ok(responseData);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("message", "토큰 재발급 중 오류가 발생했습니다."));
+        }
+    }
+
+    /**
+     * 액세스 토큰이 만료되었을 때 403을 반환하는 테스트용 API
+     * Authorization 헤더에 Bearer 액세스 토큰 필요
+     */
+    @GetMapping("/api/v1/access-token")
+    public ResponseEntity<?> ValidateAccessToken(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "인증 토큰이 필요합니다."));
+        }
+        String token = authHeader.substring(7);
+        if (!jwtService.validateAccessToken(token)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(Map.of("message", "액세스 토큰이 만료되었거나 유효하지 않습니다."));
+        }
+        // 정상 토큰일 경우
+        return ResponseEntity.ok(Map.of("message", "정상적으로 인증되었습니다."));
     }
 }

@@ -78,6 +78,9 @@ services:
       - TZ=Asia/Seoul
     volumes:
       - ./python-server:/app
+    depends_on:
+      server-canary:
+        condition: service_started
     networks:
       - app-network
     restart: always
