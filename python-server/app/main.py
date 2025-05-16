@@ -98,7 +98,7 @@ def read_root():
 
 # 추가
 # 검색 API 엔드포인트
-@app.post("/search", response_model=QuestionResponse)
+@app.post("/api/python/search", response_model=QuestionResponse)
 def search_questions(query: Query):
     vec = model.encode([query.question]).astype("float32")
     D, I = question_index.search(vec, k=1)  # 가장 유사한 문제 1개만 검색
