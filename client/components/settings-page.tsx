@@ -76,7 +76,7 @@ export default function SettingsPage() {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`, // 토큰 추가
+          Authorization: `Bearer ${localStorage.getItem("AccessToken")}`, // 토큰 추가
         },
         body: JSON.stringify({ grade: parseInt(selectedGrade) }), // 학년을 숫자로 변환
       });

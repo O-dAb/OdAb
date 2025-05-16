@@ -12,6 +12,7 @@ import {
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 import type { EducationLevel, Grade } from "@/components/user-profile";
+import LoadingPage from "@/app/loading";
 
 // 프로필 타입 (필요하다면 유지)
 type UserProfile = {
@@ -19,6 +20,13 @@ type UserProfile = {
   educationLevel: EducationLevel;
   grade: Grade;
   isProfileSet: boolean;
+};
+
+const defaultUserProfile: UserProfile = {
+  userName: "사용자",
+  educationLevel: "middle",
+  grade: "1",
+  isProfileSet: false,
 };
 
 // 인증 컨텍스트 타입
@@ -49,13 +57,8 @@ function AuthParamsHandler({
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userProfile, setUserProfile] = useState<UserProfile>(defaultUserProfile);
   const [isLoading, setIsLoading] = useState(true);
-  const [userProfile, setUserProfile] = useState<UserProfile>({
-    userName: "김수학",
-    educationLevel: "middle",
-    grade: "1",
-    isProfileSet: false,
-  });
   const [authCode, setAuthCode] = useState<string | null>(null);
 
   const router = useRouter();
@@ -73,7 +76,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           localStorage.setItem("accessToken", data.accessToken);
           localStorage.setItem("userId", data.userId);
           localStorage.setItem("nickname", data.nickname);
-
+          localStorage.setItem("grade", data.grade);
+          // 3. 프로필 정보 저장
+          localStorage.setItem("userProfile", JSON.stringify({
+            userName: data.nickname,
+            educationLevel: "middle",
+            grade: data.grade,
+            isProfileSet: true,
+          }));
           // userProfile이 없으면 기본값 저장
           if (!localStorage.getItem("userProfile")) {
             localStorage.setItem(
@@ -116,30 +126,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, [router, toast, pathname, authCode]);
 
-  // 프로필 로딩 (리다이렉트 X)
   useEffect(() => {
     const savedProfile = localStorage.getItem("userProfile");
     if (savedProfile) {
-      const { level, grade } = JSON.parse(savedProfile);
-      setUserProfile((prev) => ({
-        ...prev,
-        educationLevel: level,
-        grade: grade,
-        isProfileSet: true,
-      }));
+      setUserProfile({ ...defaultUserProfile, ...JSON.parse(savedProfile) });
+    } else {
+      setUserProfile(defaultUserProfile);
     }
+    setIsLoading(false);
   }, []);
 
   const updateProfile = (level: EducationLevel, grade: Grade) => {
-    const newProfile = {
-      ...userProfile,
+    const newProfile: UserProfile = {
+      userName: userProfile?.userName || "사용자",
       educationLevel: level,
       grade: grade,
       isProfileSet: true,
     };
     setUserProfile(newProfile);
-    localStorage.setItem("userProfile", JSON.stringify({ level, grade }));
+    localStorage.setItem("userProfile", JSON.stringify(newProfile));
   };
+
+  if (isLoading) {
+    return <LoadingPage />;
+  }
 
   return (
     <AuthContext.Provider
