@@ -1,4 +1,3 @@
-// app/page.tsx
 "use client";
 
 import { useEffect } from "react";
@@ -8,25 +7,23 @@ import { Button } from "@/components/ui/button";
 import { GraduationCap, Brain, BookOpen, Lightbulb, ArrowRight, CheckCircle2, Star, Sparkles, Award } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import LoadingPage from "./loading";
 
-export default function Home() {
-  const { isAuthenticated, isLoading } = useAuth();
+export default function LandingPage() {
   const router = useRouter();
+  const { userProfile, isAuthenticated } = useAuth();
 
   useEffect(() => {
-    if (!isLoading) {
-      if (isAuthenticated) {
-        router.replace("/dashboard");
-      }
+    // 로그인된 사용자는 대시보드로 리다이렉트
+    if (isAuthenticated && userProfile?.isProfileSet) {
+      router.push("/dashboard");
     }
-  }, [isAuthenticated, isLoading, router]);
+  }, [isAuthenticated, userProfile?.isProfileSet, router]);
 
-  if (isLoading) {
-    return <LoadingPage />;
+  // 로그인 상태가 확인되는 동안 로딩 표시
+  if (isAuthenticated === undefined) {
+    return <div>Loading...</div>;
   }
 
-  // 로그인하지 않은 경우 랜딩 페이지 표시
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* 히어로 섹션 - 애니메이션 추가 */}
@@ -74,13 +71,13 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/login">
               <Button size="lg" className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 shadow-md shadow-purple-200 dark:shadow-purple-900/20 transform hover:scale-105 transition-all">
-                무료로 시작하기
+                시작하기
               </Button>
             </Link>
             <Link href="/login">
-              {/* <Button size="lg" variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/30 dark:text-purple-300 dark:border-purple-400 px-8 transform hover:scale-105 transition-all">
+              <Button size="lg" variant="outline" className="border-purple-600 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/30 dark:text-purple-300 dark:border-purple-400 px-8 transform hover:scale-105 transition-all">
                 로그인
-              </Button> */}
+              </Button>
             </Link>
           </div>
         </div>
@@ -97,13 +94,12 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 수달이 소개 섹션 - 새로 추가 */}
+      {/* 수달이 소개 섹션 */}
       <section className="container mx-auto px-4 py-16">
         <div className="bg-white/70 dark:bg-gray-800/70 rounded-3xl p-8 md:p-12 shadow-xl backdrop-blur-sm">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="w-full md:w-1/2 relative">
               <div className="aspect-square max-w-md mx-auto bg-blue-100 dark:bg-blue-900/30 rounded-full p-8 relative overflow-hidden">
-                {/* 여기서는 수달 이미지가 있다고 가정합니다. 실제 이미지로 교체하세요 */}
                 <div className="w-full h-full rounded-full bg-blue-200 dark:bg-blue-800 flex items-center justify-center">
                   <span className="text-6xl">🦦</span>
                 </div>
@@ -148,7 +144,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 주요 기능 섹션 - 카드 디자인 개선 */}
+      {/* 주요 기능 섹션 */}
       <section id="features" className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white inline-block relative">
@@ -193,7 +189,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 학습 과정 섹션 - 타임라인 형태로 개선 */}
+      {/* 학습 과정 섹션 */}
       <section id="journey" className="container mx-auto px-4 py-20 relative">
         <div className="absolute left-1/2 top-40 bottom-32 w-1 bg-gradient-to-b from-purple-500 via-blue-500 to-green-500 hidden md:block"></div>
         
@@ -293,7 +289,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 성공 사례 섹션 - 새로 추가 */}
+      {/* 성공 사례 섹션 */}
       <section className="container mx-auto px-4 py-20">
         <div className="text-center mb-16">
           <div className="inline-block bg-yellow-100 dark:bg-yellow-900/30 px-4 py-1 rounded-full text-yellow-600 dark:text-yellow-300 font-medium text-sm mb-2">
@@ -367,7 +363,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FAQ 섹션 - 새로 추가 */}
+      {/* FAQ 섹션 */}
       <section id="faq" className="container mx-auto px-4 py-16">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
@@ -419,7 +415,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* CTA 섹션 - 디자인 개선 */}
+      {/* CTA 섹션 */}
       <section className="container mx-auto px-4 py-16">
         <div className="bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-800 dark:to-blue-800 rounded-3xl p-12 text-center relative overflow-hidden">
           {/* 배경 장식 */}
@@ -459,7 +455,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 푸터 - 개선 */}
+      {/* 푸터 */}
       <footer className="bg-white/10 dark:bg-gray-900/50 backdrop-blur-sm mt-20">
         <div className="container mx-auto px-4 py-12">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
@@ -493,7 +489,6 @@ export default function Home() {
                 <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-300">중1 수학</a></li>
                 <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-300">중2 수학</a></li>
                 <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-300">중3 수학</a></li>
-                {/* <li><a href="#" className="text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-300">수학 경시대회</a></li> */}
               </ul>
             </div>
             
@@ -553,4 +548,4 @@ export function globalStyles() {
       .animate-bounce-slow { animation: bounce-slow 3s ease-in-out infinite; }
     `}</style>
   );
-}
+} 

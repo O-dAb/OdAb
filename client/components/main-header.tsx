@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/contexts/auth-context";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 interface MainHeaderProps {
   educationLevel: EducationLevel;
@@ -55,11 +56,14 @@ export function MainHeader({
     localStorage.removeItem("nickname");
     localStorage.removeItem("grade");
     localStorage.removeItem("userProfile");
-    setDisplayName(""); // setUserName 대신 setDisplayName 사용
-    // 카카오 로그아웃
+    setDisplayName("");
+    
+    // 카카오 로그아웃 진행
     const KAKAO_CLIENT_ID = "8a48914bf786805cc4d0e1087b0e03a9";
     const LOGOUT_REDIRECT_URI = `${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}/login`;
-    window.location.href = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_CLIENT_ID}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`;
+    
+    // 로컬 로그아웃 후 랜딩 페이지로 이동
+    window.location.href = "/";
   };
 
   // localStorage 값 확인 및 상태 업데이트
@@ -70,16 +74,12 @@ export function MainHeader({
         const userProfile = JSON.parse(userProfileStr);
         const nickname = localStorage.getItem("nickname") || userProfile.userName || "사용자";
         setDisplayName(nickname);
-        if (userProfile.profileUrl) {
-          // profileUrl은 현재 컴포넌트에서 사용되지 않으므로 제거
-        }
       } catch (e) {
         // 파싱 에러 처리
         const fallbackName = localStorage.getItem("nickname")||localStorage.getItem("userName") || "사용자";
         setDisplayName(fallbackName);
       }
     }
-    console.log("LocalStorage values:", localStorage); // 디버깅을 위해 추가
   }, []);
 
   // 학년/학교명 한글 변환
@@ -90,7 +90,7 @@ export function MainHeader({
       ? "고등"
       : "";
   // localStorage에서 nickname을 가져오는 대신 props로 전달받은 nickname 사용
-  const isLoggedIn = Boolean(userName);
+  const isLoggedIn = Boolean(localStorage.getItem("accessToken"));
 
   // localStorage의 nickname이 있으면 사용, 없으면 userProfile.nickname/userName 사용
   const displayNameFromContext =
@@ -111,19 +111,21 @@ export function MainHeader({
   // 로딩 중이면 Skeleton 또는 null 반환
   if (isLoading) {
     return (
-      <header className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-blue-900 dark:via-purple-900 dark:to-pink-900 shadow-md rounded-b-2xl px-6 py-4 flex items-center justify-between">
+      <header className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-blue-900/30 dark:via-purple-900/30 dark:to-pink-900/30 shadow-lg backdrop-blur-sm rounded-b-2xl px-6 py-4 flex items-center justify-between sticky top-0 z-50">
         <div className="flex items-center space-x-4">
           <Link
             href="/"
-            className="font-extrabold text-2xl text-blue-700 dark:text-blue-300 flex items-center gap-2"
+            className="font-extrabold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 flex items-center gap-2"
           >
-            <GraduationCap className="h-7 w-7 text-purple-500 dark:text-purple-300" />
+            <div className="bg-gradient-to-r from-blue-500 to-purple-500 p-2 rounded-full">
+              <GraduationCap className="h-5 w-5 text-white" />
+            </div>
             O! dAb
           </Link>
         </div>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-3">
           <Skeleton className="w-9 h-9 rounded-full" />
-          <Skeleton className="w-20 h-6 rounded" />
+          <Skeleton className="w-24 h-9 rounded-lg" />
         </div>
       </header>
     );
@@ -131,39 +133,54 @@ export function MainHeader({
 
   // 실제 렌더링
   return (
-    <header className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 shadow-md rounded-b-2xl px-6 py-4 flex items-center justify-between">
+    <header className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-gray-900/80 dark:via-gray-800/80 dark:to-gray-900/80 shadow-lg backdrop-blur-sm rounded-b-2xl px-4 sm:px-6 py-3 flex items-center justify-between sticky top-0 z-50 transition-all duration-300">
       <div className="flex items-center space-x-4">
         <Link
           href="/"
-          className="font-extrabold text-2xl text-blue-700 dark:text-blue-200 flex items-center gap-2"
+          className="font-extrabold text-2xl bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 flex items-center gap-2"
         >
-          <GraduationCap className="h-7 w-7 text-purple-500 dark:text-purple-300" />
+          <div className="bg-gradient-to-r from-blue-500 to-purple-500 dark:from-blue-600 dark:to-purple-600 p-2 rounded-full shadow-md">
+            <GraduationCap className="h-5 w-5 text-white" />
+          </div>
           O! dAb
         </Link>
       </div>
-      <div className="flex items-center space-x-2">
+      
+      <div className="flex items-center space-x-3">
         <ThemeToggle />
-        <span className="px-3 py-1 rounded-full bg-white/80 dark:bg-gray-800/80 shadow text-blue-700 dark:text-blue-300 font-semibold text-sm border border-blue-200 dark:border-blue-700">
-          <Avatar className="inline-block w-9 h-9 align-middle mr-2">
-            <AvatarImage
-              src={profileUrlFromContext}
-              alt="프로필 이미지"
-            />
-            <AvatarFallback>{displayNameFromContext ? displayNameFromContext.charAt(0).toUpperCase() : "U"}</AvatarFallback>
-          </Avatar>
-          {displayNameFromContext}
-        </span>
-        <span className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-800/50 dark:to-pink-800/50 text-purple-700 dark:text-purple-200 font-semibold text-sm border border-purple-200 dark:border-gray-600">
-          {schoolLabel} {typeof window !== 'undefined' ? localStorage.getItem('grade') : ''}학년
-        </span>
-        {isLoggedIn && (
-          <button
-            onClick={handleLogout}
-            title="로그아웃"
-            className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50 transition"
-          >
-            <LogOut className="h-5 w-5 text-red-500 dark:text-red-400" />
-          </button>
+        {isLoggedIn ? (
+          <>
+            <span className="px-3 py-1.5 rounded-full bg-white/90 dark:bg-gray-800/90 shadow-sm hover:shadow text-blue-700 dark:text-blue-300 font-medium text-sm border border-blue-200 dark:border-blue-800 transition-all duration-200">
+              <Avatar className="inline-block w-8 h-8 align-middle mr-2">
+                <AvatarImage
+                  src={profileUrlFromContext}
+                  alt="프로필 이미지"
+                />
+                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-500 text-white">
+                  {displayNameFromContext ? displayNameFromContext.charAt(0).toUpperCase() : "U"}
+                </AvatarFallback>
+              </Avatar>
+              {displayNameFromContext}
+            </span>
+            
+            <span className="px-3 py-1.5 rounded-full bg-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-900/50 dark:to-pink-900/50 text-purple-700 dark:text-purple-300 font-medium text-sm border border-purple-200 dark:border-purple-800 shadow-inner">
+              {schoolLabel} {typeof window !== 'undefined' ? localStorage.getItem('grade') : ''}학년
+            </span>
+            
+            <button
+              onClick={handleLogout}
+              title="로그아웃"
+              className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors"
+            >
+              <LogOut className="h-5 w-5 text-red-500 dark:text-red-400" />
+            </button>
+          </>
+        ) : (
+          <Link href="/login">
+            <Button className="bg-gradient-to-r from-purple-400 to-blue-400 hover:from-purple-500 hover:to-blue-500 text-white shadow-sm hover:shadow transition-all duration-300 font-medium px-5 py-2 h-auto">
+              로그인
+            </Button>
+          </Link>
         )}
       </div>
     </header>
