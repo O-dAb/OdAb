@@ -397,13 +397,13 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                 onValueChange={handleGradeChange}
                 disabled={loading}
               >
-                <SelectTrigger className="w-[100px] bg-blue-50 border-blue-100 rounded-xl">
+                <SelectTrigger className="w-[100px] bg-blue-50 dark:bg-gray-800 border-blue-100 dark:border-blue-700 rounded-xl dark:text-gray-200">
                   <SelectValue placeholder="학년 선택" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">1학년</SelectItem>
-                  <SelectItem value="2">2학년</SelectItem>
-                  <SelectItem value="3">3학년</SelectItem>
+                  <SelectItem value="1" className="dark:text-gray-200">1학년</SelectItem>
+                  <SelectItem value="2" className="dark:text-gray-200">2학년</SelectItem>
+                  <SelectItem value="3" className="dark:text-gray-200">3학년</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -417,18 +417,18 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
         value={activeTab}
         onValueChange={handleTabChange}
       >
-        <TabsList className="grid grid-cols-2 mb-6 bg-blue-100 rounded-xl shadow">
-          <TabsTrigger
-            value="all"
-            className="flex items-center gap-2 data-[state=active]:bg-blue-400 dark:data-[state=active]:bg-blue-700 data-[state=active]:text-white rounded-xl font-bold"
-          >
+          <TabsList className="grid grid-cols-2 mb-6 bg-blue-100 dark:bg-blue-900 rounded-xl shadow">
+            <TabsTrigger
+              value="all"
+              className="flex items-center gap-2 data-[state=active]:bg-blue-400 dark:data-[state=active]:bg-blue-700 data-[state=active]:text-white rounded-xl font-bold dark:text-gray-300"
+            >
             <BookOpen className="h-4 w-4" />
             <span>전체 오답</span>
           </TabsTrigger>
           <TabsTrigger
             value="recent"
-            className="flex items-center gap-2 data-[state=active]:bg-yellow-400 dark:data-[state=active]:bg-yellow-700 data-[state=active]:text-white rounded-xl font-bold"
-          >
+            className="flex items-center gap-2 data-[state=active]:bg-yellow-400 dark:data-[state=active]:bg-yellow-700 data-[state=active]:text-white rounded-xl font-bold dark:text-gray-300"
+            >
             <Clock className="h-4 w-4" />
             <span>최근 학습</span>
           </TabsTrigger>
