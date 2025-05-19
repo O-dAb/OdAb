@@ -38,7 +38,7 @@ export function MainHeader({
     localStorage.removeItem("nickname");
     localStorage.removeItem("grade");
     localStorage.removeItem("userProfile");
-    setUserName("");
+    setDisplayName(""); // setUserName 대신 setDisplayName 사용
     // 카카오 로그아웃
     const KAKAO_CLIENT_ID = "8a48914bf786805cc4d0e1087b0e03a9";
     const LOGOUT_REDIRECT_URI = `${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}/login`;
@@ -52,18 +52,17 @@ export function MainHeader({
       try {
         const userProfile = JSON.parse(userProfileStr);
         if (userProfile.userName) {
-          setUserName(userProfile.userName);
+          setDisplayName(userProfile.userName);
         }
         if (userProfile.profileUrl) {
-          setProfileUrl(userProfile.profileUrl);
+          // profileUrl은 현재 컴포넌트에서 사용되지 않으므로 제거
         }
       } catch (e) {
-        // 파싱 에러 처리 (필요시)
-        setUserName("");
-        setProfileUrl(undefined);
+        // 파싱 에러 처리
+        setDisplayName("사용자");
       }
     }
-    console.log("LocalStorage values:", allLocalStorage); // 디버깅을 위해 추가
+    console.log("LocalStorage values:", localStorage); // 디버깅을 위해 추가
   }, []);
 
   // 학년/학교명 한글 변환
