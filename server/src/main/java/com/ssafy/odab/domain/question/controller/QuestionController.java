@@ -2,6 +2,7 @@ package com.ssafy.odab.domain.question.controller;
 
 import com.ssafy.odab.domain.question.dto.*;
 import com.ssafy.odab.domain.question.service.QuestionService;
+import com.ssafy.odab.domain.user.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -16,11 +17,13 @@ import org.springframework.web.bind.annotation.*;
 public class QuestionController {
 
     private final QuestionService questionService;
+    private final JwtService jwtService;
 
     @PatchMapping("{questionId}/answer")
     public ResponseEntity<VerifyAnswerResponseDto> verifyAnswer(
             @PathVariable("questionId") Integer questionId, @RequestBody VerifyAnswerRequestDto verifyAnswerRequestDto) {
-        Boolean isCorrect = questionService.verifyAnswer(verifyAnswerRequestDto, questionId);
+        Integer userId = jwtService.getUserIdFromRequest();
+        Boolean isCorrect = questionService.verifyAnswer(verifyAnswerRequestDto, questionId, userId);
         String message = isCorrect ? "정답입니다." : "오답입니다.";
         System.out.println(isCorrect);
         VerifyAnswerResponseDto verifyAnswerResponseDto = VerifyAnswerResponseDto.builder()
@@ -32,6 +35,7 @@ public class QuestionController {
 
     @GetMapping("/{questionId}/retry")
     public ResponseEntity<RetryQuestionResponseDto> findRetryQuestion(@PathVariable("questionId") Integer questionId) {
+        jwtService.getUserIdFromRequest();
         return ResponseEntity.ok(questionService.findRetryQuestionByQuestionId(questionId));
     }
 
@@ -55,7 +59,6 @@ public class QuestionController {
         Sort sortObj = Sort.by(direction, sortParams[0]);
         Pageable pageable = PageRequest.of(page, size, sortObj);
 
-        System.out.println("여기?");
         return ResponseEntity.ok(
                 questionService.findSubConceptRelatedQuestionBySubConceptId(subConceptId, pageable));
     }

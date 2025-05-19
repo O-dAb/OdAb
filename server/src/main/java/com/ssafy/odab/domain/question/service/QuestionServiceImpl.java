@@ -39,11 +39,10 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional
-    public Boolean verifyAnswer(VerifyAnswerRequestDto verifyAnswerRequestDto, Integer questionId) {
+    public Boolean verifyAnswer(VerifyAnswerRequestDto verifyAnswerRequestDto, Integer questionId, Integer userId) {
 
         String dirName = "product";
         String s3Url = s3Service.uploadBase64File(verifyAnswerRequestDto.getAnswerImg(), dirName);
-        Integer userId = 1;
         // 문제에서 정답 여부 확인
         Question question = questionRepository.findById(questionId).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
 
