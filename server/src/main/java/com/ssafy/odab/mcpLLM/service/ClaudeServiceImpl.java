@@ -66,7 +66,6 @@ public class ClaudeServiceImpl implements ClaudeService {
     private final int MAX_RETRIES = 3; // 최대 재시도 횟수
 
 
-
     @Transactional
     public Mono<ApiResponseDto> extractProblem(ApiRequestDto apiRequestDto) {
         List<Object> contents = new ArrayList<>();
@@ -113,9 +112,151 @@ public class ClaudeServiceImpl implements ClaudeService {
                 .flatMap(response -> {
                     String problem = response.getContent().get(0).getText();
                     apiRequestDto.setUserAsk(problem);
+                    System.out.println("텍스트 찾기"+response.getContent().get(0).getText());
                     return searchSimilarQuestions(apiRequestDto);
                 });
     }
+
+    @Override
+    @Transactional
+    public Mono<Boolean> isCorrectAnswer(String answer, String questionText, String userAnswerImg) {
+        List<Object> contents = new ArrayList<>();
+        // 정답을 추출하기 위한 프롬프트
+        String extractPrompt = String.format("""
+                이 이미지는 학생이 제출한 수학 문제 답안입니다.
+                 \s
+                        당신은 수학 OCR 전문가입니다. 이미지에서 수학 표현식을 정확하게 추출하고 분석하는 임무를 맡았습니다.
+                       \s
+                        이 이미지는 학생이 제출한 수학 문제 답안입니다. 최대한 정확하게 이미지의 수학 표현식을 추출해주세요.
+                       \s
+                        이 과정은 두 단계로 나누어 진행합니다:
+                       \s
+                        1단계: OCR 추출\s
+                        - 이미지에 보이는 모든 수학 기호, 숫자, 문자를 있는 그대로 정확히 추출하세요.
+                        - 분수는 반드시 '분자/분모' 형태로 추출하세요.
+                        - 분자와 분모는 정확하게 추출하세요.
+                        - 숫자, 변수, 연산자 사이의 관계를 정확히 유지하세요.
+                        - 보이는 그대로 추출하고, 수학적 해석이나 변환은 하지 마세요.
+                       \s
+                        2단계: 정답 비교
+                        - 추출한 표현식이 아래 정답과 정확히 일치하는지 확인하세요.
+                        - 수학적으로 동등한 표현(예: 2/4와 1/2)도 형태가 다르면 불일치로 판단하세요.
+                        - 분수의 경우 분자와 분모가 바뀌면 반드시 불일치입니다.
+                        - 부분적 답변(수식의 일부만 있는 경우)은 불일치입니다.
+                 \s
+                  문제 내용: %s
+                  실제 정답: %s
+                 \s
+                  응답은 아래 형식을 정확히 따라주세요:
+                  추출된 답변: [추출한 답변 - 없으면 "추출 불가"라고 표시]
+                  완전 일치 여부: [완전 일치/불일치]
+                  불일치 이유: [불일치인 경우 구체적인 이유 - 일치라면 "해당 없음"]
+                  최종 판정: [정답/오답]
+                 \s
+                  주의:\s
+                  - 정답으로 판정하려면 추출된 답변이 제시된 정답과 완전히 일치해야 합니다.
+                  - 같은 수학적 의미라도 표현이 다르면 불일치입니다. (예: 2x 대신 x+x는 불일치)
+                  - 수식의 일부만 작성된 경우는 오답입니다. (예: f(x) = 6x - 2에서 f(x)만 있다면 오답)
+                  - 변수나 기호가 잘못된 경우도 오답입니다. (예: f(x) 대신 f(y)는 오답)
+                  - 분수의 경우 분자와 분모의 위치가 바뀌면 다른 값이므로 반드시 오답으로 처리해야 합니다.
+                """, questionText, answer);
+
+        contents.add(ClaudeRequestApiDto
+                .TextContent
+                .builder()
+                .type("text")
+                .text(extractPrompt)
+                .build());
+
+        try {
+            contents.add(ClaudeRequestApiDto
+                    .ImageContent.builder()
+                    .type("image")
+                    .source(ClaudeRequestApiDto
+                            .Source
+                            .builder()
+                            .type("base64")
+                            .media_type("image/png")
+                            .data(userAnswerImg)
+                            .build())
+                    .build());
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException("이미지 인코딩 실패", e);
+        }
+
+        // 메시지 생성
+        List<ClaudeRequestApiDto.Message> sendMessages = new ArrayList<>();
+        sendMessages.add(ClaudeRequestApiDto.
+                Message
+                .builder()
+                .role("user")
+                .content(contents)
+                .build());
+        ClaudeRequestApiDto request = ClaudeRequestApiDto.builder()
+                .model("claude-3-7-sonnet-20250219")
+                .max_tokens(maxTokens)
+                .messages(sendMessages)
+                .build();
+        // 응답 처리
+// 응답 처리
+        Mono<Boolean> isCorrect = sendClaudeApi(request, sendMessages, 0, true)
+                .map(response -> {
+                    String fullResponse = response.getContent().get(0).getText().trim();
+//                    System.out.println("===== Claude 응답 시작 =====");
+//                    System.out.println(fullResponse);
+//                    System.out.println("===== Claude 응답 끝 =====");
+
+                    // 정답 추출 및 판단
+                    String extractedAnswer = extractFromResponse(fullResponse, "추출된 답변:");
+                    String completeMatch = extractFromResponse(fullResponse, "완전 일치 여부:");
+                    String mismatchReason = extractFromResponse(fullResponse, "불일치 이유:");
+                    String finalJudgment = extractFromResponse(fullResponse, "최종 판정:");
+
+//                    System.out.println("추출된 답변: " + extractedAnswer);
+//                    System.out.println("완전 일치 여부: " + completeMatch);
+//                    System.out.println("불일치 이유: " + mismatchReason);
+//                    System.out.println("최종 판정: " + finalJudgment);
+
+                    // 엄격한 판정 조건 적용
+                    boolean isFullMatch = completeMatch.contains("완전 일치");
+                    boolean isFinalCorrect = finalJudgment.contains("정답");
+
+                    if (!isFullMatch || !isFinalCorrect) {
+//                        System.out.println("엄격한 기준에 따라 오답으로 판정합니다.");
+                        return false;
+                    }
+
+
+//                    System.out.println("정답으로 최종 판정합니다.");
+                    return true;
+                })
+                .onErrorResume(e -> {
+                    System.err.println("정답 확인 중 오류 발생: " + e.getMessage());
+                    e.printStackTrace();
+                    return Mono.just(false);
+                });
+
+
+        return isCorrect;
+    }
+
+    // 응답에서 특정 라벨 다음의 내용을 추출하는 헬퍼 메서드
+    private String extractFromResponse(String response, String label) {
+        if (!response.contains(label)) {
+            return "";
+        }
+
+        int startIndex = response.indexOf(label) + label.length();
+        int endIndex = response.indexOf("\n", startIndex);
+
+        if (endIndex == -1) {
+            return response.substring(startIndex).trim();
+        } else {
+            return response.substring(startIndex, endIndex).trim();
+        }
+    }
+
 
     @Transactional
     // FAISS 서버에 질문을 보내고 유사한 문제 ID와 유사도 점수를 받는 메소드 (동기 방식)
@@ -153,16 +294,16 @@ public class ClaudeServiceImpl implements ClaudeService {
                     .append("다음은 기존 데이터 베이스에서 유사한 문제를 찾아서 보여주는거야.\n")
                     .append("필요하다면 활용해서 풀어도 돼.\n");
             sb.append(String.format("""
-                                문제 : %s
-                                다음은 기존 데이터 베이스에서 유사한 문제를 찾아서 보여주는거야. 필요하다면 활용해서 풀어도 돼.
-                                참고문제 : %s
-                                """, problem, question.getQuestionText()));
+                    문제 : %s
+                    다음은 기존 데이터 베이스에서 유사한 문제를 찾아서 보여주는거야. 필요하다면 활용해서 풀어도 돼.
+                    참고문제 : %s
+                    """, problem, question.getQuestionText()));
 
             for (RagQuestionSolution solution : question.getQuestionSolutions()) {
                 sb.append(String.format("""
-                                참고 문제 풀이
-                                step %d : %s
-                                """, solution.getStep(), solution.getSolutionContent()));
+                        참고 문제 풀이
+                        step %d : %s
+                        """, solution.getStep(), solution.getSolutionContent()));
             }
             ApiRequestDto requestDto = new ApiRequestDto();
             requestDto.setUserAsk(sb.toString());
@@ -175,8 +316,6 @@ public class ClaudeServiceImpl implements ClaudeService {
             return null;
         }
     }
-
-
 
 
     /**
