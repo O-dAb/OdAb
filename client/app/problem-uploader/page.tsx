@@ -100,7 +100,7 @@ export default function ProblemUploaderPage() {
               "Content-Type": "multipart/form-data",
             },
           }
-        );
+        ) as unknown as ProblemApiResponse;
         
         // 응답 데이터 처리 (authApi는 이미 data를 반환)
         const { questionText, answer, imageUrl, questionSolution, subConcepts } = response;
