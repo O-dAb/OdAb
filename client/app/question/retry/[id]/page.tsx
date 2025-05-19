@@ -34,6 +34,7 @@ import {
 } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
 import { authApi } from "@/lib/api";
+import { Toaster } from "@/components/ui/toaster";
 
 interface SubConcept {
   subConceptId: number;
@@ -123,11 +124,6 @@ export default function RetryQuestionPage() {
         setQuestion(response.data);
       } catch (error) {
         console.error("문제 불러오기 실패:", error);
-        toast({
-          title: "문제 불러오기 실패",
-          description: "문제를 불러오는 중 오류가 발생했습니다.",
-          variant: "destructive",
-        });
       } finally {
         setLoading(false);
       }
@@ -455,7 +451,7 @@ export default function RetryQuestionPage() {
 
     // 캔버스 내용을 이미지로 변환
     const imageData = canvas.toDataURL("image/png");
-
+    console.log(imageData);
     // base64 데이터 분리
     const base64Data = imageData.split(",")[1]; // 실제 base64 데이터만 추출
     console.log(base64Data);
@@ -474,7 +470,8 @@ export default function RetryQuestionPage() {
       setSubmittedAnswer(imageData);
 
       // 정답 여부에 따른 토스트 메시지 표시
-      const isCorrect = response.data.isCorrect;
+      const isCorrect = (response as any).correct;
+      console.log(isCorrect);
       toast({
         title: isCorrect ? "정답입니다!" : "오답입니다",
         description: isCorrect
@@ -528,393 +525,369 @@ export default function RetryQuestionPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50">
-      <div className="flex-1 p-8">
-        <Button
-          variant="outline"
-          onClick={handleBackToList}
-          className="flex items-center gap-2 mb-4 bg-white/80 border-purple-200 text-purple-600 hover:bg-purple-50 rounded-xl font-bold"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          <span>목록으로 돌아가기</span>
-        </Button>
+    <>
+      <div className="flex flex-col h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50">
+        <div className="flex-1 p-8">
+          <Button
+            variant="outline"
+            onClick={handleBackToList}
+            className="flex items-center gap-2 mb-4 bg-white/80 border-purple-200 text-purple-600 hover:bg-purple-50 rounded-xl font-bold"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            <span>목록으로 돌아가기</span>
+          </Button>
 
-        <div className="flex flex-col md:flex-row gap-6">
-          <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 w-2/5">
-            <CardHeader className="bg-purple-50/60 border-b-0 rounded-t-2xl">
-              <div className="flex justify-between items-center">
-                <CardTitle className="text-purple-700 font-extrabold">
-                  문제 다시 풀기
-                </CardTitle>
-                <div className="flex gap-2">
-                  {question.retryQuestionSubConceptDtos.map((concept) => (
-                    <Badge
-                      key={concept.subConceptId}
-                      variant="secondary"
-                      className="bg-purple-400 text-white font-bold rounded-full px-3 py-1"
-                    >
-                      {concept.subConceptType}
-                    </Badge>
-                  ))}
+          <div className="flex flex-col md:flex-row gap-6">
+            <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 w-2/5">
+              <CardHeader className="bg-purple-50/60 border-b-0 rounded-t-2xl">
+                <div className="flex justify-between items-center">
+                  <CardTitle className="text-purple-700 font-extrabold">
+                    문제 다시 풀기
+                  </CardTitle>
+                  <div className="flex gap-2">
+                    {question.retryQuestionSubConceptDtos.map((concept) => (
+                      <Badge
+                        key={concept.subConceptId}
+                        variant="secondary"
+                        className="bg-purple-400 text-white font-bold rounded-full px-3 py-1"
+                      >
+                        {concept.subConceptType}
+                      </Badge>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-7 space-y-4">
-              {/* 문제 내용 */}
-              <div className="space-y-4">
-                <div className="font-bold text-lg text-purple-700">문제</div>
-                <p className="text-gray-700">{question.questionText}</p>
-                {question.questionImg && (
-                  <img
-                    src={question.questionImg}
-                    alt="문제 이미지"
-                    className="mt-4 max-w-full rounded-xl border border-purple-200 shadow-md"
-                  />
-                )}
-              </div>
+              </CardHeader>
+              <CardContent className="pt-7 space-y-4">
+                {/* 문제 내용 */}
+                <div className="space-y-4">
+                  <div className="font-bold text-lg text-purple-700">문제</div>
+                  <p className="text-gray-700">{question.questionText}</p>
+                  {question.questionImg && (
+                    <img
+                      src={question.questionImg}
+                      alt="문제 이미지"
+                      className="mt-4 max-w-full rounded-xl border border-purple-200 shadow-md"
+                    />
+                  )}
+                </div>
 
-              {/* 해설 표시 */}
-              <div className="flex justify-between items-center mt-50 pt-20">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowSolution(!showSolution)}
-                  className="text-purple-600 hover:text-purple-700 rounded-xl font-bold"
-                >
-                  {showSolution ? "해설 닫기" : "해설 보기"}
-                </Button>
+                {/* 해설 표시 */}
+                <div className="flex justify-between items-center mt-50 pt-20">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowSolution(!showSolution)}
+                    className="text-purple-600 hover:text-purple-700 rounded-xl font-bold"
+                  >
+                    {showSolution ? "해설 닫기" : "해설 보기"}
+                  </Button>
+                  {showSolution &&
+                    question.retryQuestionSolutionDtos.length > 0 && (
+                      <div className="flex items-center gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            setCurrentStep((prev) => Math.max(0, prev - 1))
+                          }
+                          disabled={currentStep === 0}
+                          className="text-purple-600 hover:text-purple-700 rounded-xl font-bold"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </Button>
+                        <span className="text-sm text-gray-600">
+                          {currentStep + 1} /{" "}
+                          {question.retryQuestionSolutionDtos.length}
+                        </span>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            setCurrentStep((prev) =>
+                              Math.min(
+                                question.retryQuestionSolutionDtos.length - 1,
+                                prev + 1
+                              )
+                            )
+                          }
+                          disabled={
+                            currentStep ===
+                            question.retryQuestionSolutionDtos.length - 1
+                          }
+                          className="text-purple-600 hover:text-purple-700 rounded-xl font-bold"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                </div>
+
                 {showSolution &&
                   question.retryQuestionSolutionDtos.length > 0 && (
-                    <div className="flex items-center gap-2">
+                    <div className="mt-6 p-4 bg-purple-50 border border-purple-100 rounded-md">
+                      <h3 className="font-bold text-purple-700 mb-3">해설</h3>
+                      <div className="space-y-3">
+                        <div className="space-y-1">
+                          <div className="font-bold text-purple-600">
+                            Step {currentStep + 1}
+                          </div>
+                          <p className="text-gray-700">
+                            {
+                              question.retryQuestionSolutionDtos[currentStep]
+                                .solutionContent
+                            }
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 w-3/5">
+              <CardHeader className="bg-purple-50/60 border-b-0 rounded-t-2xl">
+                <CardTitle className="text-purple-700 font-extrabold">
+                  풀이 과정
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-4">
+                <div className="flex justify-between items-center">
+                  <div className="flex gap-2">
+                    {/* 색상 및 펜 두께 선택기 */}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="w-8 h-8 p-0 flex items-center justify-center"
+                          style={{
+                            backgroundColor: isEraser
+                              ? "white"
+                              : drawingState.color,
+                            borderColor: "rgb(216, 180, 254)",
+                          }}
+                          onClick={(e) => {
+                            e.preventDefault(); // 팝오버가 바로 닫히는 것 방지
+                            if (isEraser) {
+                              // 지우개 모드에서 펜 모드로 전환
+                              console.log("Switching to pen mode");
+                              setIsEraser(false);
+                            }
+                          }}
+                        >
+                          <Pen
+                            className="h-4 w-4"
+                            style={{
+                              color: isEraser ? drawingState.color : "white",
+                            }}
+                          />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-64 p-2">
+                        <div className="grid grid-cols-4 gap-2">
+                          {availableColors.map((color) => (
+                            <Button
+                              key={color}
+                              variant="outline"
+                              className="w-10 h-10 p-0 rounded-full"
+                              style={{
+                                backgroundColor: color,
+                                borderColor:
+                                  color === drawingState.color
+                                    ? "black"
+                                    : "transparent",
+                                borderWidth:
+                                  color === drawingState.color ? "2px" : "0",
+                              }}
+                              onClick={() => changeColor(color)}
+                            />
+                          ))}
+                        </div>
+                        <div className="mt-4 space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-sm">펜 두께</span>
+                            <span className="text-sm">
+                              {drawingState.lineWidth}px
+                            </span>
+                          </div>
+                          <Slider
+                            defaultValue={[drawingState.lineWidth]}
+                            min={1}
+                            max={20}
+                            step={1}
+                            value={[drawingState.lineWidth]}
+                            onValueChange={(value) => {
+                              console.log("Changing pen width to:", value[0]);
+                              setDrawingState((prev) => ({
+                                ...prev,
+                                lineWidth: value[0],
+                              }));
+                            }}
+                          />
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+
+                    {/* 지우개 두께 선택기 - 새로 추가 */}
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.preventDefault(); // 팝오버가 바로 닫히는 것 방지
+                            if (!isEraser) {
+                              // 펜 모드에서 지우개 모드로 전환
+                              console.log("Switching to eraser mode");
+                              setIsEraser(true);
+                            }
+                          }}
+                          className={isEraser ? "bg-purple-100" : ""}
+                        >
+                          <Eraser className="h-4 w-4" />
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-64 p-2">
+                        <div className="space-y-2">
+                          <div className="flex justify-between">
+                            <span className="text-sm">지우개 두께</span>
+                            <span className="text-sm">
+                              {drawingState.eraserWidth}px
+                            </span>
+                          </div>
+                          <Slider
+                            defaultValue={[drawingState.eraserWidth]}
+                            min={5}
+                            max={50}
+                            step={1}
+                            value={[drawingState.eraserWidth]}
+                            onValueChange={(value) => {
+                              console.log(
+                                "Changing eraser width to:",
+                                value[0]
+                              );
+                              setDrawingState((prev) => ({
+                                ...prev,
+                                eraserWidth: value[0],
+                              }));
+                            }}
+                          />
+                          <div className="mt-3 flex justify-end">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setIsEraser(false)}
+                              className="text-xs"
+                            >
+                              펜 모드로 전환
+                            </Button>
+                          </div>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleUndo}
+                      disabled={undoStack.length === 0}
+                    >
+                      <Undo className="h-4 w-4" />
+                    </Button>
+
+                    <Button variant="outline" size="sm" onClick={clearCanvas}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+
+                  {/* 빠른 굵기 조절 */}
+                  <div className="flex items-center gap-2 mt-2">
+                    <span className="text-xs text-gray-500">
+                      {isEraser ? "지우개" : "펜"} 굵기:
+                    </span>
+                    <div className="flex items-center gap-1">
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() =>
-                          setCurrentStep((prev) => Math.max(0, prev - 1))
-                        }
-                        disabled={currentStep === 0}
-                        className="text-purple-600 hover:text-purple-700 rounded-xl font-bold"
+                        className="h-6 px-2 py-0 text-xs"
+                        onClick={() => {
+                          if (isEraser) {
+                            const newWidth = Math.max(
+                              5,
+                              drawingState.eraserWidth - 5
+                            );
+                            setDrawingState((prev) => ({
+                              ...prev,
+                              eraserWidth: newWidth,
+                            }));
+                          } else {
+                            const newWidth = Math.max(
+                              1,
+                              drawingState.lineWidth - 1
+                            );
+                            setDrawingState((prev) => ({
+                              ...prev,
+                              lineWidth: newWidth,
+                            }));
+                          }
+                        }}
                       >
-                        <ChevronLeft className="h-4 w-4" />
+                        -
                       </Button>
-                      <span className="text-sm text-gray-600">
-                        {currentStep + 1} /{" "}
-                        {question.retryQuestionSolutionDtos.length}
+                      <span className="text-xs min-w-[30px] text-center">
+                        {isEraser
+                          ? drawingState.eraserWidth
+                          : drawingState.lineWidth}
+                        px
                       </span>
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() =>
-                          setCurrentStep((prev) =>
-                            Math.min(
-                              question.retryQuestionSolutionDtos.length - 1,
-                              prev + 1
-                            )
-                          )
-                        }
-                        disabled={
-                          currentStep ===
-                          question.retryQuestionSolutionDtos.length - 1
-                        }
-                        className="text-purple-600 hover:text-purple-700 rounded-xl font-bold"
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  )}
-              </div>
-
-              {showSolution &&
-                question.retryQuestionSolutionDtos.length > 0 && (
-                  <div className="mt-6 p-4 bg-purple-50 border border-purple-100 rounded-md">
-                    <h3 className="font-bold text-purple-700 mb-3">해설</h3>
-                    <div className="space-y-3">
-                      <div className="space-y-1">
-                        <div className="font-bold text-purple-600">
-                          Step {currentStep + 1}
-                        </div>
-                        <p className="text-gray-700">
-                          {
-                            question.retryQuestionSolutionDtos[currentStep]
-                              .solutionContent
-                          }
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-            </CardContent>
-          </Card>
-
-          <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 w-3/5">
-            <CardHeader className="bg-purple-50/60 border-b-0 rounded-t-2xl">
-              <CardTitle className="text-purple-700 font-extrabold">
-                풀이 과정
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6 space-y-4">
-              <div className="flex justify-between items-center">
-                <div className="flex gap-2">
-                  {/* 색상 및 펜 두께 선택기 */}
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-8 h-8 p-0 flex items-center justify-center"
-                        style={{
-                          backgroundColor: isEraser
-                            ? "white"
-                            : drawingState.color,
-                          borderColor: "rgb(216, 180, 254)",
-                        }}
-                        onClick={(e) => {
-                          e.preventDefault(); // 팝오버가 바로 닫히는 것 방지
+                        className="h-6 px-2 py-0 text-xs"
+                        onClick={() => {
                           if (isEraser) {
-                            // 지우개 모드에서 펜 모드로 전환
-                            console.log("Switching to pen mode");
-                            setIsEraser(false);
+                            const newWidth = Math.min(
+                              50,
+                              drawingState.eraserWidth + 5
+                            );
+                            setDrawingState((prev) => ({
+                              ...prev,
+                              eraserWidth: newWidth,
+                            }));
+                          } else {
+                            const newWidth = Math.min(
+                              20,
+                              drawingState.lineWidth + 1
+                            );
+                            setDrawingState((prev) => ({
+                              ...prev,
+                              lineWidth: newWidth,
+                            }));
                           }
                         }}
                       >
-                        <Pen
-                          className="h-4 w-4"
-                          style={{
-                            color: isEraser ? drawingState.color : "white",
-                          }}
-                        />
+                        +
                       </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-64 p-2">
-                      <div className="grid grid-cols-4 gap-2">
-                        {availableColors.map((color) => (
-                          <Button
-                            key={color}
-                            variant="outline"
-                            className="w-10 h-10 p-0 rounded-full"
-                            style={{
-                              backgroundColor: color,
-                              borderColor:
-                                color === drawingState.color
-                                  ? "black"
-                                  : "transparent",
-                              borderWidth:
-                                color === drawingState.color ? "2px" : "0",
-                            }}
-                            onClick={() => changeColor(color)}
-                          />
-                        ))}
-                      </div>
-                      <div className="mt-4 space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-sm">펜 두께</span>
-                          <span className="text-sm">
-                            {drawingState.lineWidth}px
-                          </span>
-                        </div>
-                        <Slider
-                          defaultValue={[drawingState.lineWidth]}
-                          min={1}
-                          max={20}
-                          step={1}
-                          value={[drawingState.lineWidth]}
-                          onValueChange={(value) => {
-                            console.log("Changing pen width to:", value[0]);
-                            setDrawingState((prev) => ({
-                              ...prev,
-                              lineWidth: value[0],
-                            }));
-                          }}
-                        />
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-
-                  {/* 지우개 두께 선택기 - 새로 추가 */}
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={(e) => {
-                          e.preventDefault(); // 팝오버가 바로 닫히는 것 방지
-                          if (!isEraser) {
-                            // 펜 모드에서 지우개 모드로 전환
-                            console.log("Switching to eraser mode");
-                            setIsEraser(true);
-                          }
-                        }}
-                        className={isEraser ? "bg-purple-100" : ""}
-                      >
-                        <Eraser className="h-4 w-4" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-64 p-2">
-                      <div className="space-y-2">
-                        <div className="flex justify-between">
-                          <span className="text-sm">지우개 두께</span>
-                          <span className="text-sm">
-                            {drawingState.eraserWidth}px
-                          </span>
-                        </div>
-                        <Slider
-                          defaultValue={[drawingState.eraserWidth]}
-                          min={5}
-                          max={50}
-                          step={1}
-                          value={[drawingState.eraserWidth]}
-                          onValueChange={(value) => {
-                            console.log("Changing eraser width to:", value[0]);
-                            setDrawingState((prev) => ({
-                              ...prev,
-                              eraserWidth: value[0],
-                            }));
-                          }}
-                        />
-                        <div className="mt-3 flex justify-end">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => setIsEraser(false)}
-                            className="text-xs"
-                          >
-                            펜 모드로 전환
-                          </Button>
-                        </div>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleUndo}
-                    disabled={undoStack.length === 0}
-                  >
-                    <Undo className="h-4 w-4" />
-                  </Button>
-
-                  <Button variant="outline" size="sm" onClick={clearCanvas}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
-
-                {/* 빠른 굵기 조절 */}
-                <div className="flex items-center gap-2 mt-2">
-                  <span className="text-xs text-gray-500">
-                    {isEraser ? "지우개" : "펜"} 굵기:
-                  </span>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-6 px-2 py-0 text-xs"
-                      onClick={() => {
-                        if (isEraser) {
-                          const newWidth = Math.max(
-                            5,
-                            drawingState.eraserWidth - 5
-                          );
-                          setDrawingState((prev) => ({
-                            ...prev,
-                            eraserWidth: newWidth,
-                          }));
-                        } else {
-                          const newWidth = Math.max(
-                            1,
-                            drawingState.lineWidth - 1
-                          );
-                          setDrawingState((prev) => ({
-                            ...prev,
-                            lineWidth: newWidth,
-                          }));
-                        }
-                      }}
-                    >
-                      -
-                    </Button>
-                    <span className="text-xs min-w-[30px] text-center">
-                      {isEraser
-                        ? drawingState.eraserWidth
-                        : drawingState.lineWidth}
-                      px
-                    </span>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-6 px-2 py-0 text-xs"
-                      onClick={() => {
-                        if (isEraser) {
-                          const newWidth = Math.min(
-                            50,
-                            drawingState.eraserWidth + 5
-                          );
-                          setDrawingState((prev) => ({
-                            ...prev,
-                            eraserWidth: newWidth,
-                          }));
-                        } else {
-                          const newWidth = Math.min(
-                            20,
-                            drawingState.lineWidth + 1
-                          );
-                          setDrawingState((prev) => ({
-                            ...prev,
-                            lineWidth: newWidth,
-                          }));
-                        }
-                      }}
-                    >
-                      +
-                    </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div
-                ref={canvasContainerRef}
-                className="border border-purple-100 rounded-lg overflow-auto"
-                style={{
-                  maxHeight: "300px", // 세로 최대 높이 제한
-                  maxWidth: "100%", // 가로 너비는 부모 요소 너비까지만 (스크롤 활성화 위해)
-                  position: "relative",
-                }}
-              >
-                <canvas
-                  ref={canvasRef}
-                  className="touch-none bg-white"
-                  style={{
-                    width: "1000px", // 가로 스크롤을 위해 넓은 너비 설정 (원하는 크기로 조정 가능)
-                    height: "600px", // 세로 스크롤을 위해 높은 높이 설정 (원하는 크기로 조정 가능)
-                    minWidth: "100%", // 최소 너비는 컨테이너 너비만큼
-                    minHeight: "300px", // 최소 높이는 컨테이너 높이만큼
-                  }}
-                  onMouseDown={startDrawing}
-                  onMouseMove={draw}
-                  onMouseUp={stopDrawing}
-                  onMouseLeave={stopDrawing}
-                  onTouchStart={startDrawing}
-                  onTouchMove={draw}
-                  onTouchEnd={stopDrawing}
-                />
-              </div>
-
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-purple-700">답:</span>
                 <div
-                  ref={answerCanvasContainerRef}
-                  className="border border-purple-100 rounded-lg overflow-hidden"
+                  ref={canvasContainerRef}
+                  className="border border-purple-100 rounded-lg overflow-auto"
                   style={{
-                    width: "200px",
-                    height: "100px",
+                    maxHeight: "300px", // 세로 최대 높이 제한
+                    maxWidth: "100%", // 가로 너비는 부모 요소 너비까지만 (스크롤 활성화 위해)
                     position: "relative",
                   }}
                 >
                   <canvas
-                    ref={answerCanvasRef}
+                    ref={canvasRef}
                     className="touch-none bg-white"
                     style={{
-                      width: "100%",
-                      height: "100%",
+                      width: "1000px", // 가로 스크롤을 위해 넓은 너비 설정 (원하는 크기로 조정 가능)
+                      height: "600px", // 세로 스크롤을 위해 높은 높이 설정 (원하는 크기로 조정 가능)
+                      minWidth: "100%", // 최소 너비는 컨테이너 너비만큼
+                      minHeight: "300px", // 최소 높이는 컨테이너 높이만큼
                     }}
                     onMouseDown={startDrawing}
                     onMouseMove={draw}
@@ -925,18 +898,64 @@ export default function RetryQuestionPage() {
                     onTouchEnd={stopDrawing}
                   />
                 </div>
-                <Button
-                  size="sm"
-                  className="bg-purple-500 hover:bg-purple-600 rounded-xl font-bold"
-                  onClick={handleSubmitAnswer}
-                >
-                  제출
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-purple-900">답:</span>
+                  <div
+                    ref={answerCanvasContainerRef}
+                    className="border border-purple-100 rounded-lg overflow-hidden"
+                    style={{
+                      width: "300px",
+                      height: "150px",
+                      position: "relative",
+                    }}
+                  >
+                    <canvas
+                      ref={answerCanvasRef}
+                      className="touch-none bg-white"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                      }}
+                      onMouseDown={startDrawing}
+                      onMouseMove={draw}
+                      onMouseUp={stopDrawing}
+                      onMouseLeave={stopDrawing}
+                      onTouchStart={startDrawing}
+                      onTouchMove={draw}
+                      onTouchEnd={stopDrawing}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="border-purple-200 text-purple-600 hover:bg-purple-50 rounded-xl font-bold"
+                      onClick={() => {
+                        const canvas = answerCanvasRef.current;
+                        if (!canvas) return;
+                        const ctx = canvas.getContext("2d");
+                        if (!ctx) return;
+                        ctx.clearRect(0, 0, canvas.width, canvas.height);
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      className="bg-purple-600 hover:bg-purple-700 rounded-xl font-bold"
+                      onClick={handleSubmitAnswer}
+                    >
+                      제출
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </div>
       </div>
-    </div>
+      <Toaster />
+    </>
   );
 }
