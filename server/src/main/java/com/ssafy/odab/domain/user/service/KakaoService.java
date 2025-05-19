@@ -132,6 +132,7 @@ public class KakaoService {
 
         // 2. JWT 토큰 생성
         String accessToken = jwtService.createAccessToken(user);
+        System.out.println("[JWT] accessToken: " + accessToken);
         // refresh 토큰 생성
         String refreshToken = jwtService.createRefreshToken(user);
 

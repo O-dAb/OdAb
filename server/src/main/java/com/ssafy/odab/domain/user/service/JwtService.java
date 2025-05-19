@@ -5,6 +5,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import jakarta.servlet.ServletOutputStream;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -85,9 +86,13 @@ public class JwtService {
      */
     public boolean validateAccessToken(String accessToken) {
         try {
+            System.out.println("여기 오나1");
+            System.out.println("accessToken오나?" + accessToken);
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken);
+            System.out.println("여기 오나2");
             return true;
         } catch (Exception e) {
+            System.out.println("토큰 검증 오류: " + e.getClass().getName() + " - " + e.getMessage());
             return false;
         }
     }
@@ -98,7 +103,9 @@ public class JwtService {
 
     // 현재 요청의 HttpServletRequest 가져오기
     private HttpServletRequest getCurrentRequest() {
+//        System.out.println("여기 오나11");
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+//        System.out.println("여기 오나22");
         if (attributes == null) {
             throw new RuntimeException("Request not found");
         }
@@ -108,7 +115,9 @@ public class JwtService {
     // 컨트롤러에서 매개변수 없이 userId 추출
     public Integer getUserId() {
         String accessToken = resolveAccessToken(getCurrentRequest());
+        System.out.println("accessToken:"+accessToken);
         if (accessToken != null && validateAccessToken(accessToken)) {
+            System.out.println("뭐가문제지");
             return getUserIdFromAccessToken(accessToken);
         }
         throw new RuntimeException("유효한 인증 Access Token이 없습니다.");
