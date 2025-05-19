@@ -25,10 +25,6 @@ export default function HomePage() {
   const { educationLevel, grade } = userProfile;
   const router = useRouter();
 
-  // 프로필이 설정되지 않은 경우 처리
-  if (!userProfile.isProfileSet) {
-    return null; // UserProfile 컴포넌트는 layout.tsx에서 처리
-  }
   // 최근 학습한 주제
   const recentTopics = getRecentlyStudiedTopics(
     educationLevel as EducationLevel,

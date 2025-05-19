@@ -5,7 +5,7 @@ import Link from "next/link";
 import type { EducationLevel, Grade } from "@/components/user-profile";
 import { GraduationCap, LogOut } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 interface MainHeaderProps {
   educationLevel: EducationLevel;
@@ -14,7 +14,20 @@ interface MainHeaderProps {
   nickname?: string;
 }
 
-export function MainHeader({ educationLevel, grade, userName, nickname }: MainHeaderProps) {
+export function MainHeader({
+  educationLevel,
+  grade,
+  userName,
+  nickname,
+}: MainHeaderProps) {
+  const [displayName, setDisplayName] = useState<string>("");
+
+  useEffect(() => {
+    // localStorage에서 직접 nickname 가져오기
+    const storedNickname = localStorage.getItem("nickname");
+    setDisplayName(storedNickname || userName || "사용자");
+  }, [userName]);
+
   // 로그아웃 처리
   const handleLogout = () => {
     if (!window.confirm("정말 로그아웃 하시겠습니까?")) {
@@ -39,6 +52,7 @@ export function MainHeader({ educationLevel, grade, userName, nickname }: MainHe
         allLocalStorage[key] = localStorage.getItem(key) ?? "";
       }
     }
+    console.log("LocalStorage values:", allLocalStorage); // 디버깅을 위해 추가
   }, []);
 
   // 학년/학교명 한글 변환
@@ -48,8 +62,7 @@ export function MainHeader({ educationLevel, grade, userName, nickname }: MainHe
       : educationLevel === "high"
       ? "고등"
       : "";
-
-  // nickname이 있으면 로그인된 상태로 간주하여 로그아웃 버튼 노출
+  // localStorage에서 nickname을 가져오는 대신 props로 전달받은 nickname 사용
   const isLoggedIn = Boolean(userName);
 
   return (
@@ -66,7 +79,7 @@ export function MainHeader({ educationLevel, grade, userName, nickname }: MainHe
       <div className="flex items-center space-x-2">
         <ThemeToggle />
         <span className="px-3 py-1 rounded-full bg-white/80 dark:bg-gray-800/80 shadow text-blue-700 dark:text-blue-300 font-semibold text-sm border border-blue-200 dark:border-blue-700">
-          {userName ?? "사용자"}
+          {displayName}
         </span>
         <span className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-700 dark:to-pink-700 text-purple-700 dark:text-purple-200 font-semibold text-sm border border-purple-200 dark:border-purple-700">
           {schoolLabel} {grade}학년

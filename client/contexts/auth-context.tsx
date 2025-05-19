@@ -21,7 +21,8 @@ type UserProfile = {
   grade: Grade;
   isProfileSet: boolean;
   profileUrl: string;
-  userId?: string | number;  // userId 추가
+  userId?: string | number; // userId 추가
+  nickname?: string; // nickname 추가
 };
 
 const defaultUserProfile: UserProfile = {
@@ -30,6 +31,7 @@ const defaultUserProfile: UserProfile = {
   grade: "1",
   isProfileSet: false,
   profileUrl: "",
+  nickname: "", // 기본값 추가
 };
 
 // 인증 컨텍스트 타입
@@ -37,8 +39,12 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   userProfile: UserProfile;
-  updateProfile: (level: EducationLevel, grade: Grade, profileUrl?: string) => void;
-  logout: () => void;  // 로그아웃 함수 추가
+  updateProfile: (
+    level: EducationLevel,
+    grade: Grade,
+    profileUrl?: string
+  ) => void;
+  logout: () => void; // 로그아웃 함수 추가
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -61,7 +67,8 @@ function AuthParamsHandler({
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userProfile, setUserProfile] = useState<UserProfile>(defaultUserProfile);
+  const [userProfile, setUserProfile] =
+    useState<UserProfile>(defaultUserProfile);
   const [isLoading, setIsLoading] = useState(true);
   const [authCode, setAuthCode] = useState<string | null>(null);
 
@@ -73,7 +80,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (pathname === "/" && authCode) {
       // 1. 서버에 auth_code로 토큰 요청
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/result?auth_code=${authCode}`)
+      fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/result?auth_code=${authCode}`
+      )
         .then((res) => res.json())
         .then((data) => {
           // 2. 토큰/유저정보 저장
@@ -88,7 +97,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             grade: String(data.grade) as Grade,
             isProfileSet: true,
             profileUrl: data.profileUrl || "",
-            userId: data.userId,  // userId 저장
+            userId: data.userId, // userId 저장
+            nickname: data.nickname,
           };
           localStorage.setItem("userProfile", JSON.stringify(userProfile));
           setUserProfile(userProfile);
@@ -127,7 +137,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const savedProfile = localStorage.getItem("userProfile");
     const currentUserId = localStorage.getItem("userId");
-    
+
     if (savedProfile) {
       const parsedProfile = JSON.parse(savedProfile);
       // 저장된 프로필의 userId와 현재 userId가 일치하는지 확인
@@ -143,7 +153,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(false);
   }, []);
 
-  const updateProfile = (level: EducationLevel, grade: Grade, profileUrl?: string) => {
+  const updateProfile = (
+    level: EducationLevel,
+    grade: Grade,
+    profileUrl?: string
+  ) => {
     const updatedProfile = {
       ...userProfile,
       educationLevel: level,
@@ -151,13 +165,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       isProfileSet: true,
       ...(profileUrl && { profileUrl }),
     };
-    
+
     setUserProfile(updatedProfile);
-    
+
     // 로컬 스토리지에도 업데이트된 정보 저장
     localStorage.setItem("userProfile", JSON.stringify(updatedProfile));
   };
-  
+
   // 로그아웃 함수
   const logout = () => {
     // 토큰 및 사용자 정보 제거
@@ -166,11 +180,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.removeItem("userId");
     localStorage.removeItem("nickname");
     localStorage.removeItem("grade");
-    
+
     // 상태 초기화
     setIsAuthenticated(false);
     setUserProfile(defaultUserProfile);
-    
+
     // 로그인 페이지로 이동
     router.push("/login");
   };
