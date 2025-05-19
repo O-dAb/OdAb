@@ -52,16 +52,24 @@ export default function SettingsPage() {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [showSettingsModal, setShowSettingsModal] = useState(false);
 
-  // 컴포넌트 마운트 시 데이터 로드
-  useEffect(() => {
-    // 프로필 이미지 로드
-    if (userProfile.profileUrl) {
-      setImageUrl(userProfile.profileUrl);
+// 컴포넌트 마운트 시 데이터 로드
+useEffect(() => {
+  // localStorage에서 직접 userProfile 정보 가져오기
+  const storedUserProfile = localStorage.getItem("userProfile");
+  if (storedUserProfile) {
+    try {
+      const parsedProfile = JSON.parse(storedUserProfile);
+      if (parsedProfile.profileUrl) {
+        setImageUrl(parsedProfile.profileUrl);
+      }
+    } catch (error) {
+      console.error("프로필 정보 파싱 오류:", error);
     }
-
-    // 다크 모드 상태 설정
-    setDarkMode(theme === 'dark');
-  }, [theme, userProfile.profileUrl]);
+  }
+  
+  // 다크 모드 상태 설정
+  setDarkMode(theme === 'dark');
+}, [theme, userProfile.profileUrl]);
 
   const handleSaveProfile = async () => {
     try {
