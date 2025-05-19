@@ -38,7 +38,7 @@ import { useTheme } from "next-themes";
 
 export default function SettingsPage() {
   // AuthContext에서 사용자 정보 가져오기
-  const { userProfile, updateProfile } = useAuth();
+  const { userProfile, updateProfile} = useAuth();
   const { educationLevel, grade } = userProfile;
 
   const [level, setLevel] = useState<EducationLevel>(educationLevel);
@@ -201,7 +201,7 @@ useEffect(() => {
 
       // 가능한 속성 이름들 확인
       if (data.imageUrl) imageUrlFromServer = data.imageUrl;
-      else if (data.profileUrl) imageUrlFromServer = data.profileUrl;
+      else if (data.profileImageUrl) imageUrlFromServer = data.profileImageUrl;
       else if (data.url) imageUrlFromServer = data.url;
       else if (data.image) imageUrlFromServer = data.image;
       else if (data.profileImageUrl) imageUrlFromServer = data.profileImageUrl;
@@ -227,8 +227,21 @@ useEffect(() => {
 
       if (imageUrlFromServer) {
         setImageUrl(imageUrlFromServer);
-        // userProfile 업데이트
+        // userProfile 업데이트 (userName을 기존 값으로 유지)
         updateProfile(level, selectedGrade, imageUrlFromServer);
+        // userProfile을 localStorage에 직접 갱신할 때 userName을 유지하도록 보장
+        const storedProfile = localStorage.getItem("userProfile");
+        if (storedProfile) {
+          try {
+            const parsedProfile = JSON.parse(storedProfile);
+            parsedProfile.profileUrl = imageUrlFromServer;
+            // userName이 없으면 기존 userProfile의 userName을 유지
+            if (!parsedProfile.userName) {
+              parsedProfile.userName = userProfile.userName;
+            }
+            localStorage.setItem("userProfile", JSON.stringify(parsedProfile));
+          } catch (e) {}
+        }
 
         toast({
           title: "프로필 이미지 업로드 완료",
