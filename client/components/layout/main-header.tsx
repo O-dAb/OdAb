@@ -76,7 +76,7 @@ export function MainHeader({
       case "profile":
         return "프로필";
       default:
-        return "수학 학습 도우미";
+        return "O! dAb";
     }
   };
 

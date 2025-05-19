@@ -48,20 +48,20 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto border-blue-200">
-      <CardHeader className="bg-blue-50 border-b border-blue-200">
+    <Card className="w-full max-w-md mx-auto border-blue-200 dark:border-blue-800 dark:bg-gray-800">
+      <CardHeader className="bg-blue-50 dark:bg-blue-900/50 border-b border-blue-200 dark:border-blue-800">
         <div className="flex items-center justify-center mb-4">
-          <BrainCircuit className="h-12 w-12 text-blue-500" />
+          <BrainCircuit className="h-12 w-12 text-blue-500 dark:text-blue-400" />
         </div>
-        <CardTitle className="text-center text-xl">로그인</CardTitle>
-        <CardDescription className="text-center">
-          수학 학습 도우미에 로그인하세요
+        <CardTitle className="text-center text-xl dark:text-white">로그인</CardTitle>
+        <CardDescription className="text-center dark:text-gray-300">
+          O! dAb 에 로그인하세요
         </CardDescription>
       </CardHeader>
       <CardContent className="pt-6">
         <Button
           type="button"
-          className="w-full bg-yellow-400 hover:bg-yellow-500 text-black"
+          className="w-full bg-yellow-400 hover:bg-yellow-500 text-black dark:bg-yellow-500 dark:hover:bg-yellow-600"
           onClick={loginWithKakao}
           disabled={isLoading}
         >
