@@ -1,56 +1,63 @@
 package com.ssafy.odab.domain.question.controller;
+
 import com.ssafy.odab.domain.question.dto.*;
 import com.ssafy.odab.domain.question.service.QuestionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import java.util.List;
+import org.springframework.web.bind.annotation.*;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/question/")
 public class QuestionController {
 
-  private final QuestionService questionService;
+    private final QuestionService questionService;
 
-  @PatchMapping("anwser")
-  public ResponseEntity<VerifyAnswerResponseDto> verifyAnswer(
-      @RequestBody VerifyAnswerRequestDto verifyAnswerRequestDto) {
+    @PatchMapping("{questionId}/answer")
+    public ResponseEntity<VerifyAnswerResponseDto> verifyAnswer(
+            @PathVariable("questionId") Integer questionId, @RequestBody VerifyAnswerRequestDto verifyAnswerRequestDto) {
+        Boolean isCorrect = questionService.verifyAnswer(verifyAnswerRequestDto, questionId);
+        String message = isCorrect ? "정답입니다." : "오답입니다.";
+        System.out.println(isCorrect);
+        VerifyAnswerResponseDto verifyAnswerResponseDto = VerifyAnswerResponseDto.builder()
+                .correct(isCorrect)
+                .message(message)
+                .build();
+        return ResponseEntity.ok(verifyAnswerResponseDto);
+    }
 
-    Boolean isCorrect = questionService.verifyAnswer(verifyAnswerRequestDto);
-    String message = isCorrect ? "정답입니다." : "오답입니다.";
-    VerifyAnswerResponseDto verifyAnswerResponseDto = VerifyAnswerResponseDto.builder()
-        .correct(isCorrect)
-        .message(message)
-        .build();
-    return ResponseEntity.ok(verifyAnswerResponseDto);
-  }
+    @GetMapping("/{questionId}/retry")
+    public ResponseEntity<RetryQuestionResponseDto> findRetryQuestion(@PathVariable("questionId") Integer questionId) {
+        return ResponseEntity.ok(questionService.findRetryQuestionByQuestionId(questionId));
+    }
 
-  @GetMapping("/{questionId}/retry")
-  public ResponseEntity<RetryQuestionResponseDto> findRetryQuestion(@PathVariable("questionId") Integer questionId) {
-    return ResponseEntity.ok(questionService.findRetryQuestionByQuestionId(questionId));
-  }
-  //개념선택 - 수학개념 목록 조회
-  @GetMapping("/concept")
-  public ResponseEntity<ConceptResponseDto> findConceptList() {
-    return ResponseEntity.ok(questionService.findConceptList());
-  }
-  @GetMapping("{subConceptId}/related")
-  public ResponseEntity<Page<SubConceptRelatedQuestionResponseDto>> findSubConceptRelatedQuestion(
-      @PathVariable("subConceptId") Integer subConceptId,
-      @PageableDefault(size = 20, sort = "registedAt", direction = Sort.Direction.DESC) Pageable pageable) {
-    return ResponseEntity.ok(
-        questionService.findSubConceptRelatedQuestionBySubConceptId(subConceptId, pageable));
-  }
+    //개념선택 - 수학개념 목록 조회
+    @GetMapping("/concept")
+    public ResponseEntity<ConceptResponseDto> findConceptList() {
+        return ResponseEntity.ok(questionService.findConceptList());
+    }
 
+    @GetMapping("/{subConceptId}/related")
+    public ResponseEntity<Page<SubConceptRelatedQuestionResponseDto>> findSubConceptRelatedQuestion(
+            @PathVariable("subConceptId") Integer subConceptId,
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "20") int size,
+            @RequestParam(value = "sort", defaultValue = "registedAt,desc") String sort) {
 
+        String[] sortParams = sort.split(",");
+        Sort.Direction direction = sortParams.length > 1 ?
+                Sort.Direction.fromString(sortParams[1]) : Sort.Direction.DESC;
+
+        Sort sortObj = Sort.by(direction, sortParams[0]);
+        Pageable pageable = PageRequest.of(page, size, sortObj);
+
+        System.out.println("여기?");
+        return ResponseEntity.ok(
+                questionService.findSubConceptRelatedQuestionBySubConceptId(subConceptId, pageable));
+    }
 
 }

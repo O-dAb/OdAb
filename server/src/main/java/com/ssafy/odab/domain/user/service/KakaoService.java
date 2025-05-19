@@ -132,6 +132,7 @@ public class KakaoService {
 
         // 2. JWT 토큰 생성
         String accessToken = jwtService.createAccessToken(user);
+        System.out.println("[JWT] accessToken: " + accessToken);
         // refresh 토큰 생성
         String refreshToken = jwtService.createRefreshToken(user);
 
@@ -143,7 +144,8 @@ public class KakaoService {
             "accessToken", accessToken,
             "refreshToken", refreshToken,
             "userId", user.getId(),
-            "nickname", user.getUserName()
+            "nickname", user.getUserName(),
+            "grade", user.getGrade()
         );
         try {
             String redisValue = objectMapper.writeValueAsString(redisData);

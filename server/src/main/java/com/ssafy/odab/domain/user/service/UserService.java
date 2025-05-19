@@ -9,4 +9,6 @@ public interface UserService {
     void updateGrade(Integer userId, Integer grade);
 
     User findById(Integer userId);
+
+    String getProfileImageUrl(Integer userId);
 }

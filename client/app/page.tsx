@@ -35,6 +35,7 @@ export default function HomePage() {
   const { educationLevel, grade } = userProfile;
   const router = useRouter();
 
+<<<<<<< HEAD
   // 상태: 오늘의 복습, 최근 학습
   const [todayReviews, setTodayReviews] = useState<any[]>([]);
   const [recentStudy, setRecentStudy] = useState<any | null>(null);
@@ -60,6 +61,8 @@ export default function HomePage() {
     return <div>Loading...</div>;
   }
 
+=======
+>>>>>>> f07170c85f95674f7ec1ca8587947e0a5d966e9c
   // 최근 학습한 주제
   const recentTopics = getRecentlyStudiedTopics(
     educationLevel as EducationLevel,

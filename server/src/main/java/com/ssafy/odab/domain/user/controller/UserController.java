@@ -14,14 +14,18 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseCookie;
 
 import org.springframework.data.redis.core.StringRedisTemplate;
+
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.io.IOException;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Map;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Value;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,6 +35,16 @@ public class UserController {
     private final UserService userService;
     private final JwtService jwtService;
     private final StringRedisTemplate redisTemplate;
+
+    @Value("${client-base-url}")
+    private String clientBaseUrl;
+
+    @GetMapping("api/v1/test/get-user-id")
+    private Integer getUserid(){
+        return jwtService.getUserId();
+    }
+
+
 
     /**
      * 토큰에서 사용자 ID를 추출합니다.
@@ -57,7 +71,7 @@ public class UserController {
         throw new RuntimeException("유효한 인증 토큰이 없습니다.");
     }
 
-    @GetMapping("/login/oauth2/code/kakao")
+    @GetMapping("/api/login/oauth2/code/kakao")
     public void kakaoOauth2Callback(@RequestParam("code") String code, HttpServletResponse response) throws IOException {
         String accessToken = kakaoService.getKakaoAccessToken(code);
         KakaoUserInfo userInfo = kakaoService.getKakaoUserInfo(accessToken);
@@ -67,15 +81,15 @@ public class UserController {
         Map<String, Object> responseData = kakaoService.loginOrSignup(userInfo);
         String refreshToken = (String) responseData.get("refreshToken");
         String uuid = (String) responseData.get("auth_code");
-        String redirectUrl = String.format("http://localhost:3000/?auth_code=%s", uuid);
+        String redirectUrl = String.format(clientBaseUrl + "/?auth_code=%s", uuid);
         // 쿠키로 내려주기
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
-            .httpOnly(true)
-            .secure(true)
-            .path("/")
-            .maxAge(60 * 60 * 24 * 14)
-            .sameSite("Strict")
-            .build();
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(60 * 60 * 24 * 14)
+                .sameSite("Strict")
+                .build();
         response.addHeader("Set-Cookie", cookie.toString());
         response.sendRedirect(redirectUrl);
     }
@@ -100,6 +114,7 @@ public class UserController {
         }
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> result = objectMapper.readValue(redisValue, Map.class);
+        System.out.println("[getAuthResult] Redis에서 꺼낸 정보: " + result);
         return ResponseEntity.ok(result);
     }
 
@@ -113,10 +128,23 @@ public class UserController {
     public ResponseEntity<ProfileImageResponse> saveProfileImg(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
         try {
             // 토큰에서 사용자 ID추출
-//      Integer userId = getUserIdFromToken(request);
-            Integer userId = 1;
-
+            Integer userId = getUserIdFromToken(request);
+//            Integer userId = 1;
             String imageUrl = userService.saveProfileImg(userId, file);
+            return ResponseEntity.ok(new ProfileImageResponse(imageUrl));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/api/v1/profile_img")
+    public ResponseEntity<ProfileImageResponse> getProfileImg(HttpServletRequest request) {
+        try {
+            // 토큰에서 사용자 ID 추출
+            Integer userId = getUserIdFromToken(request);
+            String imageUrl = userService.getProfileImageUrl(userId);
+
             return ResponseEntity.ok(new ProfileImageResponse(imageUrl));
         } catch (Exception e) {
             e.printStackTrace();
@@ -133,8 +161,8 @@ public class UserController {
     public ResponseEntity<?> updateGrade(@RequestBody Map<String, Integer> gradeMap, HttpServletRequest request) {
         try {
             // 토큰에서 사용자 ID추출
-//      Integer userId = getUserIdFromToken(request);
-            Integer userId = 1;
+            Integer userId = getUserIdFromToken(request);
+//            Integer userId = 1;
             Integer grade = gradeMap.get("grade");
 
             // 유효성 검사: 학년 정보가 제공되지 않은 경우
@@ -161,21 +189,10 @@ public class UserController {
         Integer userId = jwtService.getUserIdFromAccessToken(token);
         return ResponseEntity.ok(userId);
     }
-    // Postman 등 테스트용 토큰 발급 API (실서비스 미사용)
-    @GetMapping("/api/v1/test-token")
-    public ResponseEntity<String> getTestAccessToken(@RequestParam("userId") Integer userId) {
-        // UserService에서 User 조회
-        var user = userService.findById(userId);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 userId의 사용자가 존재하지 않습니다.");
-        }
-        // JwtService로 토큰 발급
-        String token = jwtService.createAccessToken(user);
-        return ResponseEntity.ok(token);
-    }
 
     /**
      * 클라이언트에서 리프레시 토큰을 받아 액세스/리프레시 토큰을 재발급합니다.
+     *
      * @param requestBody {"refreshToken": "..."}
      * @return 새 accessToken, refreshToken 또는 403
      */
@@ -217,18 +234,18 @@ public class UserController {
 
             // 6. 응답 반환
             Map<String, String> responseData = Map.of(
-                "accessToken", newAccessToken,
-                "refreshToken", newRefreshToken
+                    "accessToken", newAccessToken,
+                    "refreshToken", newRefreshToken
             );
 
             // 새 refreshToken 발급 후
             ResponseCookie cookie = ResponseCookie.from("refreshToken", newRefreshToken)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(60 * 60 * 24 * 14)
-                .sameSite("Strict")
-                .build();
+                    .httpOnly(true)
+                    .secure(true)
+                    .path("/")
+                    .maxAge(60 * 60 * 24 * 14)
+                    .sameSite("Strict")
+                    .build();
             response.addHeader("Set-Cookie", cookie.toString());
 
             return ResponseEntity.ok(responseData);

@@ -3,18 +3,19 @@ package com.ssafy.odab.domain.question_result.repository;
 import com.ssafy.odab.domain.question.dto.RetryQuestionResponseDto;
 import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question_result.entity.QuestionResult;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 public interface QuestionResultRepository extends JpaRepository<QuestionResult, Integer> {
 
-    Optional<QuestionResult> findByQuestionId(@Param("questionId") Integer questionId);
+    @Query("SELECT qr FROM QuestionResult qr WHERE qr.user.id = :userId AND qr.question.id = :questionId ORDER BY qr.times DESC")
+    List<QuestionResult> findByQuestionIdAndUserId(@Param("questionId") Integer questionId, @Param("userId") Integer userId, Pageable pageable);
 
     @Query("select distinct q from Question q join fetch q.questionResults qr where q.user.id = :userId")
     List<Question> findWrongQuestionsByUserId(@Param("userId") Integer userId);
