@@ -15,6 +15,7 @@ import com.ssafy.odab.domain.question.repository.QuestionRepository;
 import com.ssafy.odab.domain.question.repository.QuestionSolutionRepository;
 import com.ssafy.odab.domain.user.entity.User;
 import com.ssafy.odab.domain.user.repository.UserRepository;
+import com.ssafy.odab.domain.user.service.JwtService;
 import com.ssafy.odab.mcpLLM.config.ClaudeConfig;
 import com.ssafy.odab.mcpLLM.dto.*;
 import com.ssafy.odab.mcpLLM.image.ImageEncode;
@@ -56,6 +57,7 @@ public class ClaudeServiceImpl implements ClaudeService {
     private final QuestionConceptRepository questionConceptRepository;
     private final LastLearningDateRepository lastLearningDateRepository;
     private final RagQuestionRepository ragQuestionRepository;
+    private final JwtService jwtService;
     private String modelVersion = "claude-3-5-sonnet-20240620";    //사용할 모델명
     //    private String modelVersion = "claude-3-7-sonnet-20250219";	//사용할 모델명
     private int maxTokens = 4000;                    //최대 사용 가능한 토큰 수
@@ -209,7 +211,7 @@ public class ClaudeServiceImpl implements ClaudeService {
         return sendClaudeApi(request, sendMessages, 0, false)
                 .flatMap(response -> {
                     // 유저 찾기
-                    Integer userId = 1;
+                    Integer userId = jwtService.getUserId();
                     User user = userRepository.findByIdWithLastLearningTimes(userId).orElseThrow(
                             () -> new RuntimeException("User not found")
                     );
