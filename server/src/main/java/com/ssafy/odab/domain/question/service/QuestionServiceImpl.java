@@ -1,7 +1,9 @@
 package com.ssafy.odab.domain.question.service;
 
+import com.ssafy.odab.common.service.S3Service;
 import com.ssafy.odab.domain.concept.entity.SubConcept;
 import com.ssafy.odab.domain.concept.repository.SubConceptRepository;
+import com.ssafy.odab.domain.question.dto.ConceptResponseDto;
 import com.ssafy.odab.domain.question.dto.RetryQuestionResponseDto;
 import com.ssafy.odab.domain.question.dto.RetryQuestionResponseDto.RetryQuestionSolutionDto;
 import com.ssafy.odab.domain.question.dto.RetryQuestionResponseDto.RetryQuestionSubConceptDto;
@@ -11,27 +13,18 @@ import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question.repository.QuestionRepository;
 import com.ssafy.odab.domain.question_result.entity.QuestionResult;
 import com.ssafy.odab.domain.question_result.repository.QuestionResultRepository;
-   import com.ssafy.odab.domain.question.dto.ConceptResponseDto;
+import com.ssafy.odab.mcpLLM.service.ClaudeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.io.File;
+
 import java.time.LocalDateTime;
-import java.util.UUID;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-
 
 
 @Service
@@ -41,23 +34,40 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
     private final QuestionResultRepository questionResultRepository;
     private final SubConceptRepository subConceptRepository;
+    private final ClaudeService claudeService;
+    private final S3Service s3Service;
 
     @Override
     @Transactional
-    public Boolean verifyAnswer(VerifyAnswerRequestDto verifyAnswerRequestDto) {
+    public Boolean verifyAnswer(VerifyAnswerRequestDto verifyAnswerRequestDto, Integer questionId) {
 
+        String dirName = "product";
+        String s3Url = s3Service.uploadBase64File(verifyAnswerRequestDto.getAnswerImg(), dirName);
+        Integer userId = 1;
         // 문제에서 정답 여부 확인
-        Question question = questionRepository.findById(verifyAnswerRequestDto.getQuestionId()).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
+        Question question = questionRepository.findById(questionId).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
 
         // 정답결과 테이블에서 회원의 문제 조회
-        QuestionResult questionResult = questionResultRepository.findByQuestionId(question.getId()).orElseThrow(() -> new IllegalArgumentException("문제 결과를 찾을 수 없습니다."));
-        Boolean isCorrect = question.getAnswer().equals(verifyAnswerRequestDto.getAnswer());
+        Pageable pageable = PageRequest.of(0, 1);
+
+        List<QuestionResult> questionResults = questionResultRepository.findByQuestionIdAndUserId(question.getId(), userId, pageable);
+        QuestionResult questionResult = questionResults.get(0);
+
+        // claude에 정답 비교
+        Boolean isCorrect = claudeService.isCorrectAnswer(question.getAnswer(), question.getQuestionText(), verifyAnswerRequestDto.getAnswerImg()).block();;
+
         // 정답이 맞으면 풀이일자 수정, 정답여부 true
         // 정답이 틀리면 풀이일자 수정, 정답여부 false
-        questionResult.changeVerifyAnswer(isCorrect, LocalDateTime.now());
-
-        // 정답이 맞으면 true
-        // 정답이 틀리면 false를 리턴
+        //정답 테이블을 새롭게 생성
+        QuestionResult newQuestionResult = QuestionResult.builder()
+                .user(questionResult.getUser())
+                .times(questionResult.getTimes() + 1)
+                .solvedAt(LocalDateTime.now())
+                .solutionImage(s3Url)
+                .question(question)
+                .isCorrect(isCorrect)
+                .build();
+        questionResultRepository.save(newQuestionResult);
         return isCorrect;
     }
 
@@ -83,8 +93,6 @@ public class QuestionServiceImpl implements QuestionService {
         // 개념별로 다른 학생들이 올려준 문제 조회
         // 개념별 조회시 인덱스 처리 필요
         // 페이징 처리 필요
-        Pageable sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("registedAt").descending());
-
         Page<Question> questions = questionRepository.findSubConceptRelatedQuestionBySubConceptId(subConceptId, pageable);
 
         return questions.map(SubConceptRelatedQuestionResponseDto::from);

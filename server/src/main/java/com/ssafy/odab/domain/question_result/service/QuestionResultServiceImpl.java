@@ -1,6 +1,7 @@
 package com.ssafy.odab.domain.question_result.service;
 
 import com.ssafy.odab.domain.concept.entity.SubConcept;
+import com.ssafy.odab.domain.concept.repository.MajorConceptRepository;
 import com.ssafy.odab.domain.concept.repository.SubConceptRepository;
 import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question_result.dto.SubConceptWrongQuestionResponseDto;
@@ -15,11 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +25,7 @@ public class QuestionResultServiceImpl implements QuestionResultService {
 
     private final SubConceptRepository subConceptRepository;
     private final QuestionResultRepository questionResultRepository;
+    private final MajorConceptRepository majorConceptRepository;
 
     @Override
     @Transactional
@@ -40,8 +39,13 @@ public class QuestionResultServiceImpl implements QuestionResultService {
                 question -> question.getQuestionConcepts().stream().anyMatch(
                         questionConcept -> questionConcept.getSubConcept().getGradeLevel().getGrade()
                                 .equals(grade))).toList();
+        System.out.println();
+        System.out.println("문제 크기 : "+wrongQuestions.size());
         List<Integer> wrongQuestionIds = wrongQuestions.stream().map(Question::getId).toList();
         List<SubConcept> subConcepts = subConceptRepository.findByQuestionIds(wrongQuestionIds);
+        // grade인 majorConcept 가져오기
+        List<WrongQuestionResponseDto.WrongQuestionMajorConcept> majorConcepts
+                = majorConceptRepository.findAllByGrade(grade).stream().map(WrongQuestionResponseDto.WrongQuestionMajorConcept::from).toList();
         List<WrongQuestionDto> gradeWrongQuestionResponseDtos = wrongQuestions.stream()
                 .map(question -> WrongQuestionDto.builder()
                         .questionId(question.getId())
@@ -56,66 +60,63 @@ public class QuestionResultServiceImpl implements QuestionResultService {
                                 .sorted(Comparator.comparingInt(WrongQuestionSolution::getStep))
                                 .toList())
                         .build()).toList();
-        Set<WrongQuestionSubconcept> wrongQuestionSubconcepts = subConcepts.stream()
-                .map(subConcept -> new WrongQuestionSubconcept(
-                        subConcept.getId(),
-                        subConcept.getConceptType()
-                )).collect(Collectors.toSet());
         return WrongQuestionResponseDto.builder()
                 .gradeWrongQuestionDtos(gradeWrongQuestionResponseDtos)
-                .wrongQuestionSubconcepts(wrongQuestionSubconcepts).build();
+                .majorConcepts(majorConcepts).build();
     }
 
-    @Override
-    @Transactional
-    public WrongQuestionResponseDto findWrongAnswersBySchoolLevel(String schoolLevel,
-                                                                  Integer userId) {
-        // 회원이 틀린 전체 문제중 중학교, 고등학교 구분
-        // middle = 1, 2, 3
-        // high = 4, 5, 6
-        List<Integer> grades = new ArrayList<>();
-        if (schoolLevel.equals("middle")) {
-            for (int i = 0; i < 3; i++) {
-                grades.add(i + 1);
-            }
-        } else if (schoolLevel.equals("high")) {
-            for (int i = 0; i < 3; i++) {
-                grades.add(i + 4);
-            }
-        }
-
-        List<Question> wrongQuestions = questionResultRepository.findWrongQuestionsByUserIdAndSchoolLevel(
-                userId, grades);
-        List<WrongQuestionDto> gradeWrongQuestionResponseDtos = wrongQuestions.stream()
-                .map(question -> WrongQuestionDto.builder()
-                        .questionId(question.getId())
-                        .questionImg(question.getQuestionImg())
-                        .questionText(question.getQuestionText())
-                        .registDate(question.getRegistedAt())
-                        .wrongQuestionSubconceptList(question.getQuestionConcepts().stream()
-                                .map(questionConcept -> WrongQuestionSubconcept.from(questionConcept.getSubConcept())).toList())
-                        .answer(question.getAnswer())
-                        .wrongQuestionSolutions(
-                                question.getQuestionSolutions().stream()
-                                        .map(WrongQuestionSolution::from)
-                                        .sorted(Comparator.comparingInt(WrongQuestionSolution::getStep))
-                                        .toList())
-                        .build()).toList();
-
-        // subConcepts 필요
-        List<Integer> wrongQuestionIds = wrongQuestions.stream().map(Question::getId).toList();
-        List<SubConcept> subConcepts = subConceptRepository.findByQuestionIds(wrongQuestionIds);
-
-        Set<WrongQuestionSubconcept> wrongQuestionSubconcepts = subConcepts.stream()
-                .map(subConcept -> new WrongQuestionSubconcept(
-                        subConcept.getId(),
-                        subConcept.getConceptType()
-                )).collect(Collectors.toSet());
-
-        return WrongQuestionResponseDto.builder()
-                .gradeWrongQuestionDtos(gradeWrongQuestionResponseDtos)
-                .wrongQuestionSubconcepts(wrongQuestionSubconcepts).build();
-    }
+//    @Override
+//    @Transactional
+//    public WrongQuestionResponseDto findWrongAnswersBySchoolLevel(String schoolLevel,
+//                                                                  Integer userId) {
+//        // 회원이 틀린 전체 문제중 중학교, 고등학교 구분
+//        // middle = 1, 2, 3
+//        // high = 4, 5, 6
+//        List<Integer> grades = new ArrayList<>();
+//        if (schoolLevel.equals("middle")) {
+//            for (int i = 0; i < 3; i++) {
+//                grades.add(i + 1);
+//            }
+//        } else if (schoolLevel.equals("high")) {
+//            for (int i = 0; i < 3; i++) {
+//                grades.add(i + 4);
+//            }
+//        }
+//
+//        List<Question> wrongQuestions = questionResultRepository.findWrongQuestionsByUserIdAndSchoolLevel(
+//                userId, grades);
+//        List<WrongQuestionDto> gradeWrongQuestionResponseDtos = wrongQuestions.stream()
+//                .map(question -> WrongQuestionDto.builder()
+//                        .questionId(question.getId())
+//                        .questionImg(question.getQuestionImg())
+//                        .questionText(question.getQuestionText())
+//                        .registDate(question.getRegistedAt())
+//                        .wrongQuestionSubconceptList(question.getQuestionConcepts().stream()
+//                                .map(questionConcept -> WrongQuestionSubconcept.from(questionConcept.getSubConcept())).toList())
+//                        .answer(question.getAnswer())
+//                        .wrongQuestionSolutions(
+//                                question.getQuestionSolutions().stream()
+//                                        .map(WrongQuestionSolution::from)
+//                                        .sorted(Comparator.comparingInt(WrongQuestionSolution::getStep))
+//                                        .toList())
+//                        .build()).toList();
+//
+//        // subConcepts 필요
+//        List<WrongQuestionResponseDto.WrongQuestionMajorConcept> majorConcepts
+//                = majorConceptRepository.findAllByGrade(grade).stream().map(WrongQuestionResponseDto.WrongQuestionMajorConcept::from).toList();
+//        List<Integer> wrongQuestionIds = wrongQuestions.stream().map(Question::getId).toList();
+//        List<SubConcept> subConcepts = subConceptRepository.findByQuestionIds(wrongQuestionIds);
+//
+//        Set<WrongQuestionSubconcept> wrongQuestionSubconcepts = subConcepts.stream()
+//                .map(subConcept -> new WrongQuestionSubconcept(
+//                        subConcept.getId(),
+//                        subConcept.getConceptType()
+//                )).collect(Collectors.toSet());
+//
+//        return WrongQuestionResponseDto.builder()
+//                .gradeWrongQuestionDtos(gradeWrongQuestionResponseDtos)
+//                .wrongQuestionSubconcepts(wrongQuestionSubconcepts).build();
+//    }
 
     @Override
     @Transactional
@@ -137,54 +138,54 @@ public class QuestionResultServiceImpl implements QuestionResultService {
                         SubConceptWrongQuestionDto::from).toList()).build();
     }
 
-    @Override
-    @Transactional
-    public WrongQuestionResponseDto findRecentWrongAnswersBySchoolLevel(String schoolLevel,
-                                                                        Integer userId,
-                                                                        LocalDateTime startTime) {
-        List<Integer> grades = new ArrayList<>();
-        if (schoolLevel.equals("middle")) {
-            for (int i = 0; i < 3; i++) {
-                grades.add(i + 1);
-            }
-        } else if (schoolLevel.equals("high")) {
-            for (int i = 0; i < 3; i++) {
-                grades.add(i + 4);
-            }
-        }
-
-        List<Question> wrongQuestions = questionResultRepository.findRecentWrongQuestionsByUserIdAndSchoolLevel(
-                userId, grades, startTime, LocalDateTime.now());
-        List<WrongQuestionDto> gradeWrongQuestionResponseDtos = wrongQuestions.stream()
-                .map(question -> WrongQuestionDto.builder()
-                        .questionId(question.getId())
-                        .questionImg(question.getQuestionImg())
-                        .questionText(question.getQuestionText())
-                        .registDate(question.getRegistedAt())
-                        .wrongQuestionSubconceptList(question.getQuestionConcepts().stream()
-                                .map(questionConcept -> WrongQuestionSubconcept.from(questionConcept.getSubConcept())).toList())
-                        .answer(question.getAnswer())
-                        .wrongQuestionSolutions(
-                                question.getQuestionSolutions().stream()
-                                        .map(WrongQuestionSolution::from)
-                                        .sorted(Comparator.comparingInt(WrongQuestionSolution::getStep))
-                                        .toList())
-                        .build()).toList();
-
-        // subConcepts 필요
-        List<Integer> wrongQuestionIds = wrongQuestions.stream().map(Question::getId).toList();
-        List<SubConcept> subConcepts = subConceptRepository.findByQuestionIds(wrongQuestionIds);
-
-        Set<WrongQuestionSubconcept> wrongQuestionSubconcepts = subConcepts.stream()
-                .map(subConcept -> new WrongQuestionSubconcept(
-                        subConcept.getId(),
-                        subConcept.getConceptType()
-                )).collect(Collectors.toSet());
-
-        return WrongQuestionResponseDto.builder()
-                .gradeWrongQuestionDtos(gradeWrongQuestionResponseDtos)
-                .wrongQuestionSubconcepts(wrongQuestionSubconcepts).build();
-    }
+//    @Override
+//    @Transactional
+//    public WrongQuestionResponseDto findRecentWrongAnswersBySchoolLevel(String schoolLevel,
+//                                                                        Integer userId,
+//                                                                        LocalDateTime startTime) {
+//        List<Integer> grades = new ArrayList<>();
+//        if (schoolLevel.equals("middle")) {
+//            for (int i = 0; i < 3; i++) {
+//                grades.add(i + 1);
+//            }
+//        } else if (schoolLevel.equals("high")) {
+//            for (int i = 0; i < 3; i++) {
+//                grades.add(i + 4);
+//            }
+//        }
+//
+//        List<Question> wrongQuestions = questionResultRepository.findRecentWrongQuestionsByUserIdAndSchoolLevel(
+//                userId, grades, startTime, LocalDateTime.now());
+//        List<WrongQuestionDto> gradeWrongQuestionResponseDtos = wrongQuestions.stream()
+//                .map(question -> WrongQuestionDto.builder()
+//                        .questionId(question.getId())
+//                        .questionImg(question.getQuestionImg())
+//                        .questionText(question.getQuestionText())
+//                        .registDate(question.getRegistedAt())
+//                        .wrongQuestionSubconceptList(question.getQuestionConcepts().stream()
+//                                .map(questionConcept -> WrongQuestionSubconcept.from(questionConcept.getSubConcept())).toList())
+//                        .answer(question.getAnswer())
+//                        .wrongQuestionSolutions(
+//                                question.getQuestionSolutions().stream()
+//                                        .map(WrongQuestionSolution::from)
+//                                        .sorted(Comparator.comparingInt(WrongQuestionSolution::getStep))
+//                                        .toList())
+//                        .build()).toList();
+//
+//        // subConcepts 필요
+//        List<Integer> wrongQuestionIds = wrongQuestions.stream().map(Question::getId).toList();
+//        List<SubConcept> subConcepts = subConceptRepository.findByQuestionIds(wrongQuestionIds);
+//
+//        Set<WrongQuestionSubconcept> wrongQuestionSubconcepts = subConcepts.stream()
+//                .map(subConcept -> new WrongQuestionSubconcept(
+//                        subConcept.getId(),
+//                        subConcept.getConceptType()
+//                )).collect(Collectors.toSet());
+//
+//        return WrongQuestionResponseDto.builder()
+//                .gradeWrongQuestionDtos(gradeWrongQuestionResponseDtos)
+//                .wrongQuestionSubconcepts(wrongQuestionSubconcepts).build();
+//    }
 
     @Override
     @Transactional
@@ -211,13 +212,10 @@ public class QuestionResultServiceImpl implements QuestionResultService {
                                 .sorted(Comparator.comparingInt(WrongQuestionSolution::getStep))
                                 .toList())
                         .build()).toList();
-        Set<WrongQuestionSubconcept> wrongQuestionSubconcepts = subConcepts.stream()
-                .map(subConcept -> new WrongQuestionSubconcept(
-                        subConcept.getId(),
-                        subConcept.getConceptType()
-                )).collect(Collectors.toSet());
+        List<WrongQuestionResponseDto.WrongQuestionMajorConcept> majorConcepts
+                = majorConceptRepository.findAllByGrade(grade).stream().map(WrongQuestionResponseDto.WrongQuestionMajorConcept::from).toList();
         return WrongQuestionResponseDto.builder()
                 .gradeWrongQuestionDtos(gradeWrongQuestionResponseDtos)
-                .wrongQuestionSubconcepts(wrongQuestionSubconcepts).build();
+                .majorConcepts(majorConcepts).build();
     }
 }

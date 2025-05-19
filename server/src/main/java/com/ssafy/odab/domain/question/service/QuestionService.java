@@ -9,7 +9,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface QuestionService {
 
-  Boolean verifyAnswer(VerifyAnswerRequestDto verifyAnswerRequestDto);
+  Boolean verifyAnswer(VerifyAnswerRequestDto verifyAnswerRequestDto, Integer questionId);
   RetryQuestionResponseDto findRetryQuestionByQuestionId(Integer questionId);
   ConceptResponseDto findConceptList(); //개념선택 - 수학개념선택
 
