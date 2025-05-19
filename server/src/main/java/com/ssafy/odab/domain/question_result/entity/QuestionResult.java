@@ -4,6 +4,7 @@ import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "question_result")
 @Getter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class QuestionResult {
