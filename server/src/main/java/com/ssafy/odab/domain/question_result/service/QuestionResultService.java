@@ -9,11 +9,11 @@ public interface QuestionResultService {
 
     WrongQuestionResponseDto findWrongAnswersByGrade(Byte grade, Integer userId);
 
-    WrongQuestionResponseDto findWrongAnswersBySchoolLevel(String schoolLevel, Integer userId);
+//    WrongQuestionResponseDto findWrongAnswersBySchoolLevel(String schoolLevel, Integer userId);
 
     SubConceptWrongQuestionResponseDto findWrongAnswersBySubConcept(Integer subConceptId, Integer userId);
 
-    WrongQuestionResponseDto findRecentWrongAnswersBySchoolLevel(String schoolLevel, Integer userId, LocalDateTime startTime);
+//    WrongQuestionResponseDto findRecentWrongAnswersBySchoolLevel(String schoolLevel, Integer userId, LocalDateTime startTime);
 
     WrongQuestionResponseDto findRecentWrongAnswersByGrade(Byte grade, Integer userId, LocalDateTime startTime);
 }

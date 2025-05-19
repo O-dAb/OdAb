@@ -76,6 +76,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const { toast } = useToast();
 
+  // 프로필 이미지 URL 가져오기 함수
+  const fetchProfileImage = async () => {
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+      const token = localStorage.getItem("accessToken");
+      
+      if (!token) return;
+      
+      const response = await fetch(`${apiUrl}/api/v1/profile_img`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.profileUrl) {
+          // userProfile 상태 업데이트
+          const updatedProfile = {
+            ...userProfile,
+            profileUrl: data.profileUrl
+          };
+          setUserProfile(updatedProfile);
+          localStorage.setItem("userProfile", JSON.stringify(updatedProfile));
+        }
+      }
+    } catch (error) {
+      console.error("프로필 이미지 가져오기 실패:", error);
+    }
+  };
+
   // authCode 처리
   useEffect(() => {
     if (pathname === "/" && authCode) {
@@ -104,6 +135,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setUserProfile(userProfile);
 
           setIsAuthenticated(true);
+          
+          // 로그인 성공 후 프로필 이미지 가져오기
+          fetchProfileImage();
+          
           setIsLoading(false);
           router.replace("/");
         })
@@ -121,6 +156,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = localStorage.getItem("accessToken");
     if (token) {
       setIsAuthenticated(true);
+      
+      // 토큰 확인 시 프로필 이미지 가져오기
+      fetchProfileImage();
+      
       setIsLoading(false);
     } else {
       if (pathname !== "/login") {
@@ -143,6 +182,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // 저장된 프로필의 userId와 현재 userId가 일치하는지 확인
       if (!parsedProfile.userId || parsedProfile.userId === currentUserId) {
         setUserProfile({ ...defaultUserProfile, ...parsedProfile });
+        
+        // 로그인 상태이고 프로필 URL이 없으면 가져오기 시도
+        if (localStorage.getItem("accessToken") && !parsedProfile.profileUrl) {
+          fetchProfileImage();
+        }
       } else {
         // userId가 일치하지 않으면 기본값 사용
         setUserProfile(defaultUserProfile);

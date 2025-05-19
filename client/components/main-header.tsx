@@ -37,19 +37,30 @@ export function MainHeader({
     localStorage.removeItem("userId");
     localStorage.removeItem("nickname");
     localStorage.removeItem("grade");
+    localStorage.removeItem("userProfile");
+    setUserName("");
     // 카카오 로그아웃
     const KAKAO_CLIENT_ID = "8a48914bf786805cc4d0e1087b0e03a9";
     const LOGOUT_REDIRECT_URI = `${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}/login`;
     window.location.href = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_CLIENT_ID}&logout_redirect_uri=${LOGOUT_REDIRECT_URI}`;
   };
 
-  // 모든 localStorage 값 콘솔 출력
+  // localStorage 값 확인 및 상태 업데이트
   useEffect(() => {
-    const allLocalStorage: Record<string, string> = {};
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key) {
-        allLocalStorage[key] = localStorage.getItem(key) ?? "";
+    const userProfileStr = localStorage.getItem("userProfile");
+    if (userProfileStr) {
+      try {
+        const userProfile = JSON.parse(userProfileStr);
+        if (userProfile.userName) {
+          setUserName(userProfile.userName);
+        }
+        if (userProfile.profileUrl) {
+          setProfileUrl(userProfile.profileUrl);
+        }
+      } catch (e) {
+        // 파싱 에러 처리 (필요시)
+        setUserName("");
+        setProfileUrl(undefined);
       }
     }
     console.log("LocalStorage values:", allLocalStorage); // 디버깅을 위해 추가
