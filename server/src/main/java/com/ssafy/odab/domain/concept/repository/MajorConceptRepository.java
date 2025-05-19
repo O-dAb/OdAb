@@ -3,6 +3,7 @@ package com.ssafy.odab.domain.concept.repository;
 import com.ssafy.odab.domain.concept.entity.MajorConcept;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -27,7 +28,6 @@ public interface MajorConceptRepository extends JpaRepository<MajorConcept, Inte
     @Query("SELECT DISTINCT m FROM MajorConcept m JOIN FETCH m.gradeLevel LEFT JOIN FETCH m.subConcepts")
     List<MajorConcept> findAllWithGradeLevelAndSubConcepts();
 
-    
-
-
+    @Query("select m from MajorConcept m where m.gradeLevel.grade = :grade order by m.conceptOrder")
+    List<MajorConcept> findAllByGrade(@Param("grade") Byte grade);
 }

@@ -7,7 +7,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.Base64;
 import java.util.UUID;
 
 @Service
@@ -44,5 +46,20 @@ public class S3ServiceImpl implements S3Service {
 
     private String createFileName(String originalFileName) {
         return UUID.randomUUID().toString() + "_" + originalFileName;
+    }
+
+    @Override
+    public String uploadBase64File(String base64Img, String dirName) {
+        byte[] imageBytes = Base64.getDecoder().decode(base64Img);
+        String contentType = ".png";
+
+        String fileName = UUID.randomUUID() + contentType;
+        String fileUrl = dirName + "/" + fileName;
+
+        ObjectMetadata metadata = new ObjectMetadata();
+        metadata.setContentType(contentType);
+        metadata.setContentLength(imageBytes.length);
+        amazonS3.putObject(bucket, fileUrl, new ByteArrayInputStream(imageBytes), metadata);
+        return amazonS3.getUrl(bucket, fileUrl).toString();
     }
 } 

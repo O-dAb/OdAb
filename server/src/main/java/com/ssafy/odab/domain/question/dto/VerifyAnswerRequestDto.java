@@ -1,13 +1,15 @@
 package com.ssafy.odab.domain.question.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 @Getter
-@RequiredArgsConstructor
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class VerifyAnswerRequestDto {
-
-    private final Integer questionId;
-    private final String answer;
+    private String answerImg;
 
 }
