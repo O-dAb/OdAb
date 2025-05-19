@@ -9,7 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Camera, FileText, Upload, ChevronRight, ChevronLeft, ArrowLeft } from "lucide-react";
+import {
+  Camera,
+  FileText,
+  Upload,
+  ChevronRight,
+  ChevronLeft,
+  ArrowLeft,
+} from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
@@ -34,9 +41,11 @@ export default function ProblemUploaderPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
-  
+
   // 문제 풀이 관련 상태
-  const [problemData, setProblemData] = useState<ProblemApiResponse | null>(null);
+  const [problemData, setProblemData] = useState<ProblemApiResponse | null>(
+    null
+  );
   const [userAnswer, setUserAnswer] = useState("");
   const [userSolution, setUserSolution] = useState("");
   const [showSolution, setShowSolution] = useState(false);
@@ -84,43 +93,48 @@ export default function ProblemUploaderPage() {
   const handleImageSubmit = async () => {
     if (selectedFile) {
       setIsUploading(true);
-      
+
       try {
         // FormData 객체 생성
         const formData = new FormData();
         formData.append("imageData", selectedFile, "math_problem.png");
-        
+
         // API 요청 보내기 (authApi는 response.data를 직접 반환)
-        const response = await authApi.post<ProblemApiResponse>(
+        const response = (await authApi.post<ProblemApiResponse>(
           "/api/claude",
           formData,
           {
-            timeout: 40000,
+            timeout: 900000,
             headers: {
               "Content-Type": "multipart/form-data",
             },
           }
-        );
-        
+        )) as unknown as ProblemApiResponse;
+
         // 응답 데이터 처리 (authApi는 이미 data를 반환)
-        const { questionText, answer, imageUrl, questionSolution, subConcepts } = response;
-        
+        const {
+          questionText,
+          answer,
+          imageUrl,
+          questionSolution,
+          subConcepts,
+        } = response;
+
         // 문제 데이터 설정
         setProblemData(response);
-        
+
         // 성공 메시지 표시
         toast({
           title: "문제 분석 완료",
           description: "문제와 해설이 준비되었습니다.",
           variant: "default",
         });
-        
+
         // 문제 풀이 화면 표시
         setShowProblemSolver(true);
-        
       } catch (error) {
         console.error("API 요청 오류:", error);
-        
+
         toast({
           title: "문제 분석 실패",
           description: "서버 연결에 문제가 발생했습니다. 다시 시도해주세요.",
@@ -142,11 +156,12 @@ export default function ProblemUploaderPage() {
     }
 
     setSubmittedAnswer(userAnswer);
-    
+
     // 정답 비교 (공백 제거 후 비교)
-    const isAnswerCorrect = userAnswer.trim().replace(/\s+/g, "") === 
+    const isAnswerCorrect =
+      userAnswer.trim().replace(/\s+/g, "") ===
       problemData?.answer.trim().replace(/\s+/g, "");
-    
+
     setIsCorrect(isAnswerCorrect);
 
     toast({
@@ -208,7 +223,9 @@ export default function ProblemUploaderPage() {
                     className="flex flex-col items-center justify-center border-2 border-dashed border-purple-300 rounded-xl p-6 h-full cursor-pointer hover:bg-purple-50 transition-colors shadow"
                   >
                     <FileText className="h-10 w-10 text-purple-400 mb-2" />
-                    <span className="text-base font-semibold">이미지 업로드</span>
+                    <span className="text-base font-semibold">
+                      이미지 업로드
+                    </span>
                     <span className="text-xs text-gray-500 mt-1">
                       클릭하여 파일 선택
                     </span>
@@ -302,7 +319,9 @@ export default function ProblemUploaderPage() {
                 {/* 정답 표시 */}
                 <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
                   <h3 className="font-bold text-blue-700 mb-2">정답</h3>
-                  <p className="text-gray-700 font-medium">{problemData?.answer}</p>
+                  <p className="text-gray-700 font-medium">
+                    {problemData?.answer}
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -330,13 +349,16 @@ export default function ProblemUploaderPage() {
                     <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
                       <div className="flex justify-between items-center mb-4">
                         <h3 className="font-bold text-blue-700">
-                          {currentStep + 1}단계 / {problemData?.questionSolution.length}단계
+                          {currentStep + 1}단계 /{" "}
+                          {problemData?.questionSolution.length}단계
                         </h3>
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setCurrentStep((prev) => Math.max(0, prev - 1))}
+                            onClick={() =>
+                              setCurrentStep((prev) => Math.max(0, prev - 1))
+                            }
                             disabled={currentStep === 0}
                             className="text-blue-600 hover:text-blue-700 rounded-xl font-bold"
                           >
@@ -345,10 +367,19 @@ export default function ProblemUploaderPage() {
                           <Button
                             variant="outline"
                             size="sm"
-                            onClick={() => setCurrentStep((prev) => 
-                              Math.min((problemData?.questionSolution.length || 1) - 1, prev + 1)
-                            )}
-                            disabled={currentStep === (problemData?.questionSolution.length || 1) - 1}
+                            onClick={() =>
+                              setCurrentStep((prev) =>
+                                Math.min(
+                                  (problemData?.questionSolution.length || 1) -
+                                    1,
+                                  prev + 1
+                                )
+                              )
+                            }
+                            disabled={
+                              currentStep ===
+                              (problemData?.questionSolution.length || 1) - 1
+                            }
                             className="text-blue-600 hover:text-blue-700 rounded-xl font-bold"
                           >
                             <ChevronRight className="h-4 w-4" />
@@ -359,13 +390,13 @@ export default function ProblemUploaderPage() {
                       {/* 전체/단계별 해설 탭 */}
                       <Tabs defaultValue="step-by-step" className="mt-4">
                         <TabsList className="bg-blue-100 mb-4">
-                          <TabsTrigger 
+                          <TabsTrigger
                             value="step-by-step"
                             className="data-[state=active]:bg-blue-500 data-[state=active]:text-white"
                           >
                             단계별 보기
                           </TabsTrigger>
-                          <TabsTrigger 
+                          <TabsTrigger
                             value="all-steps"
                             className="data-[state=active]:bg-blue-500 data-[state=active]:text-white"
                           >
@@ -374,17 +405,26 @@ export default function ProblemUploaderPage() {
                         </TabsList>
                         <TabsContent value="step-by-step">
                           <div className="bg-white/70 rounded-lg p-4">
-                            <p className="text-gray-700">{problemData?.questionSolution[currentStep]}</p>
+                            <p className="text-gray-700">
+                              {problemData?.questionSolution[currentStep]}
+                            </p>
                           </div>
                         </TabsContent>
                         <TabsContent value="all-steps">
                           <div className="bg-white/70 rounded-lg p-4 space-y-4">
-                            {problemData?.questionSolution.map((step, index) => (
-                              <div key={index} className="border-b border-blue-200 pb-3 last:border-b-0 last:pb-0">
-                                <h4 className="font-medium text-blue-700 mb-1">단계 {index + 1}</h4>
-                                <p className="text-gray-700">{step}</p>
-                              </div>
-                            ))}
+                            {problemData?.questionSolution.map(
+                              (step, index) => (
+                                <div
+                                  key={index}
+                                  className="border-b border-blue-200 pb-3 last:border-b-0 last:pb-0"
+                                >
+                                  <h4 className="font-medium text-blue-700 mb-1">
+                                    단계 {index + 1}
+                                  </h4>
+                                  <p className="text-gray-700">{step}</p>
+                                </div>
+                              )
+                            )}
                           </div>
                         </TabsContent>
                       </Tabs>

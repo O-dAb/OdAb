@@ -89,7 +89,7 @@ export function MainHeader({
     localStorage.removeItem("accessToken");
     localStorage.removeItem("userId");
     localStorage.removeItem("userProfile");
-    
+
     toast({
       title: "로그아웃 되었습니다",
       description: "다음에 또 만나요!",
@@ -195,7 +195,13 @@ export function MainHeader({
                 className="flex items-center gap-1 border-white text-white hover:bg-opacity-20 hover:bg-white"
               >
                 <Avatar className="h-6 w-6">
-                  <AvatarImage src={profileImageUrl || userProfile.profileUrl || "/placeholder.svg"} />
+                  <AvatarImage
+                    src={
+                      profileImageUrl ||
+                      userProfile.profileUrl ||
+                      "/placeholder.svg"
+                    }
+                  />
                   <AvatarFallback className="bg-white text-blue-500 text-xs">
                     {userName?.charAt(0).toUpperCase()}
                   </AvatarFallback>

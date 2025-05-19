@@ -14,9 +14,19 @@ interface MainHeaderProps {
   nickname?: string;
 }
 
-export function MainHeader({ educationLevel, grade, userName: initialUserName, nickname }: MainHeaderProps) {
-  const [userName, setUserName] = useState(initialUserName);
-  const [profileUrl, setProfileUrl] = useState<string | undefined>(undefined);
+export function MainHeader({
+  educationLevel,
+  grade,
+  userName,
+  nickname,
+}: MainHeaderProps) {
+  const [displayName, setDisplayName] = useState<string>("");
+
+  useEffect(() => {
+    // localStorage에서 직접 nickname 가져오기
+    const storedNickname = localStorage.getItem("nickname");
+    setDisplayName(storedNickname || userName || "사용자");
+  }, [userName]);
 
   // 로그아웃 처리
   const handleLogout = () => {
@@ -28,7 +38,7 @@ export function MainHeader({ educationLevel, grade, userName: initialUserName, n
     localStorage.removeItem("nickname");
     localStorage.removeItem("grade");
     localStorage.removeItem("userProfile");
-    setUserName("");
+    setDisplayName(""); // setUserName 대신 setDisplayName 사용
     // 카카오 로그아웃
     const KAKAO_CLIENT_ID = "8a48914bf786805cc4d0e1087b0e03a9";
     const LOGOUT_REDIRECT_URI = `${process.env.NEXT_PUBLIC_CLIENT_BASE_URL}/login`;
@@ -42,17 +52,17 @@ export function MainHeader({ educationLevel, grade, userName: initialUserName, n
       try {
         const userProfile = JSON.parse(userProfileStr);
         if (userProfile.userName) {
-          setUserName(userProfile.userName);
+          setDisplayName(userProfile.userName);
         }
         if (userProfile.profileUrl) {
-          setProfileUrl(userProfile.profileUrl);
+          // profileUrl은 현재 컴포넌트에서 사용되지 않으므로 제거
         }
       } catch (e) {
-        // 파싱 에러 처리 (필요시)
-        setUserName("");
-        setProfileUrl(undefined);
+        // 파싱 에러 처리
+        setDisplayName("사용자");
       }
     }
+    console.log("LocalStorage values:", localStorage); // 디버깅을 위해 추가
   }, []);
 
   // 학년/학교명 한글 변환
@@ -62,8 +72,7 @@ export function MainHeader({ educationLevel, grade, userName: initialUserName, n
       : educationLevel === "high"
       ? "고등"
       : "";
-
-  // nickname이 있으면 로그인된 상태로 간주하여 로그아웃 버튼 노출
+  // localStorage에서 nickname을 가져오는 대신 props로 전달받은 nickname 사용
   const isLoggedIn = Boolean(userName);
 
   return (
@@ -79,16 +88,8 @@ export function MainHeader({ educationLevel, grade, userName: initialUserName, n
       </div>
       <div className="flex items-center space-x-2">
         <ThemeToggle />
-        <span className="px-3 py-1 rounded-full bg-white/80 dark:bg-gray-800/80 shadow text-blue-700 dark:text-blue-300 font-semibold text-sm border border-blue-200 dark:border-blue-700 flex items-center gap-2">
-          {profileUrl && (
-            <img
-              src={profileUrl}
-              alt="프로필"
-              className="w-6 h-6 rounded-full object-cover border border-gray-300 mr-1"
-              style={{ minWidth: 24, minHeight: 24 }}
-            />
-          )}
-          {userName ?? "사용자"}
+        <span className="px-3 py-1 rounded-full bg-white/80 dark:bg-gray-800/80 shadow text-blue-700 dark:text-blue-300 font-semibold text-sm border border-blue-200 dark:border-blue-700">
+          {displayName}
         </span>
         <span className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-700 dark:to-pink-700 text-purple-700 dark:text-purple-200 font-semibold text-sm border border-purple-200 dark:border-purple-700">
           {schoolLabel} {grade}학년
