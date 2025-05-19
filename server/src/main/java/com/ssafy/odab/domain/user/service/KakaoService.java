@@ -143,7 +143,8 @@ public class KakaoService {
             "accessToken", accessToken,
             "refreshToken", refreshToken,
             "userId", user.getId(),
-            "nickname", user.getUserName()
+            "nickname", user.getUserName(),
+            "grade", user.getGrade()
         );
         try {
             String redisValue = objectMapper.writeValueAsString(redisData);

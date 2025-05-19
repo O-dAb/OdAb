@@ -6,13 +6,14 @@ import { MainHeader } from "@/components/main-header";
 
 export function ClientHeader() {
   const { userProfile } = useAuth();
-  const { educationLevel, grade, userName } = userProfile;
+  const { educationLevel, grade, userName, nickname } = userProfile;
 
   return (
     <MainHeader
       educationLevel={educationLevel}
       grade={grade}
       userName={userName}
+      nickname={nickname}
     />
   );
 }
