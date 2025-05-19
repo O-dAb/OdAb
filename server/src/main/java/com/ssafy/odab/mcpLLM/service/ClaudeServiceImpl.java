@@ -67,7 +67,7 @@ public class ClaudeServiceImpl implements ClaudeService {
 
 
     @Transactional
-    public Mono<ApiResponseDto> extractProblem(ApiRequestDto apiRequestDto) {
+    public Mono<ApiResponseDto> extractProblem(ApiRequestDto apiRequestDto, Integer userId) {
         List<Object> contents = new ArrayList<>();
         String prompt = """
                 해당 이미지를 텍스트로 변환해줘.
@@ -108,18 +108,18 @@ public class ClaudeServiceImpl implements ClaudeService {
                 .build();
 
 
-        return sendClaudeApi(request, sendMessages, 0, true)
+        return sendClaudeApi(request, sendMessages, 0, true, userId)
                 .flatMap(response -> {
                     String problem = response.getContent().get(0).getText();
                     apiRequestDto.setUserAsk(problem);
                     System.out.println("텍스트 찾기"+response.getContent().get(0).getText());
-                    return searchSimilarQuestions(apiRequestDto);
+                    return searchSimilarQuestions(apiRequestDto, userId);
                 });
     }
 
     @Override
     @Transactional
-    public Mono<Boolean> isCorrectAnswer(String answer, String questionText, String userAnswerImg) {
+    public Mono<Boolean> isCorrectAnswer(String answer, String questionText, String userAnswerImg, Integer userId) {
         List<Object> contents = new ArrayList<>();
         // 정답을 추출하기 위한 프롬프트
         String extractPrompt = String.format("""
@@ -200,7 +200,7 @@ public class ClaudeServiceImpl implements ClaudeService {
                 .build();
         // 응답 처리
 // 응답 처리
-        Mono<Boolean> isCorrect = sendClaudeApi(request, sendMessages, 0, true)
+        Mono<Boolean> isCorrect = sendClaudeApi(request, sendMessages, 0, true, userId)
                 .map(response -> {
                     String fullResponse = response.getContent().get(0).getText().trim();
 //                    System.out.println("===== Claude 응답 시작 =====");
@@ -260,7 +260,7 @@ public class ClaudeServiceImpl implements ClaudeService {
 
     @Transactional
     // FAISS 서버에 질문을 보내고 유사한 문제 ID와 유사도 점수를 받는 메소드 (동기 방식)
-    public Mono<ApiResponseDto> searchSimilarQuestions(ApiRequestDto apiRequestDto) {
+    public Mono<ApiResponseDto> searchSimilarQuestions(ApiRequestDto apiRequestDto, Integer userId) {
         try {
             // RestTemplate 생성
             RestTemplate restTemplate = new RestTemplate();
@@ -309,7 +309,7 @@ public class ClaudeServiceImpl implements ClaudeService {
             requestDto.setUserAsk(sb.toString());
             requestDto.setImageData(apiRequestDto.getImageData());
 
-            return sendMathProblem(requestDto);
+            return sendMathProblem(requestDto, userId);
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println("FAISS 서버 요청 오류: " + e.getMessage());
@@ -322,7 +322,7 @@ public class ClaudeServiceImpl implements ClaudeService {
      * historyMessages 에는 과거 메시지와 내가 현재 질문할
      */
     @Transactional
-    public Mono<ApiResponseDto> sendMathProblem(ApiRequestDto apiRequestDto) {
+    public Mono<ApiResponseDto> sendMathProblem(ApiRequestDto apiRequestDto, Integer userId) {
         List<Object> contents = new ArrayList<>();
         // 유저 대화내용 content 생성후 contents 에 넣음.
         contents.add(ClaudeRequestApiDto.TextContent.builder()
@@ -347,10 +347,8 @@ public class ClaudeServiceImpl implements ClaudeService {
                 .tools(tools)
                 .messages(sendMessages)
                 .build();
-        return sendClaudeApi(request, sendMessages, 0, false)
+        return sendClaudeApi(request, sendMessages, 0, false, userId)
                 .flatMap(response -> {
-                    // 유저 찾기
-                    Integer userId = jwtService.getUserId();
                     User user = userRepository.findByIdWithLastLearningTimes(userId).orElseThrow(
                             () -> new RuntimeException("User not found")
                     );
@@ -435,7 +433,8 @@ public class ClaudeServiceImpl implements ClaudeService {
             ClaudeRequestApiDto request,
             List<ClaudeRequestApiDto.Message> sendMessages,
             int depth,
-            boolean isFirst) {
+            boolean isFirst,
+            Integer userId) {
         System.out.println("request = " + request);
         ArrayDeque<Integer> toolUseIndexQueue = new ArrayDeque<>();
 //        System.out.println("request = " + request.getMessages());
@@ -485,7 +484,7 @@ public class ClaudeServiceImpl implements ClaudeService {
                         return Mono.error(new RuntimeException("메시지가 너무 많습니다"));
                     }
                     if (isToolUse) {
-                        return sendClaudeApi(request, sendMessages, depth + 1, false);
+                        return sendClaudeApi(request, sendMessages, depth + 1, false, userId);
                     } else if (!isFirst) {
                         // toolUse가 없을 때 마지막으로 요청을 한 번 더 보내 총 정리를 수행
                         return sendClaudeApiForSummary(request, sendMessages);

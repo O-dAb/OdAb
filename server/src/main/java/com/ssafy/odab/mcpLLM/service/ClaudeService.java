@@ -7,9 +7,9 @@ import reactor.core.publisher.Mono;
 
 @Service
 public interface ClaudeService {
-    Mono<ApiResponseDto> sendMathProblem(ApiRequestDto apiRequestDto);
+    Mono<ApiResponseDto> sendMathProblem(ApiRequestDto apiRequestDto, Integer userId);
 
-    Mono<ApiResponseDto> extractProblem(ApiRequestDto apiRequestDto);
+    Mono<ApiResponseDto> extractProblem(ApiRequestDto apiRequestDto, Integer userId);
 
-    Mono<Boolean> isCorrectAnswer(String answer, String questionText, String userAnswerImg);
+    Mono<Boolean> isCorrectAnswer(String answer, String questionText, String userAnswerImg, Integer userId);
 }
