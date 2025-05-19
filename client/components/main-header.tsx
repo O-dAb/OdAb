@@ -92,7 +92,7 @@ export function MainHeader({
           {displayName}
         </span>
         <span className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-700 dark:to-pink-700 text-purple-700 dark:text-purple-200 font-semibold text-sm border border-purple-200 dark:border-purple-700">
-          {schoolLabel} {grade}학년
+          {schoolLabel} {typeof window !== 'undefined' ? localStorage.getItem('grade') : ''}학년
         </span>
         {isLoggedIn && (
           <button

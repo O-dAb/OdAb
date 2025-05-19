@@ -41,7 +41,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!userProfile.isProfileSet) return;
+    // if (!userProfile.isProfileSet) return;
     // API 호출
     authApi.get("/api/v1/main")
       .then((res) => {
@@ -52,9 +52,9 @@ export default function HomePage() {
   }, [userProfile.isProfileSet]);
 
   // 프로필이 설정되지 않은 경우 처리
-  if (!userProfile.isProfileSet) {
-    return null; // UserProfile 컴포넌트는 layout.tsx에서 처리
-  }
+  // if (!userProfile.isProfileSet) {
+  //   return null; // UserProfile 컴포넌트는 layout.tsx에서 처리
+  // }
 
   if (loading) {
     return <div>Loading...</div>;
