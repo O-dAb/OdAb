@@ -21,7 +21,7 @@ public class QuestionResultController {
     @GetMapping("{grade}/grade")
     public ResponseEntity<WrongQuestionResponseDto> findGradeWrongAnswersByGrade(
             @PathVariable("grade") Byte grade) {
-        Integer userId = 1;
+        Integer userId = jwtService.getUserIdFromRequest();
         WrongQuestionResponseDto wrongQuestionResponseDto
                 = questionResultService.findWrongAnswersByGrade(grade, userId);
         return ResponseEntity.ok(wrongQuestionResponseDto);
@@ -39,7 +39,7 @@ public class QuestionResultController {
     @GetMapping("{subConceptId}/subconcept")
     public ResponseEntity<SubConceptWrongQuestionResponseDto> findWrongAnswersBySubConcept(
             @PathVariable("subConceptId") Integer subConceptId) {
-        Integer userId = 1;
+        Integer userId = jwtService.getUserIdFromRequest();
         return ResponseEntity.ok(
                 questionResultService.findWrongAnswersBySubConcept(subConceptId, userId));
     }
@@ -59,7 +59,7 @@ public class QuestionResultController {
     @GetMapping("{grade}/recent/grade")
     public ResponseEntity<WrongQuestionResponseDto> findRecentWrongAnswersByGrade(@PathVariable("grade") Byte grade,
                                                                                   @RequestParam(name = "days", defaultValue = "25") Integer days) {
-        Integer userId = 1;
+        Integer userId = jwtService.getUserIdFromRequest();
         LocalDateTime startTime = LocalDateTime.now().minusDays(days);
         WrongQuestionResponseDto wrongQuestionResponseDto =
                 questionResultService.findRecentWrongAnswersByGrade(grade, userId, startTime);

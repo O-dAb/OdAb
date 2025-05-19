@@ -94,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const userProfile: UserProfile = {
             userName: data.nickname,
             educationLevel: "middle" as EducationLevel,
-            grade: String(data.grade) as Grade,
+            grade: data.grade,
             isProfileSet: true,
             profileUrl: data.profileUrl || "",
             userId: data.userId, // userId 저장

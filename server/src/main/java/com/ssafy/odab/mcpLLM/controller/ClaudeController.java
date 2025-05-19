@@ -24,6 +24,7 @@ public class ClaudeController {
     public Mono<ApiResponseDto> apiRequest(
             @RequestParam(value = "userAsk", required = false) String userAsk,
             @RequestParam(value = "imageData", required = false) MultipartFile imageData) {
+        System.out.println("컨트롤러에서");
         Integer userId = jwtService.getUserId();
         ApiRequestDto apiRequestDto = new ApiRequestDto();
         if (userAsk != null) {
@@ -32,6 +33,6 @@ public class ClaudeController {
         if (imageData != null) {
             apiRequestDto.setImageData(imageData);
         }
-        return claudeService.extractProblem(apiRequestDto);
+        return claudeService.extractProblem(apiRequestDto, userId);
     }
 }

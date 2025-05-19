@@ -17,7 +17,7 @@ public interface QuestionResultRepository extends JpaRepository<QuestionResult, 
     @Query("SELECT qr FROM QuestionResult qr WHERE qr.user.id = :userId AND qr.question.id = :questionId ORDER BY qr.times DESC")
     List<QuestionResult> findByQuestionIdAndUserId(@Param("questionId") Integer questionId, @Param("userId") Integer userId, Pageable pageable);
 
-    @Query("select distinct q from Question q join fetch q.questionResults qr where q.user.id = :userId")
+    @Query("select distinct q from Question q where q.user.id = :userId")
     List<Question> findWrongQuestionsByUserId(@Param("userId") Integer userId);
 
     @Query("select distinct q from Question q join fetch q.questionResults qr where q.user.id = :userId and q.registedAt between :start and :end")
