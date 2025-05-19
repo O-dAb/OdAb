@@ -39,6 +39,13 @@ public class UserController {
     @Value("${client-base-url}")
     private String clientBaseUrl;
 
+    @GetMapping("api/v1/test/get-user-id")
+    private Integer getUserid(){
+        return jwtService.getUserId();
+    }
+
+
+
     /**
      * 토큰에서 사용자 ID를 추출합니다.
      */
@@ -181,19 +188,6 @@ public class UserController {
     public ResponseEntity<Integer> getUserIdFromAccessToken(@RequestParam("token") String token) {
         Integer userId = jwtService.getUserIdFromAccessToken(token);
         return ResponseEntity.ok(userId);
-    }
-
-    // Postman 등 테스트용 토큰 발급 API (실서비스 미사용)
-    @GetMapping("/api/v1/test-token")
-    public ResponseEntity<String> getTestAccessToken(@RequestParam("userId") Integer userId) {
-        // UserService에서 User 조회
-        var user = userService.findById(userId);
-        if (user == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 userId의 사용자가 존재하지 않습니다.");
-        }
-        // JwtService로 토큰 발급
-        String token = jwtService.createAccessToken(user);
-        return ResponseEntity.ok(token);
     }
 
     /**
