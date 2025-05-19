@@ -134,7 +134,7 @@ public class ClaudeServiceImpl implements ClaudeService {
 
             // FAISS 서버에 POST 요청 보내기
             ResponseEntity<FaissResponse> response = restTemplate.exchange(
-                    "http://localhost:8000/search",
+                    "https://k12b103.p.ssafy.io/api/python/search",
                     HttpMethod.POST,
                     entity,
                     FaissResponse.class

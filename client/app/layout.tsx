@@ -2,10 +2,10 @@
 import { Inter } from "next/font/google";
 import "@/styles/globals.css";
 import { AuthProvider } from "@/contexts/auth-context";
-import { ClientHeader } from "@/components/client-header";
-import { ClientSideNav } from "@/components/client-sidenav";
 import { ThemeProvider } from "@/components/theme-provider";
 import Script from "next/script";
+import AppShell from "@/components/Appshell";
+import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -43,13 +43,9 @@ export default function RootLayout({
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="light">
           <AuthProvider>
-            <div className="flex flex-col h-screen">
-              <ClientHeader />
-              <div className="flex flex-1 overflow-hidden">
-                <ClientSideNav />
-                <div className="flex-1 overflow-y-auto">{children}</div>
-              </div>
-            </div>
+            <AppShell>
+              <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
+            </AppShell>
           </AuthProvider>
         </ThemeProvider>
       </body>

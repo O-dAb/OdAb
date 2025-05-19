@@ -7,47 +7,45 @@ import { useToast } from "@/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { BrainCircuit } from "lucide-react"
-import axios from "axios"
+import { publicApi } from "@/lib/api"
+import { useAuth } from "@/contexts/auth-context"
 
 export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
   const router = useRouter()
+  const { isAuthenticated } = useAuth()
 
   // 이미 로그인된 상태인지 확인
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      router.push('/');
+    if (isAuthenticated) {
+      router.push('/')
     }
-  }, [router]);
+  }, [isAuthenticated, router])
 
   // 카카오 로그인 시작
   const loginWithKakao = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
-      const response = await axios.get<{ url: string }>('http://localhost:8080/api/v1/auth/kakao');
-      const kakaoUrl = response.data.url;
+      const kakaoRes: { url: string } = await publicApi.get("/api/v1/auth/kakao");
+      const kakaoUrl = kakaoRes.url;
       
       if (!kakaoUrl) {
-        throw new Error('카카오 로그인 URL이 없습니다.');
+        throw new Error('카카오 로그인 URL이 없습니다.')
       }
 
-      // 로그인 시도 로그
-      console.log('카카오 로그인 시도:', kakaoUrl);
-      
-      window.location.href = kakaoUrl;
+      window.location.href = kakaoUrl
     } catch (error) {
-      console.error('카카오 로그인 에러:', error);
+      console.error('카카오 로그인 에러:', error)
       toast({
         title: "로그인 실패",
         description: error instanceof Error ? error.message : "카카오 로그인 중 오류가 발생했습니다.",
         variant: "destructive",
-      });
+      })
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <Card className="w-full max-w-md mx-auto border-blue-200">
@@ -89,14 +87,6 @@ export function LoginForm() {
           )}
         </Button>
       </CardContent>
-      <CardFooter className="flex justify-center">
-        <div className="text-center text-sm">
-          계정이 없으신가요?{" "}
-          <Link href="/signup" className="text-blue-500 hover:underline">
-            회원가입
-          </Link>
-        </div>
-      </CardFooter>
     </Card>
-  );
+  )
 }

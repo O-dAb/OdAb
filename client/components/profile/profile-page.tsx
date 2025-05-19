@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -12,56 +11,51 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Camera } from "lucide-react"
-type EducationLevel = "middle" | "high"
-type Grade = "1" | "2" | "3"
+import type { EducationLevel, Grade } from "@/components/user-profile"
+import { useAuth } from "@/contexts/auth-context"
 import axios from "axios"
 
 export function ProfilePage() {
+  const { userProfile, updateProfile } = useAuth();
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
-  const [profileImage, setProfileImage] = useState<string | null>(null)
-  const [educationLevel, setEducationLevel] = useState<EducationLevel>("middle")
-  const [grade, setGrade] = useState<Grade>("1")
+  const [educationLevel, setEducationLevel] = useState<EducationLevel>(userProfile.educationLevel)
+  const [grade, setGrade] = useState<Grade>(userProfile.grade)
+  const [profileImage, setProfileImage] = useState<string | null>(userProfile.profileUrl || null)
   const [isLoading, setIsLoading] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
-    // 로컬 스토리지에서 사용자 정보 불러오기
-    const userJson = localStorage.getItem("user")
-    const profileJson = localStorage.getItem("userProfile")
-
-    if (userJson) {
-      const user = JSON.parse(userJson)
-      setName(user.name || "")
-      setEmail(user.email || "")
-      setProfileImage(user.profileImage || null)
-    }
-
-    if (profileJson) {
-      const profile = JSON.parse(profileJson)
-      setEducationLevel(profile.level || "middle")
-      setGrade(profile.grade || "1")
-    }
-  }, [])
+    // 사용자 이름과 이메일은 필요하다면 로컬 스토리지나 서버에서 가져옴
+    const savedName = localStorage.getItem("nickname")
+    if (savedName) setName(savedName)
+    
+    // AuthContext에서 프로필 정보 업데이트 시 로컬 상태도 업데이트
+    setEducationLevel(userProfile.educationLevel)
+    setGrade(userProfile.grade)
+    setProfileImage(userProfile.profileUrl || null)
+  }, [userProfile])
 
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // 예시: 백엔드에 프로필 정보 저장
-      await axios.put(
+      // 백엔드에 프로필 정보 저장
+      const response = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/profile_grade`,
         {
-          profileImage, // 이미지 업로드 후 받은 URL
-          grade,
+          grade: parseInt(grade),
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         }
       );
+
+      // 성공적으로 저장되면 AuthContext 업데이트
+      updateProfile(educationLevel, grade, profileImage || undefined);
 
       toast({
         title: "프로필 업데이트 성공",
@@ -82,32 +76,58 @@ export function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // 이미지 크기 제한 체크 (예: 900KB)
+    if (file.size > 900 * 1024) {
+      toast({
+        title: "파일 크기 초과",
+        description: "이미지 크기는 900KB 이하여야 합니다.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     // 서버에 업로드
     const formData = new FormData();
     formData.append('file', file);
 
     try {
+      setIsLoading(true);
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_API_URL}/api/v1/profile_img`,
         formData,
         {
           headers: {
             'Content-Type': 'multipart/form-data',
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
+            Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
           },
         }
       );
-      setProfileImage(response.data.imageUrl); // 서버에서 받은 이미지 URL로 상태 업데이트
-      toast({
-        title: "프로필 이미지 업로드 성공",
-        description: "프로필 이미지가 변경되었습니다.",
-      });
+      
+      // 서버에서 받은 이미지 URL로 상태 업데이트
+      const imageUrl = response.data.imageUrl || response.data.profileUrl || response.data.url;
+      
+      if (imageUrl) {
+        // 로컬 상태 업데이트
+        setProfileImage(imageUrl);
+        
+        // AuthContext 업데이트
+        updateProfile(educationLevel, grade, imageUrl);
+        
+        toast({
+          title: "프로필 이미지 업로드 성공",
+          description: "프로필 이미지가 변경되었습니다.",
+        });
+      } else {
+        throw new Error("이미지 URL을 찾을 수 없습니다");
+      }
     } catch (err) {
       toast({
         title: "업로드 실패",
         description: "이미지 업로드 중 오류가 발생했습니다.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 

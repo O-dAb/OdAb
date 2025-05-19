@@ -10,6 +10,13 @@ services:
       - /etc/letsencrypt:/etc/letsencrypt:ro    # SSL 인증서 마운트
     environment:
       - TZ=Asia/Seoul
+    depends_on:
+      python-stable:
+        condition: service_started
+      server-stable:
+        condition: service_started
+      client-stable:
+        condition: service_started
     restart: always
     networks:
       - app-network

@@ -43,6 +43,7 @@ services:
       - KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
       - KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET}
       - KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
+      - CLIENT_BASE_URL=${CLIENT_BASE_URL}
       # AWS S3 환경 변수 추가
       - CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${CLOUD_AWS_CREDENTIALS_ACCESS_KEY}
       - CLOUD_AWS_CREDENTIALS_SECRET_KEY=${CLOUD_AWS_CREDENTIALS_SECRET_KEY}
@@ -79,6 +80,8 @@ services:
     volumes:
       - ./python-server:/app
     depends_on:
+      server-stable:
+        condition: service_started
       my-db:
         condition: service_healthy
     restart: always
