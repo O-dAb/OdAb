@@ -142,6 +142,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const parsedProfile = JSON.parse(savedProfile);
       // 저장된 프로필의 userId와 현재 userId가 일치하는지 확인
       if (!parsedProfile.userId || parsedProfile.userId === currentUserId) {
+        if (!parsedProfile.userName) {
+          parsedProfile.userName = localStorage.getItem("nickname") || localStorage.getItem("userName") || "사용자";
+        }
         setUserProfile({ ...defaultUserProfile, ...parsedProfile });
       } else {
         // userId가 일치하지 않으면 기본값 사용
@@ -170,6 +173,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // 로컬 스토리지에도 업데이트된 정보 저장
     localStorage.setItem("userProfile", JSON.stringify(updatedProfile));
+    // grade도 별도로 저장
+    localStorage.setItem("grade", grade);
   };
 
   // 로그아웃 함수
