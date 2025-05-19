@@ -136,5 +136,14 @@ public class UserServiceImpl implements UserService {
     public User findById(Integer userId) {
         return userRepository.findById(userId).orElse(null);
     }
+
+    @Override
+    public String getProfileImageUrl(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementException("사용자를 찾을 수 없습니다. ID: " + userId));
+
+        // 프로필 URL이 없으면 빈 문자열 반환
+        return user.getProfileUrl() != null ? user.getProfileUrl() : "";
+    }
 }
 

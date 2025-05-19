@@ -131,6 +131,19 @@ public class UserController {
         }
     }
 
+    @GetMapping("/api/v1/profile_img")
+    public ResponseEntity<ProfileImageResponse> getProfileImg(HttpServletRequest request) {
+        try {
+            // 토큰에서 사용자 ID 추출
+            Integer userId = getUserIdFromToken(request);
+            String imageUrl = userService.getProfileImageUrl(userId);
+
+            return ResponseEntity.ok(new ProfileImageResponse(imageUrl));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
     /**
      * 사용자의 학년 정보를 업데이트합니다.
      *
