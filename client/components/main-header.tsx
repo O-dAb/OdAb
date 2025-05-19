@@ -76,11 +76,11 @@ export function MainHeader({
   const isLoggedIn = Boolean(userName);
 
   return (
-    <header className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-blue-900 dark:via-purple-900 dark:to-pink-900 shadow-md rounded-b-2xl px-6 py-4 flex items-center justify-between">
+    <header className="bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 shadow-md rounded-b-2xl px-6 py-4 flex items-center justify-between">
       <div className="flex items-center space-x-4">
         <Link
           href="/"
-          className="font-extrabold text-2xl text-blue-700 dark:text-blue-300 flex items-center gap-2"
+          className="font-extrabold text-2xl text-blue-700 dark:text-blue-200 flex items-center gap-2"
         >
           <GraduationCap className="h-7 w-7 text-purple-500 dark:text-purple-300" />
           O! dAb
@@ -88,17 +88,17 @@ export function MainHeader({
       </div>
       <div className="flex items-center space-x-2">
         <ThemeToggle />
-        <span className="px-3 py-1 rounded-full bg-white/80 dark:bg-gray-800/80 shadow text-blue-700 dark:text-blue-300 font-semibold text-sm border border-blue-200 dark:border-blue-700">
+        <span className="px-3 py-1 rounded-full bg-white/80 dark:bg-gray-700/80 shadow text-blue-700 dark:text-blue-200 font-semibold text-sm border border-blue-200 dark:border-gray-600">
           {displayName}
         </span>
-        <span className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-700 dark:to-pink-700 text-purple-700 dark:text-purple-200 font-semibold text-sm border border-purple-200 dark:border-purple-700">
+        <span className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-200 to-pink-200 dark:from-purple-800/50 dark:to-pink-800/50 text-purple-700 dark:text-purple-200 font-semibold text-sm border border-purple-200 dark:border-gray-600">
           {schoolLabel} {typeof window !== 'undefined' ? localStorage.getItem('grade') : ''}학년
         </span>
         {isLoggedIn && (
           <button
             onClick={handleLogout}
             title="로그아웃"
-            className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900 transition"
+            className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50 transition"
           >
             <LogOut className="h-5 w-5 text-red-500 dark:text-red-400" />
           </button>

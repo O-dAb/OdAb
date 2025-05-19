@@ -178,14 +178,14 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
   }, [selectedConcept]);
 
   return (
-    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-pink-950 dark:via-blue-950 dark:to-purple-950 min-h-screen p-6 flex flex-col items-center">
+    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen p-6 flex flex-col items-center">
       {/* 검색창 */}
       <div className="w-full max-w-6xl flex justify-center mb-4">
         <div className="relative flex-1 max-w-2xl">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4" />
           <Input
             placeholder="개념 검색..."
-            className="pl-10 border-blue-100 dark:border-blue-800 dark:bg-gray-800 dark:text-gray-200 rounded-xl shadow w-full"
+            className="pl-10 border-blue-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 rounded-xl shadow w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -198,8 +198,8 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
           variant={showAllGrades ? "default" : "outline"}
           className={`rounded-xl font-bold px-6 py-2 text-lg ${
             showAllGrades
-              ? "bg-blue-400 text-white dark:bg-blue-700 dark:hover:bg-blue-600"
-              : "bg-white text-blue-500 border-blue-200 dark:bg-gray-800 dark:text-blue-300 dark:border-blue-700"
+              ? "bg-blue-400 text-white dark:bg-blue-600 dark:hover:bg-blue-500"
+              : "bg-white text-blue-500 border-blue-200 dark:bg-gray-800 dark:text-blue-300 dark:border-gray-600"
           }`}
           onClick={() => setShowAllGrades(true)}
         >
@@ -211,8 +211,8 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
           }
           className={`rounded-xl font-bold px-6 py-2 text-lg ${
             !showAllGrades && selectedGrade === "1"
-              ? "bg-blue-400 text-white dark:bg-blue-700 dark:hover:bg-blue-600"
-              : "bg-white text-blue-500 border-blue-200 dark:bg-gray-800 dark:text-blue-300 dark:border-blue-700"
+              ? "bg-blue-400 text-white dark:bg-blue-600 dark:hover:bg-blue-500"
+              : "bg-white text-blue-500 border-blue-200 dark:bg-gray-800 dark:text-blue-300 dark:border-gray-600"
           }`}
           onClick={() => {
             setShowAllGrades(false);
@@ -227,8 +227,8 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
           }
           className={`rounded-xl font-bold px-6 py-2 text-lg ${
             !showAllGrades && selectedGrade === "2"
-              ? "bg-blue-400 text-white dark:bg-blue-700 dark:hover:bg-blue-600"
-              : "bg-white text-blue-500 border-blue-200 dark:bg-gray-800 dark:text-blue-300 dark:border-blue-700"
+              ? "bg-blue-400 text-white dark:bg-blue-600 dark:hover:bg-blue-500"
+              : "bg-white text-blue-500 border-blue-200 dark:bg-gray-800 dark:text-blue-300 dark:border-gray-600"
           }`}
           onClick={() => {
             setShowAllGrades(false);
@@ -243,8 +243,8 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
           }
           className={`rounded-xl font-bold px-6 py-2 text-lg ${
             !showAllGrades && selectedGrade === "3"
-              ? "bg-blue-400 text-white dark:bg-blue-700 dark:hover:bg-blue-600"
-              : "bg-white text-blue-500 border-blue-200 dark:bg-gray-800 dark:text-blue-300 dark:border-blue-700"
+              ? "bg-blue-400 text-white dark:bg-blue-600 dark:hover:bg-blue-500"
+              : "bg-white text-blue-500 border-blue-200 dark:bg-gray-800 dark:text-blue-300 dark:border-gray-600"
           }`}
           onClick={() => {
             setShowAllGrades(false);
@@ -261,10 +261,10 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
           filteredConcepts.map((concept) => (
             <Card
               key={concept.id}
-              className={`cursor-pointer border-0 shadow-lg rounded-2xl bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 dark:from-blue-900 dark:via-purple-900 dark:to-pink-900 hover:scale-105 transition-transform duration-200 ${
+              className={`cursor-pointer border-0 shadow-lg rounded-2xl bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 hover:scale-105 transition-transform duration-200 ${
                 educationLevel === "middle"
-                  ? "border-green-100 dark:border-green-900"
-                  : "border-blue-100 dark:border-blue-900"
+                  ? "border-green-100 dark:border-green-700"
+                  : "border-blue-100 dark:border-gray-600"
               } ${
                 selectedConcept?.id === concept.id
                   ? educationLevel === "middle"
@@ -286,8 +286,8 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
                   variant="outline"
                   className={`mt-2 px-3 py-1 rounded-full font-bold text-base shadow ${
                     educationLevel === "middle"
-                      ? "border-green-200 dark:border-green-700 text-green-600 dark:text-green-400 bg-white/80 dark:bg-gray-800/80"
-                      : "border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-400 bg-white/80 dark:bg-gray-800/80"
+                      ? "border-green-200 dark:border-gray-600 text-green-600 dark:text-green-400 bg-white/80 dark:bg-gray-800/80"
+                      : "border-blue-200 dark:border-gray-600 text-blue-600 dark:text-blue-400 bg-white/80 dark:bg-gray-800/80"
                   }`}
                 >
                   {educationLevel === "middle" ? "중" : "고"}
@@ -307,8 +307,8 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
 
       {/* 선택한 개념 상세 정보 */}
       {selectedConcept && (
-        <Card className="border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-yellow-100 via-pink-50 to-purple-50 dark:from-yellow-900 dark:via-pink-950 dark:to-purple-950 w-full max-w-4xl mt-8">
-          <CardHeader className="bg-yellow-50/60 dark:bg-yellow-950/60 border-b-0 rounded-t-2xl">
+        <Card className="border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-yellow-100 via-pink-50 to-purple-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 w-full max-w-4xl mt-8">
+          <CardHeader className="bg-yellow-50/60 dark:bg-gray-800/60 border-b-0 rounded-t-2xl">
             <CardTitle className="flex items-center gap-2 text-yellow-700 dark:text-yellow-300 text-2xl font-extrabold">
               <span className="text-3xl">🦦</span>
               {selectedConcept.title}
@@ -324,14 +324,14 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
 
             <div>
               <h3 className="text-base font-bold mb-1 text-yellow-700 dark:text-yellow-300">공식</h3>
-              <div className="bg-yellow-50 dark:bg-yellow-950 p-4 rounded-xl font-mono text-lg shadow">
+              <div className="bg-yellow-50 dark:bg-gray-700 p-4 rounded-xl font-mono text-lg shadow dark:text-gray-300">
                 {selectedConcept.formula}
               </div>
             </div>
 
             <div>
               <h3 className="text-base font-bold mb-1 text-yellow-700 dark:text-yellow-300">예시</h3>
-              <ul className="list-disc pl-5 space-y-1 text-lg">
+              <ul className="list-disc pl-5 space-y-1 text-lg dark:text-gray-300">
                 {selectedConcept.examples.map(
                   (example: string, index: number) => (
                     <li key={index}>{example}</li>
@@ -345,7 +345,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
               href={`/study/related?subConceptId=${selectedConcept.id}`}
               className="w-full block"
             >
-              <Button className="w-full bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-700 dark:hover:bg-yellow-600 rounded-xl font-bold text-lg mt-4">
+              <Button className="w-full bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-600 dark:hover:bg-yellow-500 rounded-xl font-bold text-lg mt-4">
                 관련 문제 풀어보기
               </Button>
             </Link>
@@ -367,9 +367,9 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
                 {row.map((major: any) => (
                   <Card
                     key={major.majorConceptId}
-                    className="flex-1 rounded-2xl shadow-lg bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 dark:from-blue-900 dark:via-purple-900 dark:to-pink-900 border-0 p-0 min-w-[320px]"
+                    className="flex-1 rounded-2xl shadow-lg bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 border-0 p-0 min-w-[320px]"
                   >
-                    <CardHeader className="bg-blue-100/60 dark:bg-blue-900/60 rounded-t-2xl p-5 border-b-0">
+                    <CardHeader className="bg-blue-100/60 dark:bg-gray-800/60 rounded-t-2xl p-5 border-b-0">
                       <CardTitle className="text-blue-700 dark:text-blue-300 text-xl font-extrabold flex items-center gap-2">
                         <span className="text-2xl">📚</span>
                         {major.majorConceptType}
@@ -414,7 +414,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
                             }}
                           >
                             <div
-                              className={`bg-white/80 dark:bg-gray-800/80 border border-yellow-200 dark:border-yellow-700 rounded-xl shadow px-5 py-3 font-bold text-base text-yellow-800 dark:text-yellow-300 hover:bg-yellow-100 dark:hover:bg-yellow-900 transition cursor-pointer min-w-[140px] text-center ${
+                              className={`bg-white/80 dark:bg-gray-800/80 border border-yellow-200 dark:border-gray-600 rounded-xl shadow px-5 py-3 font-bold text-base text-yellow-800 dark:text-yellow-300 hover:bg-yellow-100 dark:hover:bg-gray-700 transition cursor-pointer min-w-[140px] text-center ${
                                 selectedSubConcept &&
                                 selectedSubConcept.subConceptId ===
                                   sub.subConceptId
@@ -435,8 +435,8 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
               {isSelectedInRow && selectedSubConcept && (
                 <div className="flex justify-center mt-3">
                   <div className="w-full max-w-3xl">
-                    <div className="rounded-2xl shadow-2xl bg-gradient-to-r from-yellow-100 via-pink-50 to-purple-50 dark:from-yellow-900 dark:via-pink-950 dark:to-purple-950 border-0 p-0">
-                      <div className="bg-yellow-50/60 dark:bg-yellow-950/60 rounded-t-2xl px-8 py-6 border-b-0">
+                    <div className="rounded-2xl shadow-2xl bg-gradient-to-r from-yellow-100 via-pink-50 to-purple-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 border-0 p-0">
+                      <div className="bg-yellow-50/60 dark:bg-gray-800/60 rounded-t-2xl px-8 py-6 border-b-0">
                         <div className="flex items-center gap-2 text-yellow-700 dark:text-yellow-300 text-2xl font-extrabold">
                           <span className="text-3xl">🦦</span>
                           {selectedSubConcept.subConceptType}
@@ -459,7 +459,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
                             <h3 className="text-base font-bold mb-1 text-yellow-700 dark:text-yellow-300">
                               공식
                             </h3>
-                            <div className="bg-yellow-50 dark:bg-yellow-950 p-4 rounded-xl font-mono text-lg shadow">
+                            <div className="bg-yellow-50 dark:bg-gray-700 p-4 rounded-xl font-mono text-lg shadow dark:text-gray-300">
                               {selectedSubConcept.formula}
                             </div>
                           </div>
@@ -470,7 +470,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
                               <h3 className="text-base font-bold mb-1 text-yellow-700 dark:text-yellow-300">
                                 예시
                               </h3>
-                              <ul className="list-disc pl-5 space-y-1 text-lg">
+                              <ul className="list-disc pl-5 space-y-1 text-lg dark:text-gray-300">
                                 {selectedSubConcept.examples.map(
                                   (example: string, idx: number) => (
                                     <li key={idx}>{example}</li>
@@ -485,7 +485,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
                             className="block"
                           >
                             <Button
-                              className="w-full bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-700 dark:hover:bg-yellow-600 rounded-xl font-bold text-lg mt-4"
+                              className="w-full bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-600 dark:hover:bg-yellow-500 rounded-xl font-bold text-lg mt-4"
                               variant="outline"
                             >
                               관련 문제 풀어보기

@@ -138,7 +138,7 @@ export default function RelatedProblemsPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-pink-950 dark:via-blue-950 dark:to-purple-950">
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 dark:border-purple-400"></div>
       </div>
     );
@@ -146,7 +146,7 @@ export default function RelatedProblemsPage() {
 
   if (error) {
     return (
-      <div className="container mx-auto py-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-pink-950 dark:via-blue-950 dark:to-purple-950">
+      <div className="container mx-auto py-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="p-8 text-center">
             <h2 className="text-xl font-semibold mb-2 dark:text-white">오류 발생</h2>
@@ -166,7 +166,7 @@ export default function RelatedProblemsPage() {
 
   if (!subConceptId) {
     return (
-      <div className="container mx-auto py-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-pink-950 dark:via-blue-950 dark:to-purple-950">
+      <div className="container mx-auto py-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="p-8 text-center">
             <h2 className="text-xl font-semibold mb-2 dark:text-white">잘못된 접근</h2>
@@ -185,7 +185,7 @@ export default function RelatedProblemsPage() {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-pink-950 dark:via-blue-950 dark:to-purple-950">
+    <div className="container mx-auto py-6 space-y-6 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -193,7 +193,7 @@ export default function RelatedProblemsPage() {
             variant="outline"
             size="icon"
             onClick={() => router.back()}
-            className="h-8 w-8 bg-white/80 dark:bg-gray-800/80 border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/50 rounded-xl font-bold"
+            className="h-8 w-8 bg-white/80 dark:bg-gray-800/80 border-purple-200 dark:border-gray-600 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-gray-700/50 rounded-xl font-bold"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
@@ -207,7 +207,7 @@ export default function RelatedProblemsPage() {
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4" />
           <Input
             placeholder="문제 검색..."
-            className="pl-10 border-yellow-100 dark:border-yellow-900 dark:bg-gray-800 dark:text-gray-200 rounded-xl"
+            className="pl-10 border-yellow-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 rounded-xl"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -219,7 +219,7 @@ export default function RelatedProblemsPage() {
               setSelectedSubConceptType(value === "all" ? null : value)
             }
           >
-            <SelectTrigger className="w-[140px] border-yellow-100 dark:border-yellow-900 dark:bg-gray-800 dark:text-gray-200 rounded-xl">
+            <SelectTrigger className="w-[140px] border-yellow-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 rounded-xl">
               <div className="flex items-center gap-2">
                 <BookOpen className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                 <SelectValue placeholder="개념 유형" />
@@ -248,14 +248,14 @@ export default function RelatedProblemsPage() {
           filteredProblems.map((problem) => (
             <Card
               key={problem.questionId}
-              className="border-l-4 border-l-purple-500 dark:border-l-purple-400 hover:shadow-md transition-shadow rounded-xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 dark:from-purple-900 dark:via-pink-900 dark:to-blue-900 dark:border-gray-700"
+              className="border-l-4 border-l-purple-500 dark:border-l-purple-400 hover:shadow-md transition-shadow rounded-xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 dark:border-gray-700"
             >
-              <CardHeader className="bg-purple-50 dark:bg-purple-900/50 border-b border-purple-100 dark:border-purple-800 py-3 rounded-t-xl">
+              <CardHeader className="bg-purple-50 dark:bg-gray-800/60 border-b border-purple-100 dark:border-gray-700 py-3 rounded-t-xl">
                 <CardTitle className="flex justify-between items-center text-base">
                   <span className="dark:text-gray-200">문제 {problem.questionId}</span>
                   <Badge
                     variant="outline"
-                    className="border-purple-200 dark:border-purple-700 text-purple-600 dark:text-purple-300 text-xs"
+                    className="border-purple-200 dark:border-gray-600 text-purple-600 dark:text-purple-300 text-xs"
                   >
                     {problem.userName}
                   </Badge>
@@ -267,7 +267,7 @@ export default function RelatedProblemsPage() {
                     <Badge
                       key={index}
                       variant="outline"
-                      className="border-blue-200 dark:border-blue-700 text-blue-600 dark:text-blue-300 text-xs"
+                      className="border-blue-200 dark:border-gray-600 text-blue-600 dark:text-blue-300 text-xs"
                     >
                       {subConcept.subConceptType}
                     </Badge>
@@ -289,7 +289,7 @@ export default function RelatedProblemsPage() {
                 <div className="flex justify-end">
                   <Button
                     onClick={() => handleSolveProblem(problem.questionId)}
-                    className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-700 dark:hover:bg-purple-600 text-sm h-8 rounded-xl font-bold"
+                    className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-500 text-sm h-8 rounded-xl font-bold"
                   >
                     문제 풀기
                   </Button>
@@ -298,7 +298,7 @@ export default function RelatedProblemsPage() {
             </Card>
           ))
         ) : (
-          <Card className="col-span-3 border-yellow-100 dark:border-yellow-900 dark:bg-gray-800 rounded-xl">
+          <Card className="col-span-3 border-yellow-100 dark:border-gray-700 dark:bg-gray-800 rounded-xl">
             <CardContent className="p-6 text-center">
               <p className="text-gray-500 dark:text-gray-400">검색 결과가 없습니다.</p>
             </CardContent>
