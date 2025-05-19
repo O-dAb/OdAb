@@ -13,6 +13,8 @@ import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question.repository.QuestionRepository;
 import com.ssafy.odab.domain.question_result.entity.QuestionResult;
 import com.ssafy.odab.domain.question_result.repository.QuestionResultRepository;
+import com.ssafy.odab.domain.user.entity.User;
+import com.ssafy.odab.domain.user.repository.UserRepository;
 import com.ssafy.odab.mcpLLM.service.ClaudeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,6 +36,7 @@ public class QuestionServiceImpl implements QuestionService {
     private final QuestionRepository questionRepository;
     private final QuestionResultRepository questionResultRepository;
     private final SubConceptRepository subConceptRepository;
+    private final UserRepository userRepository;
     private final ClaudeService claudeService;
     private final S3Service s3Service;
 
@@ -45,13 +48,12 @@ public class QuestionServiceImpl implements QuestionService {
         String s3Url = s3Service.uploadBase64File(verifyAnswerRequestDto.getAnswerImg(), dirName);
         // 문제에서 정답 여부 확인
         Question question = questionRepository.findById(questionId).orElseThrow(() -> new IllegalArgumentException("문제를 찾을 수 없습니다."));
-
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("회원을 찾을 수 없습니다."));
         // 정답결과 테이블에서 회원의 문제 조회
         Pageable pageable = PageRequest.of(0, 1);
 
         List<QuestionResult> questionResults = questionResultRepository.findByQuestionIdAndUserId(question.getId(), userId, pageable);
         QuestionResult questionResult = questionResults.get(0);
-
         // claude에 정답 비교
         Boolean isCorrect = claudeService.isCorrectAnswer(question.getAnswer(), question.getQuestionText(), verifyAnswerRequestDto.getAnswerImg(), userId).block();;
 
@@ -59,8 +61,8 @@ public class QuestionServiceImpl implements QuestionService {
         // 정답이 틀리면 풀이일자 수정, 정답여부 false
         //정답 테이블을 새롭게 생성
         QuestionResult newQuestionResult = QuestionResult.builder()
-                .user(questionResult.getUser())
-                .times(questionResult.getTimes() + 1)
+                .user(user)
+                .times(questionResult == null ? 1 : questionResult.getTimes() + 1)
                 .solvedAt(LocalDateTime.now())
                 .solutionImage(s3Url)
                 .question(question)

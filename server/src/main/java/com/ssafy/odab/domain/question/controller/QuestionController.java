@@ -35,7 +35,6 @@ public class QuestionController {
 
     @GetMapping("/{questionId}/retry")
     public ResponseEntity<RetryQuestionResponseDto> findRetryQuestion(@PathVariable("questionId") Integer questionId) {
-        jwtService.getUserIdFromRequest();
         return ResponseEntity.ok(questionService.findRetryQuestionByQuestionId(questionId));
     }
 
