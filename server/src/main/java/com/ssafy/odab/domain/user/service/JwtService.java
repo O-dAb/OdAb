@@ -5,16 +5,16 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import jakarta.servlet.ServletOutputStream;
+import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import jakarta.annotation.PostConstruct;
+
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
-import jakarta.servlet.http.HttpServletRequest;
-import java.nio.charset.StandardCharsets;
 
 @Service
 public class JwtService {
@@ -79,6 +79,27 @@ public class JwtService {
                 .parseClaimsJws(accessToken)
                 .getBody();
         return Integer.parseInt(claims.getSubject());
+    }
+
+    public Integer getUserIdFromRequest() {
+        try {
+            ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+            if (attributes == null) {
+                throw new RuntimeException("Request not found");
+            }
+
+            String accessToken = resolveAccessToken(attributes.getRequest());
+            return getUserIdFromToken(accessToken);
+        } catch (Exception e) {
+            throw new RuntimeException("토큰에서 사용자 ID를 추출할 수 없습니다: " + e.getMessage());
+        }
+    }
+
+    public Integer getUserIdFromToken(String token) {
+        if (token != null && validateAccessToken(token)) {
+            return getUserIdFromAccessToken(token);
+        }
+        throw new RuntimeException("유효한 인증 Access Token이 없습니다.");
     }
 
     /**
