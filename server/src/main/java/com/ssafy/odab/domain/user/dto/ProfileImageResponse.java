@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProfileImageResponse {
-    private String profileImg;
+    private String profileUrl;
 
 }
