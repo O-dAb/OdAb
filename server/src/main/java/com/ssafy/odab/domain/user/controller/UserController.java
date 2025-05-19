@@ -177,16 +177,6 @@ public class UserController {
         return ResponseEntity.ok(userId);
     }
 
-    // Postman 등 테스트용 토큰 발급 API (실서비스 미사용)
-    @GetMapping("/api/v1/test-token")
-    public ResponseEntity<String> getTestAccessToken(@RequestParam("userId") Integer userId) {
-        String accessToken = redisTemplate.opsForValue().get("access:" + userId);
-        if (accessToken == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 userId의 accessToken이 존재하지 않습니다.");
-        }
-        return ResponseEntity.ok(accessToken);
-    }
-
     /**
      * 클라이언트에서 리프레시 토큰을 받아 액세스/리프레시 토큰을 재발급합니다.
      *
