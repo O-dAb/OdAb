@@ -31,7 +31,6 @@ public class LearningServiceImpl implements LearningService {
       //오늘의 복습
       //오늘로 부터 1일, 4일, 6일, 13일 전 최초로 학습하고 틀린린 문제들의 subConceptId, subConceptType 가져오기.
       // subConceptType 별로 총 몇 문제가 있는지 반환.
-
       //오늘, 내일복습 날짜 리스트
         List<LocalDate> reviewDates = Arrays.asList(1, 4, 6, 13).stream().map(today::minusDays).collect(Collectors.toList());
         List<LocalDate> scheduledDates = Arrays.asList(0, 2, 5, 12).stream().map(today::minusDays).collect(Collectors.toList());
