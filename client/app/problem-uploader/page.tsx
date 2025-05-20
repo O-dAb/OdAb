@@ -64,6 +64,10 @@ export default function ProblemUploaderPage() {
   // 문제 수정 설명용 상태 추가
   const [modificationExplanation, setModificationExplanation] = useState("");
 
+  // 비디오 참조 추가
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const videoRef2 = useRef<HTMLVideoElement>(null);
+
   // Textarea 높이 자동 조절을 위한 ref 추가
   const questionTextareaRef = useRef<HTMLTextAreaElement>(null);
   const modificationTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -387,6 +391,33 @@ export default function ProblemUploaderPage() {
     adjustTextareaHeight(modificationTextareaRef.current);
   }, [problemData]); // problemData가 변경될 때만 실행
 
+  // API 요청 상태 변경 시 비디오 재생/정지 처리
+  useEffect(() => {
+    // 첫 번째 비디오 처리
+    const video = videoRef.current;
+    if (video) {
+      if (isUploading || isSearching || isModifying) {
+        video.currentTime = 0;
+        video.play().catch(err => console.error('비디오 재생 오류:', err));
+      } else {
+        video.pause();
+        video.currentTime = 0;
+      }
+    }
+    
+    // 두 번째 비디오 처리
+    const video2 = videoRef2.current;
+    if (video2) {
+      if (isUploading || isSearching || isModifying) {
+        video2.currentTime = 0;
+        video2.play().catch(err => console.error('비디오 재생 오류:', err));
+      } else {
+        video2.pause();
+        video2.currentTime = 0;
+      }
+    }
+  }, [isUploading, isSearching, isModifying]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col items-center justify-center py-10">
       {!showProblemSolver ? (
@@ -477,14 +508,16 @@ export default function ProblemUploaderPage() {
               </div>
             </div>
             <div className="flex items-center justify-center">
-              <Image
-                src="/mascot_with_pencil.png"
-                alt="수달이"
-                width={400}
-                height={400}
-                className=""
-                priority
-              />
+              <video
+                ref={videoRef2}
+                className="w-auto h-auto max-w-[400px] max-h-[400px]"
+                muted
+                playsInline
+                loop
+              >
+                <source src="/pencil.webm" type="video/webm" />
+                비디오를 재생할 수 없습니다
+              </video>
             </div>
           </div>
         </div>
@@ -609,14 +642,16 @@ export default function ProblemUploaderPage() {
             {!showExplanationCard && (
               <div className="w-full max-w-lg flex flex-col items-center justify-center">
                 <div className="flex items-center justify-center">
-                  <Image
-                    src="/mascot_with_pencil.png"
-                    alt="수달이"
-                    width={400}
-                    height={400}
-                    className=""
-                    priority
-                  />
+                  <video
+                    ref={videoRef2}
+                    className="w-auto h-auto max-w-[400px] max-h-[400px]"
+                    muted
+                    playsInline
+                    loop
+                  >
+                    <source src="/pencil.webm" type="video/webm" />
+                    비디오를 재생할 수 없습니다
+                  </video>
                 </div>
               </div>
             )}
