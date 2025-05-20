@@ -1,26 +1,26 @@
-services:
-  nginx:
-    image: nginx:latest
-    container_name: nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/conf.d:/etc/nginx/conf.d        # 로컬 설정 파일을 컨테이너 내부로 마운트
-      - /etc/letsencrypt:/etc/letsencrypt:ro    # SSL 인증서 마운트
-    environment:
-      - TZ=Asia/Seoul
-    depends_on:
-      python-stable:
-        condition: service_started
-      server-stable:
-        condition: service_started
-      client-stable:
-        condition: service_started
-    restart: always
-    networks:
-      - app-network
+# services:
+#   nginx:
+#     image: nginx:latest
+#     container_name: nginx
+#     ports:
+#       - "80:80"
+#       - "443:443"
+#     volumes:
+#       - ./nginx/conf.d:/etc/nginx/conf.d        # 로컬 설정 파일을 컨테이너 내부로 마운트
+#       - /etc/letsencrypt:/etc/letsencrypt:ro    # SSL 인증서 마운트
+#     environment:
+#       - TZ=Asia/Seoul
+#     depends_on:
+#       python-stable:
+#         condition: service_started
+#       server-stable:
+#         condition: service_started
+#       client-stable:
+#         condition: service_started
+#     restart: always
+#     networks:
+#       - app-network
 
-networks:
-  app-network:
-    external: true
+# networks:
+#   app-network:
+#     external: true

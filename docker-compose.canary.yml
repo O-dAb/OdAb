@@ -1,91 +1,91 @@
-services:
+# services:
 
-  client-canary:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-    container_name: client-canary
-    ports:
-      - "3002:3000"
-    depends_on:
-      - server-canary
-    environment:
-      - NODE_ENV=production
-      - NEXT_PUBLIC_API_URL=/api
-      - TZ=Asia/Seoul
-    restart: always
-    networks:
-      - app-network
+#   client-canary:
+#     build:
+#       context: ./client
+#       dockerfile: Dockerfile
+#     container_name: client-canary
+#     ports:
+#       - "3002:3000"
+#     depends_on:
+#       - server-canary
+#     environment:
+#       - NODE_ENV=production
+#       - NEXT_PUBLIC_API_URL=/api
+#       - TZ=Asia/Seoul
+#     restart: always
+#     networks:
+#       - app-network
 
-  server-canary:
-    build:
-      context: ./server
-      dockerfile: Dockerfile
-    container_name: server-canary
-    ports:
-      - "8082:8080"
-    environment:
-      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES}
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - SPRING_DATASOURCE_URL=jdbc:mysql://my-db:3306/${MYSQL_DATABASE}?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
-      - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_ACCESS_TOKEN_VALIDITY=${JWT_ACCESS_TOKEN_VALIDITY}
-      - JWT_REFRESH_TOKEN_VALIDITY=${JWT_REFRESH_TOKEN_VALIDITY}
-      - MY_DB=${MY_DB}
-      - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST}
-      - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT}
-      - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD}
-      - KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
-      - KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET}
-      - KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
-      - CLIENT_BASE_URL=${CLIENT_BASE_URL}
-      # AWS S3 환경 변수 추가
-      - CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${CLOUD_AWS_CREDENTIALS_ACCESS_KEY}
-      - CLOUD_AWS_CREDENTIALS_SECRET_KEY=${CLOUD_AWS_CREDENTIALS_SECRET_KEY}
-      - CLOUD_AWS_S3_BUCKET=${CLOUD_AWS_S3_BUCKET}
-      - CLOUD_AWS_REGION_STATIC=ap-northeast-2
-      - CLOUD_AWS_STACK_AUTO=false
-      - CLAUDE_APIKEY=${CLAUDE_APIKEY}
-      - TZ=Asia/Seoul
-    # depends_on:
-    #   my-db:
-    #     condition: service_healthy
-    #   my-cache-server:
-    #     condition: service_healthy
-    networks:
-      - app-network
-    restart: always
+#   server-canary:
+#     build:
+#       context: ./server
+#       dockerfile: Dockerfile
+#     container_name: server-canary
+#     ports:
+#       - "8082:8080"
+#     environment:
+#       - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES}
+#       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+#       - MYSQL_DATABASE=${MYSQL_DATABASE}
+#       - MYSQL_USER=${MYSQL_USER}
+#       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+#       - SPRING_DATASOURCE_URL=jdbc:mysql://my-db:3306/${MYSQL_DATABASE}?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
+#       - SPRING_DATASOURCE_USERNAME=${MYSQL_USER}
+#       - SPRING_DATASOURCE_PASSWORD=${MYSQL_PASSWORD}
+#       - JWT_SECRET=${JWT_SECRET}
+#       - JWT_ACCESS_TOKEN_VALIDITY=${JWT_ACCESS_TOKEN_VALIDITY}
+#       - JWT_REFRESH_TOKEN_VALIDITY=${JWT_REFRESH_TOKEN_VALIDITY}
+#       - MY_DB=${MY_DB}
+#       - SPRING_DATA_REDIS_HOST=${SPRING_DATA_REDIS_HOST}
+#       - SPRING_DATA_REDIS_PORT=${SPRING_DATA_REDIS_PORT}
+#       - SPRING_DATA_REDIS_PASSWORD=${SPRING_DATA_REDIS_PASSWORD}
+#       - KAKAO_CLIENT_ID=${KAKAO_CLIENT_ID}
+#       - KAKAO_CLIENT_SECRET=${KAKAO_CLIENT_SECRET}
+#       - KAKAO_REDIRECT_URI=${KAKAO_REDIRECT_URI}
+#       - CLIENT_BASE_URL=${CLIENT_BASE_URL}
+#       # AWS S3 환경 변수 추가
+#       - CLOUD_AWS_CREDENTIALS_ACCESS_KEY=${CLOUD_AWS_CREDENTIALS_ACCESS_KEY}
+#       - CLOUD_AWS_CREDENTIALS_SECRET_KEY=${CLOUD_AWS_CREDENTIALS_SECRET_KEY}
+#       - CLOUD_AWS_S3_BUCKET=${CLOUD_AWS_S3_BUCKET}
+#       - CLOUD_AWS_REGION_STATIC=ap-northeast-2
+#       - CLOUD_AWS_STACK_AUTO=false
+#       - CLAUDE_APIKEY=${CLAUDE_APIKEY}
+#       - TZ=Asia/Seoul
+#     # depends_on:
+#     #   my-db:
+#     #     condition: service_healthy
+#     #   my-cache-server:
+#     #     condition: service_healthy
+#     networks:
+#       - app-network
+#     restart: always
 
-  python-canary:
-    build:
-      context: ./python-server
-      dockerfile: Dockerfile
-    container_name: python-canary
-    ports:
-      - "8020:8000"
-    environment:
-      - DEBUG=False
-      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
-      - MYSQL_DATABASE=${MYSQL_DATABASE}
-      - MYSQL_USER=${MYSQL_USER}
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-      - JWT_SECRET=${JWT_SECRET}
-      - CLAUDE_APIKEY=${CLAUDE_APIKEY}
-      - TZ=Asia/Seoul
-    volumes:
-      - ./python-server:/app
-    depends_on:
-      server-canary:
-        condition: service_started
-    networks:
-      - app-network
-    restart: always
+#   python-canary:
+#     build:
+#       context: ./python-server
+#       dockerfile: Dockerfile
+#     container_name: python-canary
+#     ports:
+#       - "8020:8000"
+#     environment:
+#       - DEBUG=False
+#       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+#       - MYSQL_DATABASE=${MYSQL_DATABASE}
+#       - MYSQL_USER=${MYSQL_USER}
+#       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+#       - JWT_SECRET=${JWT_SECRET}
+#       - CLAUDE_APIKEY=${CLAUDE_APIKEY}
+#       - TZ=Asia/Seoul
+#     volumes:
+#       - ./python-server:/app
+#     depends_on:
+#       server-canary:
+#         condition: service_started
+#     networks:
+#       - app-network
+#     restart: always
 
-networks:
-  app-network:
-    external: true
+# networks:
+#   app-network:
+#     external: true
