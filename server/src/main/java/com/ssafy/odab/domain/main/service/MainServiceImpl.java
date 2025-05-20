@@ -28,6 +28,9 @@ public class MainServiceImpl implements MainService {
         List<Object[]> todayReviewRawList = questionResultRepository.findReviewDtosByUserIdAndDatesWithFirstWrong(userId, reviewDates);
         List<MainPageResponseDto.TodayReviewDto> todayReviewList = new ArrayList<>();
         for (Object[] arr : todayReviewRawList) {
+            // 배열의 내용을 한 줄로 출력
+            System.out.println("todayReviewRawList element: " + Arrays.toString(arr));
+
             Integer subConceptId = ((Number) arr[0]).intValue();
             String subConceptType = (String) arr[1];
             LocalDate lastLearningTime = (arr[2] instanceof java.sql.Date) ? ((java.sql.Date) arr[2]).toLocalDate() : (LocalDate) arr[2];
