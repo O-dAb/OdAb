@@ -47,6 +47,7 @@ export default function DashboardPage() {
     // API 호출
     authApi.get("/api/v1/main")
       .then((res) => {
+        console.log("authApi /api/v1/main 응답:", res.data);
         setTodayReviews(res.data?.todayReviewList || []);
         setRecentStudy(res.data?.recentStudySubConcept || null);
       })
