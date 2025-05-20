@@ -80,20 +80,14 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
   const [selectedGrade, setSelectedGrade] = useState<Grade>(grade);
 
   // 각 탭별로 독립적인 상태 관리
-  const [allTabQuestions, setAllTabQuestions] = useState<WrongQuestionDto[]>(
-    []
-  );
-  const [recentTabQuestions, setRecentTabQuestions] = useState<
-    WrongQuestionDto[]
-  >([]);
+  const [allTabQuestions, setAllTabQuestions] = useState<WrongQuestionDto[]>([]);
+  const [recentTabQuestions, setRecentTabQuestions] = useState<WrongQuestionDto[]>([]);
+
 
   // 개념 관련 상태
-  const [majorConcepts, setMajorConcepts] = useState<
-    WrongQuestionMajorConcept[]
-  >([]);
-  const [selectedMajorConcept, setSelectedMajorConcept] = useState<
-    number | null
-  >(null);
+  const [majorConcepts, setMajorConcepts] = useState<WrongQuestionMajorConcept[]>([]);
+  const [selectedMajorConcept, setSelectedMajorConcept] = useState<number | null>(null);
+
   const [subconcepts, setSubconcepts] = useState<WrongQuestionSubconcept[]>([]);
 
   const [loading, setLoading] = useState(false);
@@ -384,11 +378,11 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
   };
 
   return (
-    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-pink-950 dark:via-blue-950 dark:to-purple-950 min-h-screen p-6">
+    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen p-6">
       <div className="flex items-center gap-3 mb-2"></div>
       {/* 상단 필터 영역 */}
-      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-blue-900 dark:via-purple-900 dark:to-pink-900">
-        <CardHeader className="bg-blue-50/60 dark:bg-blue-950/60 border-b-0 rounded-t-2xl">
+      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800">
+        <CardHeader className="bg-blue-50/60 dark:bg-gray-800/60 border-b-0 rounded-t-2xl">
           <CardTitle className="flex justify-between items-center text-blue-700 dark:text-blue-300">
             <span>오답 노트</span>
             <div className="flex items-center gap-2">
@@ -397,13 +391,13 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                 onValueChange={handleGradeChange}
                 disabled={loading}
               >
-                <SelectTrigger className="w-[100px] bg-blue-50 border-blue-100 rounded-xl">
+                <SelectTrigger className="w-[100px] bg-blue-50 dark:bg-gray-800 border-blue-100 dark:border-gray-600 rounded-xl dark:text-gray-200">
                   <SelectValue placeholder="학년 선택" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">1학년</SelectItem>
-                  <SelectItem value="2">2학년</SelectItem>
-                  <SelectItem value="3">3학년</SelectItem>
+                  <SelectItem value="1" className="dark:text-gray-200">1학년</SelectItem>
+                  <SelectItem value="2" className="dark:text-gray-200">2학년</SelectItem>
+                  <SelectItem value="3" className="dark:text-gray-200">3학년</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -417,18 +411,18 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
         value={activeTab}
         onValueChange={handleTabChange}
       >
-        <TabsList className="grid grid-cols-2 mb-6 bg-blue-100 rounded-xl shadow">
-          <TabsTrigger
-            value="all"
-            className="flex items-center gap-2 data-[state=active]:bg-blue-400 dark:data-[state=active]:bg-blue-700 data-[state=active]:text-white rounded-xl font-bold"
-          >
+          <TabsList className="grid grid-cols-2 mb-6 bg-blue-100 dark:bg-gray-700 rounded-xl shadow">
+            <TabsTrigger
+              value="all"
+              className="flex items-center gap-2 data-[state=active]:bg-blue-400 dark:data-[state=active]:bg-blue-600 data-[state=active]:text-white rounded-xl font-bold dark:text-gray-300"
+            >
             <BookOpen className="h-4 w-4" />
             <span>전체 오답</span>
           </TabsTrigger>
           <TabsTrigger
             value="recent"
-            className="flex items-center gap-2 data-[state=active]:bg-yellow-400 dark:data-[state=active]:bg-yellow-700 data-[state=active]:text-white rounded-xl font-bold"
-          >
+            className="flex items-center gap-2 data-[state=active]:bg-yellow-400 dark:data-[state=active]:bg-yellow-600 data-[state=active]:text-white rounded-xl font-bold dark:text-gray-300"
+            >
             <Clock className="h-4 w-4" />
             <span>최근 학습</span>
           </TabsTrigger>
@@ -439,7 +433,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
           <div className="space-y-4">
             {/* 대주제 필터 */}
             <div>
-              <div className="text-sm font-medium mb-2">대주제 필터</div>
+              <div className="text-sm font-medium dark:text-gray-300 mb-2">대주제 필터</div>
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant={
@@ -449,8 +443,8 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                   onClick={() => handleMajorConceptSelect(null)}
                   className={
                     selectedMajorConcept === null
-                      ? "bg-purple-400 hover:bg-purple-500 rounded-xl font-bold"
-                      : "border-purple-100 text-purple-500 hover:bg-purple-50 rounded-xl font-bold"
+                      ? "bg-purple-400 hover:bg-purple-500 dark:bg-purple-600 dark:hover:bg-purple-500 rounded-xl font-bold"
+                      : "border-purple-100 dark:border-gray-600 text-purple-500 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-gray-700/50 rounded-xl font-bold"
                   }
                   disabled={loading}
                 >
@@ -470,8 +464,8 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                     }
                     className={
                       selectedMajorConcept === major.majorConceptId
-                        ? "bg-purple-400 hover:bg-purple-500 rounded-xl font-bold"
-                        : "border-purple-100 text-purple-500 hover:bg-purple-50 rounded-xl font-bold"
+                        ? "bg-purple-400 hover:bg-purple-500 dark:bg-purple-600 dark:hover:bg-purple-500 rounded-xl font-bold"
+                        : "border-purple-100 dark:border-gray-600 text-purple-500 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-gray-700/50 rounded-xl font-bold"
                     }
                     disabled={loading}
                   >
@@ -484,7 +478,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
             {/* 소주제 필터 - 대주제 선택시에만 표시 */}
             {selectedMajorConcept !== null && subconcepts.length > 0 && (
               <div>
-                <div className="text-sm font-medium mb-2">소주제 필터</div>
+                <div className="text-sm font-medium dark:text-gray-300 mb-2">소주제 필터</div>
                 <div className="flex flex-wrap gap-2">
                   {subconcepts.map((subconcept) => (
                     <Button
@@ -498,8 +492,8 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                       onClick={() => handleTopicSelect(subconcept.subConceptId)}
                       className={
                         selectedTopic === subconcept.subConceptId
-                          ? "bg-blue-400 hover:bg-blue-500 rounded-xl font-bold"
-                          : "border-blue-100 text-blue-500 hover:bg-blue-50 rounded-xl font-bold"
+                          ? "bg-blue-400 hover:bg-blue-500 dark:bg-blue-600 dark:hover:bg-blue-500 rounded-xl font-bold"
+                          : "border-blue-100 dark:border-gray-600 text-blue-500 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-gray-700/50 rounded-xl font-bold"
                       }
                       disabled={loading}
                     >
@@ -516,7 +510,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
         <TabsContent value="all" className="mt-4">
           <div className="space-y-4">
             {loading ? (
-              <Card className="border-blue-100 dark:border-blue-900">
+              <Card className="border-blue-100 dark:border-gray-700">
                 <CardContent className="p-6 text-center">
                   <p className="text-gray-500 dark:text-gray-400">로딩 중...</p>
                 </CardContent>
@@ -525,18 +519,18 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
               filteredQuestions.map((question) => (
                 <Card
                   key={question.questionId}
-                  className="border-0 shadow-lg rounded-2xl bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 dark:from-blue-900 dark:via-purple-900 dark:to-pink-900"
+                  className="border-0 shadow-lg rounded-2xl bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800"
                 >
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2 mb-2">
                           {/* 해당 문제의 주제 찾기 */}
-                          <Badge className="bg-blue-400 dark:bg-blue-700 rounded-full px-3 py-1 text-white font-bold">
+                          <Badge className="bg-blue-400 dark:bg-blue-600 rounded-full px-3 py-1 text-white font-bold">
                             {question.wrongQuestionSubconceptList?.[0]
                               ?.subConceptType || "주제 없음"}
                           </Badge>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
                             {question.formattedDate
                               ? new Date(
                                   question.formattedDate
@@ -554,7 +548,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                           <img
                             src={question.questionImg}
                             alt="문제 이미지"
-                            className="mt-2 max-h-40 object-contain rounded-xl border border-blue-100 dark:border-blue-800"
+                            className="mt-2 max-h-40 object-contain rounded-xl border border-blue-100 dark:border-gray-700"
                           />
                         )}
                       </div>
@@ -563,7 +557,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="flex items-center gap-1 border-blue-100 dark:border-blue-700 text-blue-500 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded-xl font-bold"
+                          className="flex items-center gap-1 border-blue-100 dark:border-gray-600 text-blue-500 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-gray-700/50 rounded-xl font-bold"
                           disabled={true}
                         >
                           <RotateCcw className="h-3 w-3" />
@@ -573,7 +567,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="flex items-center gap-1 border-blue-100 dark:border-blue-700 text-blue-500 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-900/50 rounded-xl font-bold"
+                          className="flex items-center gap-1 border-blue-100 dark:border-gray-600 text-blue-500 dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-gray-700/50 rounded-xl font-bold"
                           onClick={() => handleRetry(question.questionId)}
                           disabled={loading}
                         >
@@ -586,7 +580,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                 </Card>
               ))
             ) : (
-              <Card className="border-blue-100 dark:border-blue-900">
+              <Card className="border-blue-100 dark:border-gray-700">
                 <CardContent className="p-6 text-center">
                   <p className="text-gray-500 dark:text-gray-400">
                     아직 오답 기록이 없습니다.
@@ -601,7 +595,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
         <TabsContent value="recent" className="mt-0">
           <div className="space-y-4">
             {loading ? (
-              <Card className="border-yellow-100 dark:border-yellow-900">
+              <Card className="border-yellow-100 dark:border-gray-700">
                 <CardContent className="p-6 text-center">
                   <p className="text-gray-500 dark:text-gray-400">로딩 중...</p>
                 </CardContent>
@@ -610,18 +604,18 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
               filteredQuestions.map((question) => (
                 <Card
                   key={question.questionId}
-                  className="border-0 shadow-lg rounded-2xl bg-gradient-to-r from-yellow-50 via-pink-50 to-purple-50 dark:from-yellow-900 dark:via-pink-950 dark:to-purple-950"
+                  className="border-0 shadow-lg rounded-2xl bg-gradient-to-r from-yellow-50 via-pink-50 to-purple-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800"
                 >
                   <CardContent className="p-4">
                     <div className="flex justify-between items-start">
                       <div>
                         <div className="flex items-center gap-2 mb-2">
                           {/* 해당 문제의 주제 찾기 */}
-                          <Badge className="bg-yellow-400 dark:bg-yellow-700 rounded-full px-3 py-1 text-white font-bold">
+                          <Badge className="bg-yellow-400 dark:bg-yellow-600 rounded-full px-3 py-1 text-white font-bold">
                             {question.wrongQuestionSubconceptList?.[0]
                               ?.subConceptType || "주제 없음"}
                           </Badge>
-                          <span className="text-sm text-gray-500">
+                          <span className="text-sm text-gray-500 dark:text-gray-400">
                             {question.formattedDate
                               ? new Date(
                                   question.formattedDate
@@ -639,7 +633,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                           <img
                             src={question.questionImg}
                             alt="문제 이미지"
-                            className="mt-2 max-h-40 object-contain rounded-xl border border-yellow-100 dark:border-yellow-800"
+                            className="mt-2 max-h-40 object-contain rounded-xl border border-yellow-100 dark:border-gray-700"
                           />
                         )}
                       </div>
@@ -648,7 +642,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="flex items-center gap-1 border-yellow-100 dark:border-yellow-800 text-yellow-600 dark:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/50 rounded-xl font-bold"
+                          className="flex items-center gap-1 border-yellow-100 dark:border-gray-600 text-yellow-600 dark:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-gray-700/50 rounded-xl font-bold"
                           disabled={true}
                         >
                           <RotateCcw className="h-3 w-3" />
@@ -658,7 +652,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                         <Button
                           size="sm"
                           variant="outline"
-                          className="flex items-center gap-1 border-yellow-100 dark:border-yellow-800 text-yellow-600 dark:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-yellow-900/50 rounded-xl font-bold"
+                          className="flex items-center gap-1 border-yellow-100 dark:border-gray-600 text-yellow-600 dark:text-yellow-300 hover:bg-yellow-50 dark:hover:bg-gray-700/50 rounded-xl font-bold"
                           onClick={() => handleRetry(question.questionId)}
                           disabled={loading}
                         >
@@ -671,7 +665,7 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                 </Card>
               ))
             ) : (
-              <Card className="border-yellow-100 dark:border-yellow-900">
+              <Card className="border-yellow-100 dark:border-gray-700">
                 <CardContent className="p-6 text-center">
                   <p className="text-gray-500 dark:text-gray-400">
                     최근 학습한 오답이 없습니다.

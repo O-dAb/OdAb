@@ -38,7 +38,7 @@ import { useTheme } from "next-themes";
 
 export default function SettingsPage() {
   // AuthContext에서 사용자 정보 가져오기
-  const { userProfile, updateProfile } = useAuth();
+  const { userProfile, updateProfile} = useAuth();
   const { educationLevel, grade } = userProfile;
 
   const [level, setLevel] = useState<EducationLevel>(educationLevel);
@@ -201,7 +201,7 @@ useEffect(() => {
 
       // 가능한 속성 이름들 확인
       if (data.imageUrl) imageUrlFromServer = data.imageUrl;
-      else if (data.profileUrl) imageUrlFromServer = data.profileUrl;
+      else if (data.profileImageUrl) imageUrlFromServer = data.profileImageUrl;
       else if (data.url) imageUrlFromServer = data.url;
       else if (data.image) imageUrlFromServer = data.image;
       else if (data.profileImageUrl) imageUrlFromServer = data.profileImageUrl;
@@ -227,8 +227,21 @@ useEffect(() => {
 
       if (imageUrlFromServer) {
         setImageUrl(imageUrlFromServer);
-        // userProfile 업데이트
+        // userProfile 업데이트 (userName을 기존 값으로 유지)
         updateProfile(level, selectedGrade, imageUrlFromServer);
+        // userProfile을 localStorage에 직접 갱신할 때 userName을 유지하도록 보장
+        const storedProfile = localStorage.getItem("userProfile");
+        if (storedProfile) {
+          try {
+            const parsedProfile = JSON.parse(storedProfile);
+            parsedProfile.profileUrl = imageUrlFromServer;
+            // userName이 없으면 기존 userProfile의 userName을 유지
+            if (!parsedProfile.userName) {
+              parsedProfile.userName = userProfile.userName;
+            }
+            localStorage.setItem("userProfile", JSON.stringify(parsedProfile));
+          } catch (e) {}
+        }
 
         toast({
           title: "프로필 이미지 업로드 완료",
@@ -250,13 +263,13 @@ useEffect(() => {
   };
 
   return (
-    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-pink-950 dark:via-blue-950 dark:to-purple-950 min-h-screen p-6">
+    <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen p-6">
       {/* 프로필 성공 확인 모달 */}
       <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md dark:bg-gray-800 dark:border-gray-700">
           <DialogHeader>
-            <DialogTitle>프로필 저장 완료</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="dark:text-gray-200">프로필 저장 완료</DialogTitle>
+            <DialogDescription className="dark:text-gray-400">
               프로필 정보가 성공적으로 변경되었습니다.
             </DialogDescription>
           </DialogHeader>
@@ -265,7 +278,7 @@ useEffect(() => {
               onClick={handleCloseSuccessModal}
               className={`${
                 level === "middle" ? "bg-green-500" : "bg-blue-500"
-              } hover:${level === "middle" ? "bg-green-600" : "bg-blue-600"}`}
+              } hover:${level === "middle" ? "bg-green-600" : "bg-blue-600"} dark:bg-blue-600 dark:hover:bg-blue-500`}
             >
               확인
             </Button>
@@ -275,10 +288,10 @@ useEffect(() => {
 
       {/* 설정 성공 확인 모달 */}
       <Dialog open={showSettingsModal} onOpenChange={setShowSettingsModal}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md dark:bg-gray-800 dark:border-gray-700">
           <DialogHeader>
-            <DialogTitle>설정 저장 완료</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="dark:text-gray-200">설정 저장 완료</DialogTitle>
+            <DialogDescription className="dark:text-gray-400">
               앱 설정이 성공적으로 변경되었습니다.
               <br />
               {darkMode
@@ -289,7 +302,7 @@ useEffect(() => {
           <DialogFooter className="sm:justify-center">
             <Button
               onClick={handleCloseSettingsModal}
-              className="bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-600 dark:hover:bg-yellow-700"
+              className="bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-600 dark:hover:bg-yellow-500"
             >
               확인
             </Button>
@@ -300,20 +313,20 @@ useEffect(() => {
       {/* 프로필 이미지 카드 */}
       <Card
         id="profile-image"
-        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 dark:from-purple-900 dark:via-pink-900 dark:to-blue-900"
+        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800"
       >
-        <CardHeader className="bg-purple-50/60 dark:bg-purple-950/60 border-b-0 rounded-t-2xl">
-          <CardTitle className="dark:text-white">프로필 이미지</CardTitle>
-          <CardDescription className="dark:text-gray-300">프로필 이미지를 설정합니다</CardDescription>
+        <CardHeader className="bg-purple-50/60 dark:bg-gray-800/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="dark:text-gray-200">프로필 이미지</CardTitle>
+          <CardDescription className="dark:text-gray-400">프로필 이미지를 설정합니다</CardDescription>
         </CardHeader>
         <CardContent className="pt-6 flex flex-col items-center">
           <div
             className="relative cursor-pointer group"
             onClick={handleImageClick}
           >
-            <Avatar className="w-32 h-32 border-2 border-purple-200 dark:border-purple-700">
+            <Avatar className="w-32 h-32 border-2 border-purple-200 dark:border-gray-600">
               <AvatarImage src={imageUrl} alt="프로필 이미지" />
-              <AvatarFallback className="text-2xl bg-purple-100 dark:bg-purple-800 text-purple-500 dark:text-purple-300">
+              <AvatarFallback className="text-2xl bg-purple-100 dark:bg-gray-700 text-purple-500 dark:text-purple-300">
                 {level === "middle" ? "중" : "고"}
               </AvatarFallback>
             </Avatar>
@@ -324,7 +337,7 @@ useEffect(() => {
 
             {isUploading && (
               <div className="absolute inset-0 bg-black/50 rounded-full flex items-center justify-center">
-                <div className="w-8 h-8 border-4 border-t-purple-500 border-purple-200 dark:border-t-purple-400 dark:border-purple-700 rounded-full animate-spin"></div>
+                <div className="w-8 h-8 border-4 border-t-purple-500 border-purple-200 dark:border-t-purple-400 dark:border-gray-600 rounded-full animate-spin"></div>
               </div>
             )}
           </div>
@@ -347,21 +360,21 @@ useEffect(() => {
 
       <Card
         id="profile"
-        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-blue-100 via-green-100 to-yellow-100 dark:from-blue-900 dark:via-green-900 dark:to-yellow-900"
+        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-blue-100 via-green-100 to-yellow-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800"
       >
         <CardHeader
           className={`${
             level === "middle"
-              ? "bg-green-50/60 dark:bg-green-950/60 border-b-0 rounded-t-2xl"
-              : "bg-blue-50/60 dark:bg-blue-950/60 border-b-0 rounded-t-2xl"
+              ? "bg-green-50/60 dark:bg-gray-800/60 border-b-0 rounded-t-2xl"
+              : "bg-blue-50/60 dark:bg-gray-800/60 border-b-0 rounded-t-2xl"
           }`}
         >
-          <CardTitle className="dark:text-white">프로필 설정</CardTitle>
-          <CardDescription className="dark:text-gray-300">학습 프로필 정보를 관리합니다</CardDescription>
+          <CardTitle className="dark:text-gray-200">프로필 설정</CardTitle>
+          <CardDescription className="dark:text-gray-400">학습 프로필 정보를 관리합니다</CardDescription>
         </CardHeader>
         <CardContent className="pt-6 space-y-6">
           <div className="space-y-4">
-            <h3 className="text-sm font-medium dark:text-white">학교 구분</h3>
+            <h3 className="text-sm font-medium dark:text-gray-200">학교 구분</h3>
             <RadioGroup
               defaultValue={level}
               value={level}
@@ -386,30 +399,30 @@ useEffect(() => {
               </div>
             </RadioGroup>
             <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-              중학교 선택 시 녹색, 고등학교 선택 시 파란색 테마로 적용됩니다.
+              {/* 중학교 선택 시 녹색, 고등학교 선택 시 파란색 테마로 적용됩니다. */}
             </p>
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-sm font-medium dark:text-white">학년</h3>
+            <h3 className="text-sm font-medium dark:text-gray-200">학년</h3>
             <Select
               value={selectedGrade}
               onValueChange={(value) => setSelectedGrade(value as Grade)}
             >
-              <SelectTrigger className="w-full border-blue-200 dark:border-blue-700">
+              <SelectTrigger className="w-full border-blue-200 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200">
                 <SelectValue placeholder="학년 선택" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="1">1학년</SelectItem>
-                <SelectItem value="2">2학년</SelectItem>
-                <SelectItem value="3">3학년</SelectItem>
+              <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+                <SelectItem value="1" className="dark:text-gray-200">1학년</SelectItem>
+                <SelectItem value="2" className="dark:text-gray-200">2학년</SelectItem>
+                <SelectItem value="3" className="dark:text-gray-200">3학년</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <Button
             onClick={handleSaveProfile}
-            className="w-full bg-blue-400 hover:bg-blue-500 dark:bg-blue-600 dark:hover:bg-blue-700 rounded-xl font-bold"
+            className="w-full bg-blue-400 hover:bg-blue-500 dark:bg-blue-600 dark:hover:bg-blue-500 rounded-xl font-bold"
           >
             프로필 저장
           </Button>
@@ -418,16 +431,16 @@ useEffect(() => {
 
       <Card
         id="app-settings"
-        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-yellow-100 via-pink-100 to-purple-100 dark:from-yellow-900 dark:via-pink-900 dark:to-purple-900"
+        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-yellow-100 via-pink-100 to-purple-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800"
       >
-        <CardHeader className="bg-yellow-50/60 dark:bg-yellow-950/60 border-b-0 rounded-t-2xl">
-          <CardTitle className="dark:text-white">앱 설정</CardTitle>
-          <CardDescription className="dark:text-gray-300">앱 사용 환경을 설정합니다</CardDescription>
+        <CardHeader className="bg-yellow-50/60 dark:bg-gray-800/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="dark:text-gray-200">앱 설정</CardTitle>
+          <CardDescription className="dark:text-gray-400">앱 사용 환경을 설정합니다</CardDescription>
         </CardHeader>
         <CardContent className="pt-6 space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-medium dark:text-white">다크 모드</h3>
+              <h3 className="font-medium dark:text-gray-200">다크 모드</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 어두운 테마로 앱을 사용합니다
               </p>
@@ -441,7 +454,7 @@ useEffect(() => {
 
           <Button
             onClick={handleSaveSettings}
-            className="w-full bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-600 dark:hover:bg-yellow-700 rounded-xl font-bold"
+            className="w-full bg-yellow-400 hover:bg-yellow-500 dark:bg-yellow-600 dark:hover:bg-yellow-500 rounded-xl font-bold"
           >
             설정 저장
           </Button>
@@ -450,15 +463,15 @@ useEffect(() => {
 
       <Card
         id="data-management"
-        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-orange-100 via-red-100 to-pink-100 dark:from-orange-900 dark:via-red-900 dark:to-pink-900"
+        className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-orange-100 via-red-100 to-pink-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800"
       >
-        <CardHeader className="bg-orange-50/60 dark:bg-orange-950/60 border-b-0 rounded-t-2xl">
-          <CardTitle className="dark:text-white">데이터 관리</CardTitle>
-          <CardDescription className="dark:text-gray-300">학습 데이터를 관리합니다</CardDescription>
+        <CardHeader className="bg-orange-50/60 dark:bg-gray-800/60 border-b-0 rounded-t-2xl">
+          <CardTitle className="dark:text-gray-200">데이터 관리</CardTitle>
+          <CardDescription className="dark:text-gray-400">학습 데이터를 관리합니다</CardDescription>
         </CardHeader>
         <CardContent className="pt-6 space-y-6">
           <div className="space-y-2">
-            <h3 className="font-medium dark:text-white">데이터 초기화</h3>
+            <h3 className="font-medium dark:text-gray-200">데이터 초기화</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               모든 학습 데이터를 초기화합니다. 이 작업은 되돌릴 수 없습니다.
             </p>
@@ -467,7 +480,7 @@ useEffect(() => {
           <Button
             variant="outline"
             onClick={handleResetData}
-            className="w-full border-orange-200 dark:border-orange-700 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-orange-900/50 rounded-xl font-bold"
+            className="w-full border-orange-200 dark:border-gray-600 text-orange-600 dark:text-orange-400 hover:bg-orange-50 dark:hover:bg-gray-700/50 rounded-xl font-bold"
           >
             데이터 초기화
           </Button>

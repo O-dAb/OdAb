@@ -114,10 +114,10 @@ export function ReviewSchedule({
   }
 
   return (
-    <div className="space-y-12 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-pink-950 dark:via-blue-950 dark:to-purple-950 min-h-screen p-6 flex flex-col items-center">
+    <div className="space-y-12 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen p-6 flex flex-col items-center">
       {/* 오늘의 복습 */}
-      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-green-100 via-yellow-50 to-pink-100 dark:from-green-900 dark:via-yellow-900 dark:to-pink-900 w-full max-w-6xl">
-        <CardHeader className="bg-green-50/60 dark:bg-green-950/60 border-b-0 rounded-t-2xl">
+      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-green-100 via-yellow-50 to-pink-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 w-full max-w-6xl">
+        <CardHeader className="bg-green-50/60 dark:bg-gray-800/60 border-b-0 rounded-t-2xl">
           <CardTitle className="flex justify-between items-center text-green-700 dark:text-green-300 text-xl font-extrabold">
             <span>복습 일정</span>
           </CardTitle>
@@ -127,11 +127,11 @@ export function ReviewSchedule({
             <div className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-purple-600 dark:text-purple-400" />
               
-              <span className="font-medium dark:text-white">오늘의 복습</span>
+              <span className="font-medium dark:text-gray-200">오늘의 복습</span>
             </div>
             <Badge
               variant="outline"
-              className="font-normal bg-white/80 dark:bg-gray-800/80 border-green-200 dark:border-green-700 text-green-700 dark:text-green-300 rounded-full px-3 py-1"
+              className="font-normal bg-white/80 dark:bg-gray-800/80 border-green-200 dark:border-gray-600 text-green-700 dark:text-green-300 rounded-full px-3 py-1"
             >
               {reviewData ? reviewData.todayDate : today}
             </Badge>
@@ -149,7 +149,7 @@ export function ReviewSchedule({
                   href={`/review/${review.subConceptId}`}
                   className="block"
                 >
-                  <Card className="cursor-pointer border-0 shadow-md rounded-xl bg-gradient-to-r from-green-50 via-yellow-50 to-pink-50 dark:from-green-900/40 dark:via-yellow-900/40 dark:to-pink-900/40 hover:scale-105 transition-transform duration-200">
+                  <Card className="cursor-pointer border-0 shadow-md rounded-xl bg-gradient-to-r from-green-50 via-yellow-50 to-pink-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 hover:scale-105 transition-transform duration-200">
                     <CardContent className="p-5 flex justify-between items-center">
                       <div className="font-bold text-green-700 dark:text-green-300">
                         {review.subConceptType}
@@ -171,8 +171,8 @@ export function ReviewSchedule({
       </Card>
 
       {/* 예정된 복습 */}
-      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-yellow-100 via-pink-50 to-purple-50 dark:from-yellow-900 dark:via-pink-900 dark:to-purple-900 w-full max-w-6xl">
-        <CardHeader className="bg-yellow-50/60 dark:bg-yellow-950/60 border-b-0 rounded-t-2xl">
+      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-yellow-100 via-pink-50 to-purple-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 w-full max-w-6xl">
+        <CardHeader className="bg-yellow-50/60 dark:bg-gray-800/60 border-b-0 rounded-t-2xl">
           <CardTitle className="text-yellow-700 dark:text-yellow-300 text-xl font-extrabold">
             예정된 복습
           </CardTitle>
@@ -191,7 +191,7 @@ export function ReviewSchedule({
                   href={`/review/${review.subConceptId}`}
                   className="block"
                 >
-                  <Card className="cursor-pointer border-0 shadow-md rounded-xl bg-gradient-to-r from-yellow-50 via-pink-50 to-purple-50 dark:from-yellow-900/40 dark:via-pink-900/40 dark:to-purple-900/40 hover:scale-105 transition-transform duration-200">
+                  <Card className="cursor-pointer border-0 shadow-md rounded-xl bg-gradient-to-r from-yellow-50 via-pink-50 to-purple-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 hover:scale-105 transition-transform duration-200">
                     <CardContent className="p-5 flex justify-between items-center">
                       <div className="font-bold text-yellow-700 dark:text-yellow-300">
                         {review.subConceptType}
@@ -213,8 +213,8 @@ export function ReviewSchedule({
       </Card>
 
       {/* 주제별 마지막 학습일 */}
-      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-50 to-pink-100 dark:from-blue-900 dark:via-purple-900 dark:to-pink-900 w-full max-w-6xl">
-        <CardHeader className="bg-blue-50/60 dark:bg-blue-950/60 border-b-0 rounded-t-2xl">
+      <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-50 to-pink-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 w-full max-w-6xl">
+        <CardHeader className="bg-blue-50/60 dark:bg-gray-800/60 border-b-0 rounded-t-2xl">
           <CardTitle className="text-blue-700 dark:text-blue-300 text-xl font-extrabold">
             주제별 마지막 학습일
           </CardTitle>
@@ -244,7 +244,7 @@ export function ReviewSchedule({
                         <div className="dark:text-gray-300">{subConcept.subConceptType}</div>
                         <Badge
                           variant="outline"
-                          className="bg-white/80 dark:bg-gray-700/80 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300 rounded-full px-3 py-1"
+                          className="bg-white/80 dark:bg-gray-700/80 border-blue-200 dark:border-gray-600 text-blue-700 dark:text-blue-300 rounded-full px-3 py-1"
                         >
                           {formatDateArray(subConcept.lastLearningDate)}
                         </Badge>

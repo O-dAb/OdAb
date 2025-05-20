@@ -44,7 +44,7 @@ export function SignupForm() {
     <Card className="w-full max-w-md mx-auto border-blue-200">
       <CardHeader className="bg-blue-50 border-b border-blue-200">
         <CardTitle className="text-center text-xl">회원가입</CardTitle>
-        <CardDescription className="text-center">수학 학습 도우미 계정을 만드세요</CardDescription>
+        <CardDescription className="text-center">O! dAb 계정을 만드세요</CardDescription>
       </CardHeader>
       <form onSubmit={handleSignup}>
         <CardContent className="pt-6 space-y-4">

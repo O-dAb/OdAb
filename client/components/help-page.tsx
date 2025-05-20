@@ -49,7 +49,7 @@ export function HelpPage() {
               <div className="space-y-4">
                 <h3 className="text-lg font-medium">수학 도우미란?</h3>
                 <p>
-                  수학 도우미는 중학생과 고등학생을 위한 맞춤형 수학 학습 도우미
+                  O! dAb 은 중학생과 고등학생을 위한 맞춤형 수학 학습 도우미
                   프로그램입니다. 문제 풀이, 개념 학습, 오답 노트, 복습 일정
                   관리 등 다양한 기능을 제공하여 효율적인 수학 학습을
                   도와줍니다.

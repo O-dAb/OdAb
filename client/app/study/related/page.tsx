@@ -71,9 +71,7 @@ export default function RelatedProblemsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGrade, setSelectedGrade] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<string | null>(null);
-  const [selectedSubConceptType, setSelectedSubConceptType] = useState<
-    string | null
-  >(null);
+  const [selectedSubConceptType, setSelectedSubConceptType] = useState<string | null>(null);
   const [problems, setProblems] = useState<Question[]>([]);
   const [filteredProblems, setFilteredProblems] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -140,23 +138,23 @@ export default function RelatedProblemsPage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 dark:border-purple-400"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="container mx-auto py-8">
-        <Card>
+      <div className="container mx-auto py-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="p-8 text-center">
-            <h2 className="text-xl font-semibold mb-2">오류 발생</h2>
-            <p className="text-gray-500">{error}</p>
+            <h2 className="text-xl font-semibold mb-2 dark:text-white">오류 발생</h2>
+            <p className="text-gray-500 dark:text-gray-400">{error}</p>
             <Button
               variant="outline"
               onClick={() => router.back()}
-              className="mt-4"
+              className="mt-4 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               이전 페이지로 돌아가기
             </Button>
@@ -168,15 +166,15 @@ export default function RelatedProblemsPage() {
 
   if (!subConceptId) {
     return (
-      <div className="container mx-auto py-8">
-        <Card>
+      <div className="container mx-auto py-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="p-8 text-center">
-            <h2 className="text-xl font-semibold mb-2">잘못된 접근</h2>
-            <p className="text-gray-500">올바른 개념 ID가 필요합니다.</p>
+            <h2 className="text-xl font-semibold mb-2 dark:text-white">잘못된 접근</h2>
+            <p className="text-gray-500 dark:text-gray-400">올바른 개념 ID가 필요합니다.</p>
             <Button
               variant="outline"
               onClick={() => router.back()}
-              className="mt-4"
+              className="mt-4 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
             >
               이전 페이지로 돌아가기
             </Button>
@@ -187,7 +185,7 @@ export default function RelatedProblemsPage() {
   }
 
   return (
-    <div className="container mx-auto py-6 space-y-6 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50">
+    <div className="container mx-auto py-6 space-y-6 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* 헤더 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -195,21 +193,21 @@ export default function RelatedProblemsPage() {
             variant="outline"
             size="icon"
             onClick={() => router.back()}
-            className="h-8 w-8 bg-white/80 border-purple-200 text-purple-600 hover:bg-purple-50 rounded-xl font-bold"
+            className="h-8 w-8 bg-white/80 dark:bg-gray-800/80 border-purple-200 dark:border-gray-600 text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-gray-700/50 rounded-xl font-bold"
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold text-purple-700">관련 문제</h1>
+          <h1 className="text-2xl font-bold text-purple-700 dark:text-purple-300">관련 문제</h1>
         </div>
       </div>
 
       {/* 검색 및 필터 */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4" />
           <Input
             placeholder="문제 검색..."
-            className="pl-10 border-yellow-100 rounded-xl"
+            className="pl-10 border-yellow-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 rounded-xl"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
@@ -221,24 +219,24 @@ export default function RelatedProblemsPage() {
               setSelectedSubConceptType(value === "all" ? null : value)
             }
           >
-            <SelectTrigger className="w-[140px] border-yellow-100 rounded-xl">
+            <SelectTrigger className="w-[140px] border-yellow-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 rounded-xl">
               <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-gray-500" />
+                <BookOpen className="h-4 w-4 text-gray-500 dark:text-gray-400" />
                 <SelectValue placeholder="개념 유형" />
               </div>
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">전체 유형</SelectItem>
-              <SelectItem value="수와 연산">수와 연산</SelectItem>
-              <SelectItem value="문자와 식">문자와 식</SelectItem>
-              <SelectItem value="함수">함수</SelectItem>
-              <SelectItem value="기하">기하</SelectItem>
-              <SelectItem value="확률과 통계">확률과 통계</SelectItem>
-              <SelectItem value="수열">수열</SelectItem>
-              <SelectItem value="미분">미분</SelectItem>
-              <SelectItem value="적분">적분</SelectItem>
-              <SelectItem value="벡터">벡터</SelectItem>
-              <SelectItem value="행렬">행렬</SelectItem>
+            <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
+              <SelectItem value="all" className="dark:text-gray-200">전체 유형</SelectItem>
+              <SelectItem value="수와 연산" className="dark:text-gray-200">수와 연산</SelectItem>
+              <SelectItem value="문자와 식" className="dark:text-gray-200">문자와 식</SelectItem>
+              <SelectItem value="함수" className="dark:text-gray-200">함수</SelectItem>
+              <SelectItem value="기하" className="dark:text-gray-200">기하</SelectItem>
+              <SelectItem value="확률과 통계" className="dark:text-gray-200">확률과 통계</SelectItem>
+              <SelectItem value="수열" className="dark:text-gray-200">수열</SelectItem>
+              <SelectItem value="미분" className="dark:text-gray-200">미분</SelectItem>
+              <SelectItem value="적분" className="dark:text-gray-200">적분</SelectItem>
+              <SelectItem value="벡터" className="dark:text-gray-200">벡터</SelectItem>
+              <SelectItem value="행렬" className="dark:text-gray-200">행렬</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -250,14 +248,14 @@ export default function RelatedProblemsPage() {
           filteredProblems.map((problem) => (
             <Card
               key={problem.questionId}
-              className="border-l-4 border-l-purple-500 hover:shadow-md transition-shadow rounded-xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100"
+              className="border-l-4 border-l-purple-500 dark:border-l-purple-400 hover:shadow-md transition-shadow rounded-xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 dark:border-gray-700"
             >
-              <CardHeader className="bg-purple-50 border-b border-purple-100 py-3 rounded-t-xl">
+              <CardHeader className="bg-purple-50 dark:bg-gray-800/60 border-b border-purple-100 dark:border-gray-700 py-3 rounded-t-xl">
                 <CardTitle className="flex justify-between items-center text-base">
-                  <span>문제 {problem.questionId}</span>
+                  <span className="dark:text-gray-200">문제 {problem.questionId}</span>
                   <Badge
                     variant="outline"
-                    className="border-purple-200 text-purple-600 text-xs"
+                    className="border-purple-200 dark:border-gray-600 text-purple-600 dark:text-purple-300 text-xs"
                   >
                     {problem.userName}
                   </Badge>
@@ -269,7 +267,7 @@ export default function RelatedProblemsPage() {
                     <Badge
                       key={index}
                       variant="outline"
-                      className="border-blue-200 text-blue-600 text-xs"
+                      className="border-blue-200 dark:border-gray-600 text-blue-600 dark:text-blue-300 text-xs"
                     >
                       {subConcept.subConceptType}
                     </Badge>
@@ -277,7 +275,7 @@ export default function RelatedProblemsPage() {
                 </div>
                 <div className="mb-3 max-h-[100px] overflow-hidden">
                   {problem.questionText ? (
-                    <p className="text-gray-600 text-sm line-clamp-3">
+                    <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3">
                       {problem.questionText}
                     </p>
                   ) : problem.questionImg ? (
@@ -291,7 +289,7 @@ export default function RelatedProblemsPage() {
                 <div className="flex justify-end">
                   <Button
                     onClick={() => handleSolveProblem(problem.questionId)}
-                    className="bg-purple-500 hover:bg-purple-600 text-sm h-8 rounded-xl font-bold"
+                    className="bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-500 text-sm h-8 rounded-xl font-bold"
                   >
                     문제 풀기
                   </Button>
@@ -300,9 +298,9 @@ export default function RelatedProblemsPage() {
             </Card>
           ))
         ) : (
-          <Card className="col-span-3 border-yellow-100 rounded-xl">
+          <Card className="col-span-3 border-yellow-100 dark:border-gray-700 dark:bg-gray-800 rounded-xl">
             <CardContent className="p-6 text-center">
-              <p className="text-gray-500">검색 결과가 없습니다.</p>
+              <p className="text-gray-500 dark:text-gray-400">검색 결과가 없습니다.</p>
             </CardContent>
           </Card>
         )}

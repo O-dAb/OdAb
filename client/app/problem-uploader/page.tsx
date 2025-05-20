@@ -388,7 +388,7 @@ export default function ProblemUploaderPage() {
   }, [problemData]); // problemData가 변경될 때만 실행
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 flex flex-col items-center justify-center py-10">
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex flex-col items-center justify-center py-10">
       {!showProblemSolver ? (
         // 문제 업로드 화면
         <div className="flex flex-col md:flex-row items-center justify-center gap-16 w-full">
@@ -422,7 +422,7 @@ export default function ProblemUploaderPage() {
                 {/* 카메라 촬영 */}
                 <Button
                   variant="outline"
-                  className="h-auto flex flex-col items-center justify-center py-6 rounded-xl bg-blue-100 hover:bg-blue-200 border-blue-200 shadow"
+                  className="h-auto flex flex-col items-center justify-center py-6 rounded-xl bg-blue-100 dark:bg-gray-800 hover:bg-blue-200 dark:hover:bg-gray-700 border-blue-200 dark:border-gray-600 shadow"
                   onClick={handleCameraCapture}
                 >
                   <Camera className="h-10 w-10 text-blue-400 mb-2" />
@@ -432,16 +432,16 @@ export default function ProblemUploaderPage() {
               </div>
 
               {previewImage && (
-                <div className="space-y-2">
-                  <div className="text-sm font-medium">선택한 이미지</div>
+                <div className="space-y-2 mt-8">
+                  <div className="text-sm font-medium dark:text-gray-300">선택한 이미지</div>
                   <div className="relative">
                     <img
                       src={previewImage}
                       alt="문제 이미지"
-                      className="w-full h-auto max-h-[300px] object-contain border rounded-xl shadow"
+                      className="w-full h-auto max-h-[300px] object-contain border rounded-xl shadow dark:border-gray-700"
                     />
                     <Button
-                      className="mt-2 bg-purple-500 hover:bg-purple-600 w-full rounded-xl font-bold"
+                      className="mt-4 bg-purple-500 hover:bg-purple-600 dark:bg-purple-600 dark:hover:bg-purple-500 w-full rounded-xl font-bold"
                       onClick={handleImageSubmit}
                       disabled={isUploading}
                     >
@@ -453,12 +453,12 @@ export default function ProblemUploaderPage() {
               )}
             </CardContent>
             {isUploading && (
-              <CardFooter>
+              <CardFooter className="pb-6">
                 <div className="w-full">
-                  <div className="w-full bg-gray-200 rounded-full h-2.5">
-                    <div className="bg-purple-600 h-2.5 rounded-full animate-pulse w-3/4"></div>
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+                    <div className="bg-purple-600 dark:bg-purple-500 h-2.5 rounded-full animate-pulse w-3/4"></div>
                   </div>
-                  <p className="text-sm text-center mt-2">문제 인식 중...</p>
+                  <p className="text-sm text-center mt-2 dark:text-gray-300">문제 인식 중...</p>
                 </div>
               </CardFooter>
             )}
@@ -515,7 +515,7 @@ export default function ProblemUploaderPage() {
                       <Badge
                         key={index}
                         variant="secondary"
-                        className="bg-purple-400 text-white font-bold rounded-full px-3 py-1"
+                        className="bg-purple-400 dark:bg-purple-600 text-white font-bold rounded-full px-3 py-1"
                       >
                         {concept}
                       </Badge>
@@ -593,9 +593,9 @@ export default function ProblemUploaderPage() {
                 </div>
 
                 {/* 정답 표시 */}
-                <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-lg">
-                  <h3 className="font-bold text-blue-700 mb-2">정답</h3>
-                  <p className="text-gray-700 font-medium">
+                <div className="mt-6 p-4 bg-blue-50 dark:bg-gray-800/50 border border-blue-100 dark:border-gray-700 rounded-lg">
+                  <h3 className="font-bold text-blue-700 dark:text-blue-300 mb-2">정답</h3>
+                  <p className="text-gray-700 dark:text-gray-300 font-medium">
                     {problemData?.answer}
                   </p>
                 </div>

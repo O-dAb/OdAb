@@ -10,7 +10,7 @@ import { Suspense } from "react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "수학 학습 도우미",
+  title: "O! dAb",
   description: "수학 학습을 위한 종합 학습 플랫폼",
 };
 
