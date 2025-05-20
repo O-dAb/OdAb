@@ -62,10 +62,10 @@ public class ClaudeServiceImpl implements ClaudeService {
     private final JwtService jwtService;
     private final QuestionResultRepository questionResultRepository;
     // !!!!!!수정포인트!!!!!!
-//    private String modelVersion = "claude-3-5-sonnet-20240620";    //사용할 모델명
-        private String modelVersion = "claude-3-7-sonnet-20250219";	//사용할 모델명
+    private String modelVersion = "claude-3-5-sonnet-20240620";    //사용할 모델명
+//        private String modelVersion = "claude-3-7-sonnet-20250219";	//사용할 모델명
     private int maxTokens = 4000;                    //최대 사용 가능한 토큰 수
-    private final int MAX_DEPTH = 20;
+    private final int MAX_DEPTH = 15;
     private final int REQUEST_TIMEOUT_SECONDS = 30; // 타임아웃 시간 (초)
     private final int MAX_RETRIES = 3; // 최대 재시도 횟수
     @Transactional
