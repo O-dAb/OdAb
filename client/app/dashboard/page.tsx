@@ -190,7 +190,7 @@ export default function DashboardPage() {
             )}
           </CardContent>
           <CardFooter className="pt-2 pb-6">
-            <Link href="/review" className="w-full">
+            <Link href="/review-schedule" className="w-full">
               <Button className="w-full bg-green-400 hover:bg-green-500 dark:bg-green-500 dark:hover:bg-green-600 rounded-xl font-medium shadow-sm">
                 복습하기
               </Button>
