@@ -21,8 +21,8 @@ public class ClaudeController {
             @RequestParam(value = "userAsk") String userAsk,
             @RequestParam(value = "imageData") MultipartFile imageData) {
         // !!!!!!수정포인트!!!!!!
-//        Integer userId = jwtService.getUserId();
-        Integer userId = 1;
+        Integer userId = jwtService.getUserId();
+//        Integer userId = 1;
         ApiRequestDto apiRequestDto = new ApiRequestDto();
         apiRequestDto.setUserAsk(userAsk);
         apiRequestDto.setImageData(imageData);
@@ -33,8 +33,8 @@ public class ClaudeController {
     public Mono<ClaudeTextApiResponseDto> apiRequest2(
             @RequestParam(value = "imageData") MultipartFile imageData) {
         // !!!!!!수정포인트!!!!!!
-//        Integer userId = jwtService.getUserId();
-        Integer userId = 1;
+        Integer userId = jwtService.getUserId();
+//        Integer userId = 1;
         ApiRequestDto apiRequestDto = new ApiRequestDto();
         apiRequestDto.setImageData(imageData);
         return claudeService.extractProblem(apiRequestDto, userId);
@@ -44,8 +44,8 @@ public class ClaudeController {
     public Mono<FixProblemResponseDto> apiRequest3(
             @RequestBody FixProblemRequestDto fixProblemRequestDto) {
         // !!!!!!수정포인트!!!!!!
-//        Integer userId = jwtService.getUserId();
-        Integer userId = 1;
+        Integer userId = jwtService.getUserId();
+//        Integer userId = 1;
         return claudeService.fixProblem(fixProblemRequestDto, userId);
     }
 }
