@@ -16,6 +16,9 @@ authInstance.interceptors.request.use(
     const accessToken = localStorage.getItem("accessToken");
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
+      console.log("Authorization 헤더 추가됨:", config.headers.Authorization);
+    } else {
+      console.log("accessToken 없음!");
     }
     return config;
   },
