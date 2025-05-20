@@ -28,6 +28,29 @@ function formatDate(dateArr: number[] | string) {
   return dateArr || "";
 }
 
+function formatDateYMD(dateStrOrArr: string | number[]) {
+  if (Array.isArray(dateStrOrArr) && dateStrOrArr.length === 3) {
+    const [y, m, d] = dateStrOrArr;
+    return `${y}년 ${m}월 ${d}일`;
+  }
+  if (typeof dateStrOrArr === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateStrOrArr)) {
+    const [y, m, d] = dateStrOrArr.split("-");
+    return `${y}년 ${parseInt(m, 10)}월 ${parseInt(d, 10)}일`;
+  }
+  return dateStrOrArr || "";
+}
+
+function formatDateDash(dateStrOrArr: string | number[]) {
+  if (Array.isArray(dateStrOrArr) && dateStrOrArr.length === 3) {
+    const [y, m, d] = dateStrOrArr;
+    return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+  }
+  if (typeof dateStrOrArr === "string" && /^\d{4}-\d{2}-\d{2}$/.test(dateStrOrArr)) {
+    return dateStrOrArr;
+  }
+  return dateStrOrArr || "";
+}
+
 export default function DashboardPage() {
   // AuthContext에서 사용자 정보 가져오기
   const { userProfile } = useAuth();
@@ -151,7 +174,7 @@ export default function DashboardPage() {
                         {review.subConceptType}
                       </div>
                       <div className="text-sm text-gray-500 dark:text-gray-300">
-                        마지막 학습일: {review.lastLearningTime}
+                        마지막 학습일: {formatDateDash(review.lastLearningTime)}
                       </div>
                     </div>
                     <Badge className="bg-green-400 dark:bg-green-500 rounded-lg px-3 py-1">
@@ -191,10 +214,26 @@ export default function DashboardPage() {
                 <div className="text-sm font-medium text-blue-700 dark:text-blue-200">
                   최근 학습
                 </div>
-                <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-blue-200 rounded-lg px-3 py-1">
-                  오늘
-                </Badge>
+                {recentStudy && recentStudy.lastLearningTime ? (
+                  <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-600 dark:text-blue-200 rounded-lg px-3 py-1">
+                    {formatDateDash(recentStudy.lastLearningTime)}
+                  </Badge>
+                ) : null}
               </div>
+              {recentStudy ? (
+                <div className="mt-2">
+                  <div className="font-bold text-lg text-blue-700 dark:text-blue-200">
+                    {recentStudy.subConceptType}
+                  </div>
+                  <div className="text-sm text-gray-500 dark:text-gray-300">
+                    마지막 학습일: {formatDateDash(recentStudy.lastLearningTime)}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-gray-400 dark:text-gray-500 mt-2">
+                  최근 학습 데이터가 없습니다.
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>
