@@ -140,13 +140,14 @@ public class KakaoService {
         String uuid = UUID.randomUUID().toString();
 
         // 4. Redis에 JSON으로 저장 (3분 유효)
-        Map<String, Object> redisData = Map.of(
-            "accessToken", accessToken,
-            "refreshToken", refreshToken,
-            "userId", user.getId(),
-            "nickname", user.getUserName(),
-            "grade", user.getGrade()
-        );
+
+        Map<String, Object> redisData = new HashMap<>();
+        redisData.put("accessToken", accessToken);
+        redisData.put("refreshToken", refreshToken);
+        redisData.put("userId", user.getId());
+        redisData.put("nickname", user.getUserName());
+        redisData.put("grade", user.getGrade());
+        redisData.put("profileUrl", user.getProfileUrl() != null ? user.getProfileUrl() : ""); // url null 처리
         try {
             String redisValue = objectMapper.writeValueAsString(redisData);
             redisTemplate.opsForValue().set(uuid, redisValue, 3, TimeUnit.MINUTES);

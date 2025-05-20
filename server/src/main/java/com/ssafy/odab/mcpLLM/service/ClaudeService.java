@@ -1,7 +1,6 @@
 package com.ssafy.odab.mcpLLM.service;
 
-import com.ssafy.odab.mcpLLM.dto.ApiRequestDto;
-import com.ssafy.odab.mcpLLM.dto.ApiResponseDto;
+import com.ssafy.odab.mcpLLM.dto.*;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -9,7 +8,11 @@ import reactor.core.publisher.Mono;
 public interface ClaudeService {
     Mono<ApiResponseDto> sendMathProblem(ApiRequestDto apiRequestDto, Integer userId);
 
-    Mono<ApiResponseDto> extractProblem(ApiRequestDto apiRequestDto, Integer userId);
+    Mono<ClaudeTextApiResponseDto> extractProblem(ApiRequestDto apiRequestDto, Integer userId);
 
     Mono<Boolean> isCorrectAnswer(String answer, String questionText, String userAnswerImg, Integer userId);
+
+    Mono<ApiResponseDto> searchSimilarQuestions(ApiRequestDto apiRequestDto, Integer userId);
+
+    Mono<FixProblemResponseDto> fixProblem(FixProblemRequestDto fixProblemRequestDto, Integer userId);
 }

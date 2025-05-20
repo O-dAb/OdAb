@@ -8,7 +8,7 @@ import type { EducationLevel, Grade } from "@/components/user-profile";
 import { useRouter } from "next/navigation";
 import Link from "next/link"; // Next.js의 Link 컴포넌트 추가
 import axios from "axios";
-
+import { authApi } from "@/lib/api";
 /**
  * 복습 일정 컴포넌트
  * 학생이 이전에 학습한 내용을 효과적으로 복습할 수 있도록 일정을 관리
@@ -79,8 +79,10 @@ export function ReviewSchedule({
       // 디버깅: 요청 시작 로그
       console.log("[복습] API 요청 시작", today);
       try {
+        
         // 실제 서버로 요청 (프록시 미설정 시 http://localhost:8080 명시)
-        const res = await axios.get(
+        //authApi.get( auth로  하면 오류. 
+        const res = await authApi.get(
           `${process.env.NEXT_PUBLIC_API_URL}/api/v1/learning/review`,
           {
             params: { date: today },
@@ -89,10 +91,10 @@ export function ReviewSchedule({
         // 디버깅: 응답 전체 로그
         console.log("[복습] API 응답", res);
         // 응답 데이터 구조 확인
-        if (res.data && res.data.data) {
-          setReviewData(res.data.data);
+        if (res && res.data) {
+          setReviewData(res.data);
           // 디버깅: 파싱된 데이터 로그
-          console.log("[복습] 파싱된 데이터", res.data.data);
+          console.log("[복습] 파싱된 데이터", res.data);
         } else {
           // 응답 구조가 예상과 다를 때
           setReviewData(null);
