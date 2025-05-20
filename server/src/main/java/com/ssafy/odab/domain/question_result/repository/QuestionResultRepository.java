@@ -47,10 +47,15 @@ public interface QuestionResultRepository extends JpaRepository<QuestionResult, 
             "JOIN question q ON qr.question_id = q.question_id " +
             "JOIN question_concept qc ON q.question_id = qc.question_id " +
             "JOIN sub_concept sc ON qc.sub_concept_id = sc.sub_concept_id " +
+            "INNER JOIN ( " +
+            "    SELECT question_id, user_id, MIN(solved_at) AS first_wrong_time " +
+            "    FROM question_result " +
+            "    WHERE is_correct = 0 " +
+            "    GROUP BY question_id, user_id " +
+            ") fw ON qr.question_id = fw.question_id AND qr.user_id = fw.user_id AND qr.solved_at = fw.first_wrong_time " +
             "WHERE qr.user_id = :userId " +
             "AND DATE(qr.solved_at) IN (:reviewDates) " +
-            "AND qr.is_correct = false " +
-            "AND qr.times = 1 " +
+            "AND qr.is_correct = 0 " +
             "GROUP BY sc.sub_concept_id, sc.sub_concept_type, DATE(qr.solved_at)",
             nativeQuery = true)
     List<Object[]> findReviewDtosByUserIdAndDatesWithFirstWrong(@Param("userId") Integer userId, @Param("reviewDates") List<LocalDate> reviewDates);

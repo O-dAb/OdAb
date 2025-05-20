@@ -19,9 +19,10 @@ public class MainController {
     public ResponseEntity<?> getMainPage() {
         
         // Integer userId = 1; // TODO: 실제 로그인 유저로 교체
-        
-        Integer userId = jwtService.getUserId(); // 만드는중. 
+        Integer userId = jwtService.getUserId(); // 만드는중.
+        System.out.println("userId = " + userId);
         MainPageResponseDto data = mainService.getMainPage(userId);
+        System.out.println("하이");
         return ResponseEntity.ok(
                 new ApiResponse<>(200, "성공적으로 조회되었습니다.", data)
         );
