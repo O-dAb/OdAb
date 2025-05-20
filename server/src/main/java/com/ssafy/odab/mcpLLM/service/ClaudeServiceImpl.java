@@ -13,6 +13,8 @@ import com.ssafy.odab.domain.question.entity.Question;
 import com.ssafy.odab.domain.question.entity.QuestionSolution;
 import com.ssafy.odab.domain.question.repository.QuestionRepository;
 import com.ssafy.odab.domain.question.repository.QuestionSolutionRepository;
+import com.ssafy.odab.domain.question_result.entity.QuestionResult;
+import com.ssafy.odab.domain.question_result.repository.QuestionResultRepository;
 import com.ssafy.odab.domain.user.entity.User;
 import com.ssafy.odab.domain.user.repository.UserRepository;
 import com.ssafy.odab.domain.user.service.JwtService;
@@ -58,16 +60,58 @@ public class ClaudeServiceImpl implements ClaudeService {
     private final LastLearningDateRepository lastLearningDateRepository;
     private final RagQuestionRepository ragQuestionRepository;
     private final JwtService jwtService;
+    private final QuestionResultRepository questionResultRepository;
+    // !!!!!!수정포인트!!!!!!
     private String modelVersion = "claude-3-5-sonnet-20240620";    //사용할 모델명
     //    private String modelVersion = "claude-3-7-sonnet-20250219";	//사용할 모델명
     private int maxTokens = 4000;                    //최대 사용 가능한 토큰 수
     private final int MAX_DEPTH = 20;
     private final int REQUEST_TIMEOUT_SECONDS = 30; // 타임아웃 시간 (초)
     private final int MAX_RETRIES = 3; // 최대 재시도 횟수
+    @Transactional
+    public Mono<FixProblemResponseDto> fixProblem(FixProblemRequestDto fixProblemRequestDto, Integer userId) {
+        List<Object> contents = new ArrayList<>();
+        String prompt = String.format("""
+                아래 문제를 사용자 요청에 따라 수정해줘.
+                수정된 문제를 반환해줘.
+                문제 이외의 다른 대답은 하지마.
+                
+                수정될 문제 :
+                %s
+                
+                사용자 요청 :
+                %s
+                """, fixProblemRequestDto.getProblem(), fixProblemRequestDto.getUserAsk());
+        // 유저 대화내용 content 생성후 contents 에 넣음.
+        contents.add(ClaudeRequestApiDto.TextContent.builder()
+                .type("text")
+                .text(prompt)
+                .build());
+        // 보낼 메시지 생성
+        List<ClaudeRequestApiDto.Message> sendMessages = new ArrayList<>();
+        sendMessages.add(ClaudeRequestApiDto.Message.builder()
+                .role("user")
+                .content(contents)
+                .build());
+        ClaudeRequestApiDto request = ClaudeRequestApiDto.builder()
+                .model(modelVersion)
+                .max_tokens(maxTokens)
+                .messages(sendMessages)
+                .build();
 
+
+        return sendClaudeApi(request, sendMessages, 0, true, userId)
+                .flatMap(response -> {
+                    System.out.println("response = " + response.getContent().get(0).getText());;
+                    FixProblemResponseDto fixProblemResponseDto = FixProblemResponseDto.builder()
+                            .problem(response.getContent().get(0).getText())
+                            .build();
+                    return Mono.just(fixProblemResponseDto);
+                });
+    }
 
     @Transactional
-    public Mono<ApiResponseDto> extractProblem(ApiRequestDto apiRequestDto, Integer userId) {
+    public Mono<ClaudeTextApiResponseDto> extractProblem(ApiRequestDto apiRequestDto, Integer userId) {
         List<Object> contents = new ArrayList<>();
         String prompt = """
                 해당 이미지를 텍스트로 변환해줘.
@@ -111,9 +155,10 @@ public class ClaudeServiceImpl implements ClaudeService {
         return sendClaudeApi(request, sendMessages, 0, true, userId)
                 .flatMap(response -> {
                     String problem = response.getContent().get(0).getText();
-                    apiRequestDto.setUserAsk(problem);
-                    System.out.println("텍스트 찾기"+response.getContent().get(0).getText());
-                    return searchSimilarQuestions(apiRequestDto, userId);
+                    ClaudeTextApiResponseDto apiResponseDto = ClaudeTextApiResponseDto.builder()
+                            .questionText(problem)
+                            .build();
+                    return Mono.just(apiResponseDto);
                 });
     }
 
@@ -276,8 +321,10 @@ public class ClaudeServiceImpl implements ClaudeService {
             HttpEntity<FaissRequest> entity = new HttpEntity<>(request, headers);
 
             // FAISS 서버에 POST 요청 보내기
+            // !!!!!!수정포인트!!!!!!
             ResponseEntity<FaissResponse> response = restTemplate.exchange(
                     "https://k12b103.p.ssafy.io/api/python/search",
+//                    "http://localhost:8000/search",
                     HttpMethod.POST,
                     entity,
                     FaissResponse.class
@@ -420,6 +467,16 @@ public class ClaudeServiceImpl implements ClaudeService {
                             .questionSolution(solutionsForDto)
                             .subConcepts(conceptsForDto)
                             .build();
+                    QuestionResult questionResult = QuestionResult.builder()
+                            .question(question)
+                            .user(user)
+                            .solvedAt(LocalDateTime.now())
+                            .isCorrect(false)
+                            .solutionImage(null)
+                            .solutionImage("https://odab-s3-1.s3.ap-northeast-2.amazonaws.com/product/defaultImg.png")
+                            .times(0)
+                            .build();
+                    questionResultRepository.save(questionResult);
                     return Mono.just(apiResponseDto);
                 });
     }
