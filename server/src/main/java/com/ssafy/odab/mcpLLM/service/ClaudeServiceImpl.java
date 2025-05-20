@@ -63,9 +63,9 @@ public class ClaudeServiceImpl implements ClaudeService {
     private final QuestionResultRepository questionResultRepository;
     // !!!!!!수정포인트!!!!!!
     private String modelVersion = "claude-3-5-sonnet-20240620";    //사용할 모델명
-    //    private String modelVersion = "claude-3-7-sonnet-20250219";	//사용할 모델명
+//        private String modelVersion = "claude-3-7-sonnet-20250219";	//사용할 모델명
     private int maxTokens = 4000;                    //최대 사용 가능한 토큰 수
-    private final int MAX_DEPTH = 20;
+    private final int MAX_DEPTH = 15;
     private final int REQUEST_TIMEOUT_SECONDS = 30; // 타임아웃 시간 (초)
     private final int MAX_RETRIES = 3; // 최대 재시도 횟수
     @Transactional
@@ -323,8 +323,8 @@ public class ClaudeServiceImpl implements ClaudeService {
             // FAISS 서버에 POST 요청 보내기
             // !!!!!!수정포인트!!!!!!
             ResponseEntity<FaissResponse> response = restTemplate.exchange(
-                    "https://k12b103.p.ssafy.io/api/python/search",
-//                    "http://localhost:8000/search",
+//                    "https://k12b103.p.ssafy.io/api/python/search",
+                    "http://localhost:8000/search",
                     HttpMethod.POST,
                     entity,
                     FaissResponse.class
