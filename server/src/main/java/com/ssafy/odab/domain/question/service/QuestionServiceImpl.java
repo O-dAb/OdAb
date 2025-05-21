@@ -53,7 +53,10 @@ public class QuestionServiceImpl implements QuestionService {
         Pageable pageable = PageRequest.of(0, 1);
 
         List<QuestionResult> questionResults = questionResultRepository.findByQuestionIdAndUserId(question.getId(), userId, pageable);
-        QuestionResult questionResult = questionResults.get(0);
+        QuestionResult questionResult = null;
+        if (!questionResults.isEmpty()) {
+            questionResult = questionResults.get(0);
+        }
         // claude에 정답 비교
         Boolean isCorrect = claudeService.isCorrectAnswer(question.getAnswer(), question.getQuestionText(), verifyAnswerRequestDto.getAnswerImg(), userId).block();;
 
