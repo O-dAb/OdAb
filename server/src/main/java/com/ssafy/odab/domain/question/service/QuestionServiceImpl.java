@@ -58,7 +58,7 @@ public class QuestionServiceImpl implements QuestionService {
             questionResult = questionResults.get(0);
         }
         // claude에 정답 비교
-        Boolean isCorrect = claudeService.isCorrectAnswer(question.getAnswer(), question.getQuestionText(), verifyAnswerRequestDto.getAnswerImg(), userId).block();;
+        Boolean isCorrect = claudeService.isCorrectAnswer(question.getAnswer(), question.getQuestionText(), verifyAnswerRequestDto.getAnswerText(), userId).block();;
 
         // 정답이 맞으면 풀이일자 수정, 정답여부 true
         // 정답이 틀리면 풀이일자 수정, 정답여부 false
