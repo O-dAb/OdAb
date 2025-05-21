@@ -526,7 +526,7 @@ export default function RetryQuestionPage() {
 
   return (
     <>
-      <div className="flex flex-col h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50">
+      <div className="flex flex-col h-screen bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <div className="flex-1 p-8">
           <Button
             variant="outline"
@@ -539,18 +539,18 @@ export default function RetryQuestionPage() {
 
           <div className="flex flex-col md:flex-row gap-6">
             <Card className="border-0 shadow-xl rounded-2xl bg-white dark:bg-gray-800 w-2/5">
-              <CardHeader className="bg-purple-50/60 border-b-0 rounded-t-2xl p-4">
-                <div className="flex items-center gap-2 text-purple-700 font-extrabold">
-                  문제 다시 풀기
+              <div className="flex flex-col space-y-1.5 p-6 bg-blue-50/60 dark:bg-gray-800/60 border-b-0 rounded-t-2xl">
+                <div className="text-2xl font-semibold leading-none tracking-tight flex justify-between items-center text-blue-700 dark:text-blue-300">
+                  <span>문제 다시 풀기</span>
                 </div>
-              </CardHeader>
-              <div className="px-6 py-3 bg-purple-50/60 dark:bg-gray-700/60 border-t border-purple-100 dark:border-gray-600">
+              </div>
+              <div className="px-6 py-3 bg-blue-50/60 dark:bg-gray-800/60 border-t border-blue-100 dark:border-gray-600">
                 <div className="flex flex-wrap gap-2">
                   {question.retryQuestionSubConceptDtos.map((concept) => (
                     <Badge
                       key={concept.subConceptId}
                       variant="secondary"
-                      className="bg-purple-400 text-white font-bold rounded-lg px-3 py-1 hover:bg-purple-400 dark:hover:bg-purple-600"
+                      className="bg-purple-400 dark:bg-purple-600 text-white font-bold rounded-lg px-3 py-1 hover:bg-purple-400 dark:hover:bg-purple-600"
                     >
                       {concept.subConceptType}
                     </Badge>
@@ -560,13 +560,13 @@ export default function RetryQuestionPage() {
               <CardContent className="pt-8 space-y-6">
                 {/* 문제 내용 */}
                 <div className="space-y-4">
-                  <div className="font-bold text-lg text-purple-700">문제</div>
-                  <p className="text-gray-700">{question.questionText}</p>
+                  <div className="font-bold text-lg text-purple-700 dark:text-purple-300">문제</div>
+                  <p className="text-gray-700 dark:text-gray-100">{question.questionText}</p>
                   {question.questionImg && (
                     <img
                       src={question.questionImg}
                       alt="문제 이미지"
-                      className="mt-4 max-w-full rounded-xl border border-purple-200 shadow-md"
+                      className="mt-4 max-w-full rounded-xl border border-purple-200 dark:border-purple-700 shadow-md"
                     />
                   )}
                 </div>
@@ -577,7 +577,7 @@ export default function RetryQuestionPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => setShowSolution(!showSolution)}
-                    className="text-purple-600 hover:text-purple-700 rounded-xl font-bold"
+                    className="text-purple-600 dark:text-purple-300 hover:text-purple-700 dark:hover:text-purple-200 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-xl font-bold border-purple-200 dark:border-purple-700"
                   >
                     {showSolution ? "해설 닫기" : "해설 보기"}
                   </Button>
@@ -591,11 +591,11 @@ export default function RetryQuestionPage() {
                             setCurrentStep((prev) => Math.max(0, prev - 1))
                           }
                           disabled={currentStep === 0}
-                          className="text-purple-600 hover:text-purple-700 rounded-xl font-bold"
+                          className="text-purple-600 dark:text-purple-300 hover:text-purple-700 dark:hover:text-purple-200 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-xl font-bold border-purple-200 dark:border-purple-700"
                         >
                           <ChevronLeft className="h-4 w-4" />
                         </Button>
-                        <span className="text-sm text-gray-600">
+                        <span className="text-sm text-gray-600 dark:text-gray-300">
                           {currentStep + 1} /{" "}
                           {question.retryQuestionSolutionDtos.length}
                         </span>
@@ -614,7 +614,7 @@ export default function RetryQuestionPage() {
                             currentStep ===
                             question.retryQuestionSolutionDtos.length - 1
                           }
-                          className="text-purple-600 hover:text-purple-700 rounded-xl font-bold"
+                          className="text-purple-600 dark:text-purple-300 hover:text-purple-700 dark:hover:text-purple-200 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-xl font-bold border-purple-200 dark:border-purple-700"
                         >
                           <ChevronRight className="h-4 w-4" />
                         </Button>
@@ -624,18 +624,15 @@ export default function RetryQuestionPage() {
 
                 {showSolution &&
                   question.retryQuestionSolutionDtos.length > 0 && (
-                    <div className="mt-6 p-4 bg-purple-50 border border-purple-100 rounded-md">
-                      <h3 className="font-bold text-purple-700 mb-3">해설</h3>
+                    <div className="mt-6 p-4 bg-purple-50 dark:bg-gray-800/50 border border-purple-100 dark:border-gray-700 rounded-md">
+                      <h3 className="font-bold text-purple-700 dark:text-purple-300 mb-3">해설</h3>
                       <div className="space-y-3">
                         <div className="space-y-1">
-                          <div className="font-bold text-purple-600">
+                          <div className="font-bold text-purple-600 dark:text-purple-400">
                             Step {currentStep + 1}
                           </div>
-                          <p className="text-gray-700">
-                            {
-                              question.retryQuestionSolutionDtos[currentStep]
-                                .solutionContent
-                            }
+                          <p className="text-gray-700 dark:text-gray-100">
+                            {question.retryQuestionSolutionDtos[currentStep].solutionContent}
                           </p>
                         </div>
                       </div>
@@ -645,11 +642,11 @@ export default function RetryQuestionPage() {
             </Card>
 
             <Card className="border-0 shadow-xl rounded-2xl bg-white dark:bg-gray-800 w-3/5">
-              <CardHeader className="bg-purple-50/60 border-b-0 rounded-t-2xl">
-                <CardTitle className="text-purple-700 font-extrabold">
-                  풀이 과정
-                </CardTitle>
-              </CardHeader>
+              <div className="flex flex-col space-y-1.5 p-6 bg-blue-50/60 dark:bg-gray-800/60 border-b-0 rounded-t-2xl">
+                <div className="text-2xl font-semibold leading-none tracking-tight flex justify-between items-center text-blue-700 dark:text-blue-300">
+                  <span>풀이 과정</span>
+                </div>
+              </div>
               <CardContent className="pt-8 space-y-6">
                 <div className="flex justify-between items-center">
                   <div className="flex gap-2">
@@ -900,10 +897,10 @@ export default function RetryQuestionPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-purple-900">답:</span>
+                  <span className="font-bold text-purple-900 dark:text-purple-300">답:</span>
                   <div
                     ref={answerCanvasContainerRef}
-                    className="border border-purple-100 rounded-lg overflow-hidden"
+                    className="border border-purple-100 dark:border-purple-700 rounded-lg overflow-hidden"
                     style={{
                       width: "300px",
                       height: "150px",
