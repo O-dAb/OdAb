@@ -39,9 +39,18 @@ export default function LoadingPage() {
         {isLoading ? (
           <div className="text-center space-y-6">
             <div className="flex justify-center">
-              <div className="relative">
-                <BrainCircuit className="h-20 w-20 text-purple-500 dark:text-purple-400 animate-pulse" />
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 text-xs font-medium text-purple-700 dark:text-purple-300">
+              <div className="relative aspect-square max-w-[320px] max-h-[320px] w-full h-full mx-auto bg-blue-100 dark:bg-blue-900/30 rounded-full p-8 overflow-hidden flex items-center justify-center">
+                <video
+                  className="max-w-[320px] max-h-[320px] w-full h-full object-contain rounded-full"
+                  muted
+                  playsInline
+                  autoPlay
+                  loop
+                >
+                  <source src="/pencil.webm" type="video/webm" />
+                  비디오를 재생할 수 없습니다
+                </video>
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 text-base font-bold text-purple-700 dark:text-purple-300 drop-shadow bg-white/70 dark:bg-gray-900/70 px-3 py-1 rounded-full">
                   {progress}%
                 </div>
               </div>
