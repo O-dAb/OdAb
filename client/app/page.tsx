@@ -102,11 +102,17 @@ export default function Home() {
         <div className="bg-white/70 dark:bg-gray-800/70 rounded-3xl p-8 md:p-12 shadow-xl backdrop-blur-sm">
           <div className="flex flex-col md:flex-row items-center gap-8">
             <div className="w-full md:w-1/2 relative">
-              <div className="aspect-square max-w-md mx-auto bg-blue-100 dark:bg-blue-900/30 rounded-full p-8 relative overflow-hidden">
-                {/* 여기서는 수달 이미지가 있다고 가정합니다. 실제 이미지로 교체하세요 */}
-                <div className="w-full h-full rounded-full bg-blue-200 dark:bg-blue-800 flex items-center justify-center">
-                  <span className="text-6xl">🦦</span>
-                </div>
+              <div className="aspect-square max-w-sm mx-auto bg-blue-100 dark:bg-blue-900/30 rounded-full p-8 relative overflow-hidden flex items-center justify-center">
+                <video
+                  className="max-w-[320px] max-h-[320px] w-full h-full object-contain"
+                  muted
+                  playsInline
+                  autoPlay
+                  loop
+                >
+                  <source src="/pencil.webm" type="video/webm" />
+                  비디오를 재생할 수 없습니다
+                </video>
               </div>
               <div className="absolute -bottom-4 -right-4 bg-yellow-100 dark:bg-yellow-900/30 p-3 rounded-full shadow-lg">
                 <Star className="h-8 w-8 text-yellow-500" />
