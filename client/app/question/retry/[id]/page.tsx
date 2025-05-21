@@ -538,26 +538,26 @@ export default function RetryQuestionPage() {
           </Button>
 
           <div className="flex flex-col md:flex-row gap-6">
-            <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 w-2/5">
-              <CardHeader className="bg-purple-50/60 border-b-0 rounded-t-2xl">
-                <div className="flex justify-between items-center">
-                  <CardTitle className="text-purple-700 font-extrabold">
-                    문제 다시 풀기
-                  </CardTitle>
-                  <div className="flex gap-2">
-                    {question.retryQuestionSubConceptDtos.map((concept) => (
-                      <Badge
-                        key={concept.subConceptId}
-                        variant="secondary"
-                        className="bg-purple-400 text-white font-bold rounded-full px-3 py-1"
-                      >
-                        {concept.subConceptType}
-                      </Badge>
-                    ))}
-                  </div>
+            <Card className="border-0 shadow-xl rounded-2xl bg-white dark:bg-gray-800 w-2/5">
+              <CardHeader className="bg-purple-50/60 border-b-0 rounded-t-2xl p-4">
+                <div className="flex items-center gap-2 text-purple-700 font-extrabold">
+                  문제 다시 풀기
                 </div>
               </CardHeader>
-              <CardContent className="pt-7 space-y-4">
+              <div className="px-6 py-3 bg-purple-50/60 dark:bg-gray-700/60 border-t border-purple-100 dark:border-gray-600">
+                <div className="flex flex-wrap gap-2">
+                  {question.retryQuestionSubConceptDtos.map((concept) => (
+                    <Badge
+                      key={concept.subConceptId}
+                      variant="secondary"
+                      className="bg-purple-400 text-white font-bold rounded-lg px-3 py-1 hover:bg-purple-400 dark:hover:bg-purple-600"
+                    >
+                      {concept.subConceptType}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              <CardContent className="pt-8 space-y-6">
                 {/* 문제 내용 */}
                 <div className="space-y-4">
                   <div className="font-bold text-lg text-purple-700">문제</div>
@@ -644,13 +644,13 @@ export default function RetryQuestionPage() {
               </CardContent>
             </Card>
 
-            <Card className="border-0 shadow-xl rounded-2xl bg-gradient-to-r from-purple-100 via-pink-100 to-blue-100 w-3/5">
+            <Card className="border-0 shadow-xl rounded-2xl bg-white dark:bg-gray-800 w-3/5">
               <CardHeader className="bg-purple-50/60 border-b-0 rounded-t-2xl">
                 <CardTitle className="text-purple-700 font-extrabold">
                   풀이 과정
                 </CardTitle>
               </CardHeader>
-              <CardContent className="pt-6 space-y-4">
+              <CardContent className="pt-8 space-y-6">
                 <div className="flex justify-between items-center">
                   <div className="flex gap-2">
                     {/* 색상 및 펜 두께 선택기 */}

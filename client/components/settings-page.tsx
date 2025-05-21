@@ -42,9 +42,18 @@ export default function SettingsPage() {
   const { educationLevel, grade } = userProfile;
 
   const [level, setLevel] = useState<EducationLevel>(educationLevel);
-  const [selectedGrade, setSelectedGrade] = useState<Grade>(grade);
+  const [selectedGrade, setSelectedGrade] = useState<Grade>(() => {
+    // localStorage에서 grade를 우선 읽고, 없으면 userProfile.grade 사용
+    if (typeof window !== "undefined") {
+      const storedGrade = localStorage.getItem("grade");
+      if (storedGrade === "1" || storedGrade === "2" || storedGrade === "3") {
+        return storedGrade as Grade;
+      }
+    }
+    return grade;
+  });
   const { theme, setTheme } = useTheme();
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(theme === "dark");
   const [imageUrl, setImageUrl] = useState(userProfile.profileUrl || "");
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -70,6 +79,22 @@ useEffect(() => {
   // 다크 모드 상태 설정
   setDarkMode(theme === 'dark');
 }, [theme, userProfile.profileUrl]);
+
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const storedGrade = localStorage.getItem("grade");
+    if (storedGrade === "1" || storedGrade === "2" || storedGrade === "3") {
+      setSelectedGrade(storedGrade as Grade);
+    } else {
+      setSelectedGrade(grade);
+    }
+  }
+}, [grade]);
+
+// theme가 바뀔 때마다 darkMode도 동기화
+useEffect(() => {
+  setDarkMode(theme === "dark");
+}, [theme]);
 
   const handleSaveProfile = async () => {
     try {
@@ -128,10 +153,13 @@ useEffect(() => {
     setShowSettingsModal(false);
   };
 
+  // 스위치 토글 시 바로 setTheme 호출
+  const handleDarkModeToggle = (checked: boolean) => {
+    setDarkMode(checked);
+    setTheme(checked ? "dark" : "light");
+  };
+
   const handleSaveSettings = () => {
-    // 테마 설정
-    setTheme(darkMode ? "dark" : "light");
-    
     // 모달 표시
     setShowSettingsModal(true);
   };
@@ -447,7 +475,7 @@ useEffect(() => {
             </div>
             <Switch
               checked={darkMode}
-              onCheckedChange={setDarkMode}
+              onCheckedChange={handleDarkModeToggle}
               className="data-[state=checked]:bg-blue-400 dark:data-[state=checked]:bg-blue-600"
             />
           </div>

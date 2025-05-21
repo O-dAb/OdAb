@@ -68,13 +68,13 @@ export function LoginForm() {
       
       <Card className="w-full max-w-md mx-auto border-0 shadow-xl dark:shadow-blue-900/10 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
         <CardHeader className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 dark:from-purple-900/20 dark:to-blue-900/20 rounded-t-lg pt-8 pb-6 px-8">
-          <div className="relative flex items-center justify-center mb-6">
-            <div className="absolute -top-4 -right-4">
-              <Sparkles className="h-5 w-5 text-yellow-500 animate-pulse" />
-            </div>
-            <div className="bg-gradient-to-br from-purple-500 to-blue-600 dark:from-purple-400 dark:to-blue-500 p-3 rounded-full shadow-lg">
-              <BrainCircuit className="h-8 w-8 text-white" />
-            </div>
+          <div className="flex items-center justify-center mb-6">
+            <img
+              src="/mascot_with_pencil.png"
+              alt="수달 캐릭터"
+              className="w-40 h-40 object-contain rounded-full bg-blue-100 dark:bg-blue-900/30 shadow"
+              draggable={false}
+            />
           </div>
           <CardTitle className="text-center text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-300 dark:to-blue-300">
             O! dAb
