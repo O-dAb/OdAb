@@ -451,15 +451,7 @@ export default function ProblemUploaderPage() {
                   <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">클릭하여 파일 선택</span>
                 </label>
                 {/* 카메라 촬영 */}
-                <Button
-                  variant="outline"
-                  className="h-auto flex flex-col items-center justify-center py-6 rounded-xl bg-blue-100 dark:bg-gray-800 hover:bg-blue-200 dark:hover:bg-gray-700 border-blue-200 dark:border-gray-600 shadow"
-                  onClick={handleCameraCapture}
-                >
-                  <Camera className="h-10 w-10 text-blue-400 dark:text-blue-300 mb-2" />
-                  <span className="text-base font-semibold dark:text-gray-200">카메라로 촬영</span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">클릭하여 촬영 시작</span>
-                </Button>
+
               </div>
 
               {previewImage && (
