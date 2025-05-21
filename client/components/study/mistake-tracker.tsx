@@ -526,10 +526,23 @@ export function MistakeTracker({ educationLevel, grade }: MistakeTrackerProps) {
                       <div>
                         <div className="flex items-center gap-2 mb-2">
                           {/* 해당 문제의 주제 찾기 */}
-                          <Badge className="bg-blue-400 dark:bg-blue-600 rounded-full px-3 py-1 text-white font-bold">
-                            {question.wrongQuestionSubconceptList?.[0]
-                              ?.subConceptType || "주제 없음"}
-                          </Badge>
+  {question.wrongQuestionSubconceptList &&
+                          question.wrongQuestionSubconceptList.length > 0 ? (
+                            question.wrongQuestionSubconceptList.map(
+                              (sub, idx) => (
+                                <Badge
+                                  key={sub.subConceptId}
+                                  className="bg-blue-400 dark:bg-blue-600 rounded-full px-3 py-1 text-white font-bold"
+                                >
+                                  {sub.subConceptType}
+                                </Badge>
+                              )
+                            )
+                          ) : (
+                            <Badge className="bg-blue-400 dark:bg-blue-600 rounded-full px-3 py-1 text-white font-bold">
+                              주제 없음
+                            </Badge>
+                          )}
                           <span className="text-sm text-gray-500 dark:text-gray-400">
                             {question.formattedDate
                               ? new Date(
