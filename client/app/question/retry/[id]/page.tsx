@@ -545,6 +545,8 @@ export default function RetryQuestionPage() {
       const response = await authApi.patch(
         `/api/v1/question/${numericQuestionId}/answer`,
         { answerText: inputText, answerImg: base64Data, imageType: "image/png" }
+        ,
+        { timeout: 10000 }
       );
       const isCorrect =
         (response as any).isCorrect ?? (response as any).correct;
