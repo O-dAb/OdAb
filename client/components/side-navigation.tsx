@@ -16,10 +16,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useState } from "react";
 
 export function SideNavigation() {
   const pathname = usePathname();
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const [isOpen, setIsOpen] = useState(false);
 
   const navItems = [
     {
@@ -66,6 +68,7 @@ export function SideNavigation() {
         <li key={item.value}>
           <Link
             href={item.path}
+            onClick={() => setIsOpen(false)}
             className={`flex items-center gap-3 p-3 rounded-xl font-semibold transition-all text-base shadow-sm
               ${
                 pathname === item.path
@@ -91,7 +94,7 @@ export function SideNavigation() {
   if (isMobile) {
     return (
       <div className="fixed top-4 left-4 z-50">
-        <Sheet>
+        <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="rounded-full">
               <Menu className="h-5 w-5" />

@@ -424,10 +424,10 @@ export default function ProblemUploaderPage() {
         // 문제 업로드 화면
         <div className="flex flex-col md:flex-row items-center justify-center gap-16 w-full">
           {/* 왼쪽: 문제 업로드 카드 */}
-          <Card className="w-full max-w-lg border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100">
-            <CardHeader className="bg-blue-50/60 border-b-0 rounded-t-2xl">
-              <CardTitle className="flex items-center gap-2 text-blue-700">
-                <FileText className="h-6 w-6 text-purple-500" />
+          <Card className="w-full max-w-lg border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800">
+            <CardHeader className="bg-blue-50/60 dark:bg-gray-700/60 border-b-0 rounded-t-2xl">
+              <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-200">
+                <FileText className="h-6 w-6 text-purple-500 dark:text-purple-400" />
                 <span>문제 업로드</span>
               </CardTitle>
             </CardHeader>
@@ -444,11 +444,11 @@ export default function ProblemUploaderPage() {
                 />
                 <label
                   htmlFor="file-upload"
-                  className="flex flex-col items-center justify-center border-2 border-dashed border-purple-300 rounded-xl p-6 cursor-pointer hover:bg-purple-50 transition-colors shadow"
+                  className="flex flex-col items-center justify-center border-2 border-dashed border-purple-300 dark:border-purple-600 rounded-xl p-6 cursor-pointer hover:bg-purple-50 dark:hover:bg-purple-900/30 transition-colors shadow"
                 >
-                  <FileText className="h-10 w-10 text-purple-400 mb-2" />
-                  <span className="text-base font-semibold">이미지 업로드</span>
-                  <span className="text-xs text-gray-500 mt-1">클릭하여 파일 선택</span>
+                  <FileText className="h-10 w-10 text-purple-400 dark:text-purple-300 mb-2" />
+                  <span className="text-base font-semibold dark:text-gray-200">이미지 업로드</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">클릭하여 파일 선택</span>
                 </label>
                 {/* 카메라 촬영 */}
                 <Button
@@ -456,9 +456,9 @@ export default function ProblemUploaderPage() {
                   className="h-auto flex flex-col items-center justify-center py-6 rounded-xl bg-blue-100 dark:bg-gray-800 hover:bg-blue-200 dark:hover:bg-gray-700 border-blue-200 dark:border-gray-600 shadow"
                   onClick={handleCameraCapture}
                 >
-                  <Camera className="h-10 w-10 text-blue-400 mb-2" />
-                  <span className="text-base font-semibold">카메라로 촬영</span>
-                  <span className="text-xs text-gray-500 mt-1">클릭하여 촬영 시작</span>
+                  <Camera className="h-10 w-10 text-blue-400 dark:text-blue-300 mb-2" />
+                  <span className="text-base font-semibold dark:text-gray-200">카메라로 촬영</span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">클릭하여 촬영 시작</span>
                 </Button>
               </div>
 
@@ -529,18 +529,18 @@ export default function ProblemUploaderPage() {
             <Button
               variant="outline"
               onClick={handleBackToUploader}
-              className="mb-6 flex items-center gap-2 bg-white/80 border-purple-200 text-purple-600 hover:bg-purple-50 rounded-xl font-bold"
+              className="mb-6 flex items-center gap-2 bg-white/80 dark:bg-gray-800/80 border-purple-200 dark:border-purple-600 text-purple-600 dark:text-purple-300 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-xl font-bold"
             >
               <ArrowLeft className="h-4 w-4" />
               <span>새 문제 업로드하기</span>
             </Button>
 
             {/* 문제 카드 */}
-            <Card className="border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100">
-              <CardHeader className="bg-blue-50/60 border-b-0 rounded-t-2xl">
+            <Card className="border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800">
+              <CardHeader className="bg-blue-50/60 dark:bg-gray-700/60 border-b-0 rounded-t-2xl">
                 <div className="flex justify-between items-center">
-                  <CardTitle className="flex items-center gap-2 text-blue-700">
-                    <FileText className="h-6 w-6 text-purple-500" />
+                  <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-200">
+                    <FileText className="h-6 w-6 text-purple-500 dark:text-purple-400" />
                     <span>문제</span>
                   </CardTitle>
                   <div className="flex gap-2">
@@ -563,7 +563,7 @@ export default function ProblemUploaderPage() {
                     <img
                       src={problemData?.imageUrl || previewImage || ""}
                       alt="문제 이미지"
-                      className="w-full h-auto max-h-[300px] object-contain border rounded-xl shadow mx-auto"
+                      className="w-full h-auto max-h-[300px] object-contain border rounded-xl shadow mx-auto dark:border-gray-700"
                     />
                   </div>
                 )}
@@ -574,7 +574,7 @@ export default function ProblemUploaderPage() {
                     ref={questionTextareaRef}
                     value={editableQuestionText}
                     onChange={handleQuestionTextChange}
-                    className="w-full min-h-[100px] text-gray-700 p-3 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-purple-400 bg-white/90 shadow-sm resize-none overflow-hidden"
+                    className="w-full min-h-[100px] text-gray-700 dark:text-gray-200 p-3 border border-purple-200 dark:border-purple-600 rounded-lg focus:ring-2 focus:ring-purple-400 dark:focus:ring-purple-500 focus:border-purple-400 dark:focus:border-purple-500 bg-white/90 dark:bg-gray-800/90 shadow-sm resize-none overflow-hidden"
                     placeholder="문제 텍스트를 확인하고 수정할 수 있습니다."
                   />
                   
@@ -582,13 +582,13 @@ export default function ProblemUploaderPage() {
                     ref={modificationTextareaRef}
                     value={modificationExplanation}
                     onChange={handleModificationExplanationChange}
-                    className="w-full min-h-[80px] text-gray-700 p-3 border border-purple-200 rounded-lg focus:ring-2 focus:ring-purple-400 focus:border-purple-400 bg-white/90 shadow-sm mt-3 resize-none overflow-hidden"
+                    className="w-full min-h-[80px] text-gray-700 dark:text-gray-200 p-3 border border-purple-200 dark:border-purple-600 rounded-lg focus:ring-2 focus:ring-purple-400 dark:focus:ring-purple-500 focus:border-purple-400 dark:focus:border-purple-500 bg-white/90 dark:bg-gray-800/90 shadow-sm mt-3 resize-none overflow-hidden"
                     placeholder="고쳐야 할 부분 설명해 주세요"
                   />
                   
                   <div className="flex gap-2 mt-3">
                     <Button
-                      className="flex-1 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-lg py-3 transition-colors duration-150 ease-in-out shadow hover:shadow-md"
+                      className="flex-1 bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white font-semibold rounded-lg py-3 transition-colors duration-150 ease-in-out shadow hover:shadow-md"
                       onClick={handleSearchSimilar}
                       disabled={isSearching || !selectedFile}
                     >
@@ -606,7 +606,7 @@ export default function ProblemUploaderPage() {
                     </Button>
                     
                     <Button
-                      className="flex-1 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-lg py-3 transition-colors duration-150 ease-in-out shadow hover:shadow-md"
+                      className="flex-1 bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white font-semibold rounded-lg py-3 transition-colors duration-150 ease-in-out shadow hover:shadow-md"
                       onClick={handleModifyProblem}
                       disabled={isModifying}
                     >
@@ -658,18 +658,18 @@ export default function ProblemUploaderPage() {
 
             {/* 유사 문제 검색 후에는 해설 카드 표시 */}
             {showExplanationCard && (
-              <Card className="border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 w-full">
-                <CardHeader className="bg-blue-50/60 border-b-0 rounded-t-2xl">
+              <Card className="border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 w-full">
+                <CardHeader className="bg-blue-50/60 dark:bg-gray-700/60 border-b-0 rounded-t-2xl">
                   <div className="flex justify-between items-center">
-                    <CardTitle className="flex items-center gap-2 text-blue-700">
-                      <FileText className="h-6 w-6 text-purple-500" />
+                    <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-200">
+                      <FileText className="h-6 w-6 text-purple-500 dark:text-purple-400" />
                       <span>해설</span>
                     </CardTitle>
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => setShowSolution(!showSolution)}
-                      className="text-blue-600 hover:text-blue-700 rounded-xl font-bold"
+                      className="text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 rounded-xl font-bold"
                     >
                       {showSolution ? "해설 닫기" : "해설 보기"}
                     </Button>
@@ -678,9 +678,9 @@ export default function ProblemUploaderPage() {
                 <CardContent className="pt-6 space-y-4">
                   {showSolution ? (
                     <div className="space-y-6">
-                      <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
+                      <div className="bg-blue-50 dark:bg-gray-800/50 border border-blue-100 dark:border-gray-700 rounded-lg p-4">
                         <div className="flex justify-between items-center mb-4">
-                          <h3 className="font-bold text-blue-700">
+                          <h3 className="font-bold text-blue-700 dark:text-blue-300">
                             {currentStep + 1}단계 /{" "}
                             {problemData?.questionSolution?.length}단계
                           </h3>
@@ -692,7 +692,7 @@ export default function ProblemUploaderPage() {
                                 setCurrentStep((prev) => Math.max(0, prev - 1))
                               }
                               disabled={currentStep === 0}
-                              className="text-blue-600 hover:text-blue-700 rounded-xl font-bold"
+                              className="text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 rounded-xl font-bold"
                             >
                               <ChevronLeft className="h-4 w-4" />
                             </Button>
@@ -712,7 +712,7 @@ export default function ProblemUploaderPage() {
                                 currentStep ===
                                 (problemData?.questionSolution?.length || 1) - 1
                               }
-                              className="text-blue-600 hover:text-blue-700 rounded-xl font-bold"
+                              className="text-blue-600 dark:text-blue-300 hover:text-blue-700 dark:hover:text-blue-200 rounded-xl font-bold"
                             >
                               <ChevronRight className="h-4 w-4" />
                             </Button>
@@ -721,39 +721,39 @@ export default function ProblemUploaderPage() {
 
                         {/* 전체/단계별 해설 탭 */}
                         <Tabs defaultValue="step-by-step" className="mt-4">
-                          <TabsList className="bg-blue-100 mb-4">
+                          <TabsList className="bg-blue-100 dark:bg-gray-700 mb-4">
                             <TabsTrigger
                               value="step-by-step"
-                              className="data-[state=active]:bg-blue-500 data-[state=active]:text-white"
+                              className="data-[state=active]:bg-blue-500 data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
                             >
                               단계별 보기
                             </TabsTrigger>
                             <TabsTrigger
                               value="all-steps"
-                              className="data-[state=active]:bg-blue-500 data-[state=active]:text-white"
+                              className="data-[state=active]:bg-blue-500 data-[state=active]:text-white dark:data-[state=active]:bg-blue-600"
                             >
                               전체 보기
                             </TabsTrigger>
                           </TabsList>
                           <TabsContent value="step-by-step">
-                            <div className="bg-white/70 rounded-lg p-4">
-                              <p className="text-gray-700">
+                            <div className="bg-white/70 dark:bg-gray-800/70 rounded-lg p-4">
+                              <p className="text-gray-700 dark:text-gray-200">
                                 {problemData?.questionSolution?.[currentStep]}
                               </p>
                             </div>
                           </TabsContent>
                           <TabsContent value="all-steps">
-                            <div className="bg-white/70 rounded-lg p-4 space-y-4">
+                            <div className="bg-white/70 dark:bg-gray-800/70 rounded-lg p-4 space-y-4">
                               {problemData?.questionSolution?.map(
                                 (step, index) => (
                                   <div
                                     key={index}
-                                    className="border-b border-blue-200 pb-3 last:border-b-0 last:pb-0"
+                                    className="border-b border-blue-200 dark:border-gray-700 pb-3 last:border-b-0 last:pb-0"
                                   >
-                                    <h4 className="font-medium text-blue-700 mb-1">
+                                    <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1">
                                       단계 {index + 1}
                                     </h4>
-                                    <p className="text-gray-700">{step}</p>
+                                    <p className="text-gray-700 dark:text-gray-200">{step}</p>
                                   </div>
                                 )
                               )}
@@ -764,10 +764,10 @@ export default function ProblemUploaderPage() {
                     </div>
                   ) : (
                     <div className="flex flex-col items-center justify-center py-10">
-                      <p className="text-gray-500 text-center">
+                      <p className="text-gray-500 dark:text-gray-400 text-center">
                         해설을 보려면 "해설 보기" 버튼을 클릭하세요.
                       </p>
-                      <p className="text-gray-400 text-sm mt-2">
+                      <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">
                         먼저 문제를 풀어보는 것을 추천합니다!
                       </p>
                     </div>
