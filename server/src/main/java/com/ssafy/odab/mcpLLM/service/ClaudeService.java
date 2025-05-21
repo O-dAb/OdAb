@@ -10,9 +10,11 @@ public interface ClaudeService {
 
     Mono<ClaudeTextApiResponseDto> extractProblem(ApiRequestDto apiRequestDto, Integer userId);
 
-    Mono<Boolean> isCorrectAnswer(String answer, String questionText, String userAnswerImg, Integer userId);
+    Mono<Boolean> isCorrectAnswer(String answer, String questionText, String userAnswerText, Integer userId);
 
     Mono<ApiResponseDto> searchSimilarQuestions(ApiRequestDto apiRequestDto, Integer userId);
 
     Mono<FixProblemResponseDto> fixProblem(FixProblemRequestDto fixProblemRequestDto, Integer userId);
+
+    Mono<String> extractTextByAnswer(String userAnswerImg);
 }

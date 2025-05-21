@@ -11,5 +11,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class VerifyAnswerRequestDto {
     private String answerImg;
-
+    private String answerText;
 }

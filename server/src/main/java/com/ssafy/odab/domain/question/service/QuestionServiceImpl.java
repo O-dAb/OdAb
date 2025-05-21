@@ -103,6 +103,12 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
+    @Transactional
+    public String isCorrectText(Integer questionId, Integer userId, VerifyAnswerRequestDto verifyAnswerRequestDto) {
+        return claudeService.extractTextByAnswer(verifyAnswerRequestDto.getAnswerImg()).block();
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public ConceptResponseDto findConceptList() {
         List<SubConcept> subConcepts = subConceptRepository.findAll();

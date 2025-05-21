@@ -33,6 +33,12 @@ public class QuestionController {
         return ResponseEntity.ok(verifyAnswerResponseDto);
     }
 
+    @PostMapping("{questionId}/text")
+    public ResponseEntity<String> isCorrectText(@PathVariable("questionId") Integer questionId, @RequestBody VerifyAnswerRequestDto verifyAnswerRequestDto) {
+        Integer userId = jwtService.getUserIdFromRequest();
+        return ResponseEntity.ok(questionService.isCorrectText(questionId, userId, verifyAnswerRequestDto));
+    }
+
     @GetMapping("/{questionId}/retry")
     public ResponseEntity<RetryQuestionResponseDto> findRetryQuestion(@PathVariable("questionId") Integer questionId) {
         return ResponseEntity.ok(questionService.findRetryQuestionByQuestionId(questionId));

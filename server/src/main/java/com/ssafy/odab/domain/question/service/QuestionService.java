@@ -14,4 +14,6 @@ public interface QuestionService {
   ConceptResponseDto findConceptList(); //개념선택 - 수학개념선택
 
   Page<SubConceptRelatedQuestionResponseDto> findSubConceptRelatedQuestionBySubConceptId(Integer subConceptId, Pageable pageable);
+
+  String isCorrectText(Integer questionId, Integer userId, VerifyAnswerRequestDto verifyAnswerRequestDto);
 }

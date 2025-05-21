@@ -113,6 +113,12 @@ export default function RetryQuestionPage() {
     "#800080", // 보라
     "#FF00FF", // 핑크
   ]);
+  const [canvasText, setCanvasText] = useState(""); // 변환된 텍스트
+  const [inputText, setInputText] = useState(""); // input에 표시될 값
+  const [isChecking, setIsChecking] = useState(false);
+  const [loadingType, setLoadingType] = useState<null | "text" | "submit">(
+    null
+  );
 
   useEffect(() => {
     const fetchQuestion = async () => {
@@ -478,6 +484,7 @@ export default function RetryQuestionPage() {
           ? "정답을 맞추셨습니다."
           : "다시 한번 생각해보세요.",
         variant: isCorrect ? "default" : "destructive",
+        duration: 1000,
       });
     } catch (error) {
       console.error("답변 제출 실패:", error);
@@ -485,7 +492,80 @@ export default function RetryQuestionPage() {
         title: "답변 제출 실패",
         description: "답변을 제출하는 중 오류가 발생했습니다.",
         variant: "destructive",
+        duration: 1000,
       });
+    }
+  };
+
+  // 답안 이미지를 텍스트로 변환하는 함수
+  const handleImageToText = async () => {
+    const canvas = answerCanvasRef.current;
+    if (!canvas) return;
+    const imageData = canvas.toDataURL("image/png");
+    const base64Data = imageData.split(",")[1];
+    setIsChecking(true);
+    setLoadingType("text");
+    try {
+      const response = await authApi.post(
+        `/api/v1/question/${numericQuestionId}/text`,
+        { answerImg: base64Data, imageType: "image/png" }
+      );
+      const text = response as any;
+      console.log("text:", text);
+      setCanvasText(text);
+      setInputText(text);
+      toast({
+        title: "텍스트 변환 성공",
+        description: "이미지에서 텍스트를 추출했습니다.",
+        variant: "default",
+        duration: 1000,
+      });
+    } catch (error) {
+      toast({
+        title: "텍스트 변환 실패",
+        description: "이미지에서 텍스트 추출에 실패했습니다.",
+        variant: "destructive",
+        duration: 1000,
+      });
+    } finally {
+      setIsChecking(false);
+      setLoadingType(null);
+    }
+  };
+
+  // 텍스트 정답 제출 및 정답 확인 함수
+  const handleTextSubmit = async () => {
+    setIsChecking(true);
+    setLoadingType("submit");
+    const canvas = answerCanvasRef.current;
+    if (!canvas) return;
+    const imageData = canvas.toDataURL("image/png");
+    const base64Data = imageData.split(",")[1];
+    try {
+      const response = await authApi.patch(
+        `/api/v1/question/${numericQuestionId}/answer`,
+        { answerText: inputText, answerImg: base64Data, imageType: "image/png" }
+      );
+      const isCorrect =
+        (response as any).isCorrect ?? (response as any).correct;
+      toast({
+        title: isCorrect ? "정답입니다!" : "오답입니다",
+        description: isCorrect
+          ? "정답을 맞추셨습니다."
+          : "다시 한번 생각해보세요.",
+        variant: isCorrect ? "default" : "destructive",
+        duration: 1000,
+      });
+    } catch (error) {
+      toast({
+        title: "정답 제출 실패",
+        description: "정답을 제출하는 중 오류가 발생했습니다.",
+        variant: "destructive",
+        duration: 1000,
+      });
+    } finally {
+      setIsChecking(false);
+      setLoadingType(null);
     }
   };
 
@@ -560,8 +640,12 @@ export default function RetryQuestionPage() {
               <CardContent className="pt-8 space-y-6">
                 {/* 문제 내용 */}
                 <div className="space-y-4">
-                  <div className="font-bold text-lg text-purple-700 dark:text-purple-300">문제</div>
-                  <p className="text-gray-700 dark:text-gray-100">{question.questionText}</p>
+                  <div className="font-bold text-lg text-purple-700 dark:text-purple-300">
+                    문제
+                  </div>
+                  <p className="text-gray-700 dark:text-gray-100">
+                    {question.questionText}
+                  </p>
                   {question.questionImg && (
                     <img
                       src={question.questionImg}
@@ -625,14 +709,19 @@ export default function RetryQuestionPage() {
                 {showSolution &&
                   question.retryQuestionSolutionDtos.length > 0 && (
                     <div className="mt-6 p-4 bg-purple-50 dark:bg-gray-800/50 border border-purple-100 dark:border-gray-700 rounded-md">
-                      <h3 className="font-bold text-purple-700 dark:text-purple-300 mb-3">해설</h3>
+                      <h3 className="font-bold text-purple-700 dark:text-purple-300 mb-3">
+                        해설
+                      </h3>
                       <div className="space-y-3">
                         <div className="space-y-1">
                           <div className="font-bold text-purple-600 dark:text-purple-400">
                             Step {currentStep + 1}
                           </div>
                           <p className="text-gray-700 dark:text-gray-100">
-                            {question.retryQuestionSolutionDtos[currentStep].solutionContent}
+                            {
+                              question.retryQuestionSolutionDtos[currentStep]
+                                .solutionContent
+                            }
                           </p>
                         </div>
                       </div>
@@ -897,7 +986,9 @@ export default function RetryQuestionPage() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <span className="font-bold text-purple-900 dark:text-purple-300">답:</span>
+                  <span className="font-bold text-purple-900 dark:text-purple-300">
+                    답:
+                  </span>
                   <div
                     ref={answerCanvasContainerRef}
                     className="border border-purple-100 dark:border-purple-700 rounded-lg overflow-hidden"
@@ -940,13 +1031,50 @@ export default function RetryQuestionPage() {
                     </Button>
                     <Button
                       size="sm"
-                      className="bg-purple-600 hover:bg-purple-700 rounded-xl font-bold"
-                      onClick={handleSubmitAnswer}
+                      className="bg-blue-500 hover:bg-blue-600 text-white rounded-xl font-bold"
+                      onClick={handleImageToText}
                     >
-                      제출
+                      텍스트 변환
                     </Button>
                   </div>
                 </div>
+                {/* 변환된 텍스트 input 및 제출 UI */}
+                {(canvasText || isChecking) && (
+                  <div className="mt-4 relative min-h-[60px]">
+                    {/* 텍스트 변환 중일 때 위에 프로그레스 바 */}
+                    {isChecking && loadingType === "text" && (
+                      <div className="absolute top-0 left-0 w-full h-1 z-10">
+                        <ProgressBar />
+                      </div>
+                    )}
+                    {canvasText && (
+                      <>
+                        <label className="block mb-1 font-bold">
+                          정답(수정 가능):
+                        </label>
+                        <Input
+                          type="text"
+                          value={inputText}
+                          onChange={(e) => setInputText(e.target.value)}
+                          className="border rounded px-2 py-1 w-full"
+                        />
+                        <Button
+                          className="mt-2 px-4 py-1 bg-purple-600 hover:bg-purple-700 text-white rounded"
+                          onClick={handleTextSubmit}
+                          disabled={isChecking}
+                        >
+                          정답 제출
+                        </Button>
+                        {/* 정답 제출 중일 때 아래에 프로그레스 바 */}
+                        {isChecking && loadingType === "submit" && (
+                          <div className="w-full mt-2">
+                            <ProgressBar />
+                          </div>
+                        )}
+                      </>
+                    )}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -954,5 +1082,24 @@ export default function RetryQuestionPage() {
       </div>
       <Toaster />
     </>
+  );
+}
+
+function ProgressBar() {
+  const [progress, setProgress] = useState(0);
+  useEffect(() => {
+    setProgress(0);
+    const interval = setInterval(() => {
+      setProgress((prev) => (prev < 100 ? prev + 2 : 100));
+    }, 12);
+    return () => clearInterval(interval);
+  }, []);
+  return (
+    <div className="w-full h-1 bg-blue-100 rounded">
+      <div
+        className="h-1 bg-blue-500 rounded transition-all duration-75"
+        style={{ width: `${progress}%` }}
+      ></div>
+    </div>
   );
 }
