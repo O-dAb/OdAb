@@ -71,7 +71,9 @@ export default function RelatedProblemsPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedGrade, setSelectedGrade] = useState<string | null>(null);
   const [selectedType, setSelectedType] = useState<string | null>(null);
-  const [selectedSubConceptType, setSelectedSubConceptType] = useState<string | null>(null);
+  const [selectedSubConceptType, setSelectedSubConceptType] = useState<
+    string | null
+  >(null);
   const [problems, setProblems] = useState<Question[]>([]);
   const [filteredProblems, setFilteredProblems] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
@@ -149,7 +151,9 @@ export default function RelatedProblemsPage() {
       <div className="container mx-auto py-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="p-8 text-center">
-            <h2 className="text-2xl font-semibold mb-2 dark:text-white">오류 발생</h2>
+            <h2 className="text-2xl font-semibold mb-2 dark:text-white">
+              오류 발생
+            </h2>
             <p className="text-gray-500 dark:text-gray-400">{error}</p>
             <Button
               variant="outline"
@@ -169,8 +173,12 @@ export default function RelatedProblemsPage() {
       <div className="container mx-auto py-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="p-8 text-center">
-            <h2 className="text-xl font-semibold mb-2 dark:text-white">잘못된 접근</h2>
-            <p className="text-gray-500 dark:text-gray-400">올바른 개념 ID가 필요합니다.</p>
+            <h2 className="text-xl font-semibold mb-2 dark:text-white">
+              잘못된 접근
+            </h2>
+            <p className="text-gray-500 dark:text-gray-400">
+              올바른 개념 ID가 필요합니다.
+            </p>
             <Button
               variant="outline"
               onClick={() => router.back()}
@@ -197,48 +205,9 @@ export default function RelatedProblemsPage() {
           >
             <ArrowLeft className="h-4 w-4" />
           </Button>
-          <h1 className="text-2xl font-bold text-purple-700 dark:text-purple-300">관련 문제</h1>
-        </div>
-      </div>
-
-      {/* 검색 및 필터 */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4" />
-          <Input
-            placeholder="문제 검색..."
-            className="pl-10 border-yellow-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 rounded-xl"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-        <div className="flex gap-2">
-          <Select
-            value={selectedSubConceptType || "all"}
-            onValueChange={(value) =>
-              setSelectedSubConceptType(value === "all" ? null : value)
-            }
-          >
-            <SelectTrigger className="w-[140px] border-yellow-100 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 rounded-xl">
-              <div className="flex items-center gap-2">
-                <BookOpen className="h-4 w-4 text-gray-500 dark:text-gray-400" />
-                <SelectValue placeholder="개념 유형" />
-              </div>
-            </SelectTrigger>
-            <SelectContent className="dark:bg-gray-800 dark:border-gray-700">
-              <SelectItem value="all" className="dark:text-gray-200">전체 유형</SelectItem>
-              <SelectItem value="수와 연산" className="dark:text-gray-200">수와 연산</SelectItem>
-              <SelectItem value="문자와 식" className="dark:text-gray-200">문자와 식</SelectItem>
-              <SelectItem value="함수" className="dark:text-gray-200">함수</SelectItem>
-              <SelectItem value="기하" className="dark:text-gray-200">기하</SelectItem>
-              <SelectItem value="확률과 통계" className="dark:text-gray-200">확률과 통계</SelectItem>
-              <SelectItem value="수열" className="dark:text-gray-200">수열</SelectItem>
-              <SelectItem value="미분" className="dark:text-gray-200">미분</SelectItem>
-              <SelectItem value="적분" className="dark:text-gray-200">적분</SelectItem>
-              <SelectItem value="벡터" className="dark:text-gray-200">벡터</SelectItem>
-              <SelectItem value="행렬" className="dark:text-gray-200">행렬</SelectItem>
-            </SelectContent>
-          </Select>
+          <h1 className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+            관련 문제
+          </h1>
         </div>
       </div>
 
@@ -252,7 +221,9 @@ export default function RelatedProblemsPage() {
             >
               <CardHeader className="bg-purple-50 dark:bg-gray-800/60 border-b border-purple-100 dark:border-gray-700 py-3 rounded-t-xl">
                 <CardTitle className="flex justify-between items-center text-base">
-                  <span className="dark:text-gray-200">문제 {problem.questionId}</span>
+                  <span className="dark:text-gray-200">
+                    문제 {problem.questionId}
+                  </span>
                   <Badge
                     variant="outline"
                     className="border-purple-200 dark:border-gray-600 text-purple-600 dark:text-purple-300 text-xs"
@@ -300,7 +271,9 @@ export default function RelatedProblemsPage() {
         ) : (
           <Card className="col-span-3 border-yellow-100 dark:border-gray-700 dark:bg-gray-800 rounded-xl">
             <CardContent className="p-6 text-center">
-              <p className="text-gray-500 dark:text-gray-400">검색 결과가 없습니다.</p>
+              <p className="text-gray-500 dark:text-gray-400">
+                검색 결과가 없습니다.
+              </p>
             </CardContent>
           </Card>
         )}
