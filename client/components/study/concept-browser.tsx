@@ -180,7 +180,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
   return (
     <div className="space-y-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen p-6 flex flex-col items-center">
       {/* 검색창 */}
-      <div className="w-full max-w-6xl flex justify-center mb-4">
+      {/* <div className="w-full max-w-6xl flex justify-center mb-4">
         <div className="relative flex-1 max-w-2xl">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400 h-4 w-4" />
           <Input
@@ -190,7 +190,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
             onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
-      </div>
+      </div> */}
 
       {/* 학년 선택 버튼 */}
       <div className="flex justify-center mb-8 gap-2">
@@ -256,7 +256,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
       </div>
 
       {/* 개념 목록 */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl">
+      {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-6xl">
         {filteredConcepts.length > 0 ? (
           filteredConcepts.map((concept) => (
             <Card
@@ -303,7 +303,7 @@ export function ConceptBrowser({ educationLevel, grade }: ConceptBrowserProps) {
             검색 결과가 없습니다.
           </div>
         )}
-      </div>
+      </div> */}
 
       {/* 선택한 개념 상세 정보 */}
       {selectedConcept && (
