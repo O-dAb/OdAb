@@ -149,7 +149,7 @@ export default function RelatedProblemsPage() {
       <div className="container mx-auto py-8 bg-gradient-to-br from-pink-50 via-blue-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
         <Card className="dark:bg-gray-800 dark:border-gray-700">
           <CardContent className="p-8 text-center">
-            <h2 className="text-xl font-semibold mb-2 dark:text-white">오류 발생</h2>
+            <h2 className="text-2xl font-semibold mb-2 dark:text-white">오류 발생</h2>
             <p className="text-gray-500 dark:text-gray-400">{error}</p>
             <Button
               variant="outline"

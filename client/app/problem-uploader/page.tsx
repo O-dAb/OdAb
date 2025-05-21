@@ -432,7 +432,7 @@ export default function ProblemUploaderPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-8">
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-6 pt-4">
                 {/* 이미지 업로드 */}
                 <input
                   type="file"
@@ -528,26 +528,26 @@ export default function ProblemUploaderPage() {
             </Button>
 
             {/* 문제 카드 */}
-            <Card className="border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800">
-              <CardHeader className="bg-blue-50/60 dark:bg-gray-700/60 border-b-0 rounded-t-2xl">
-                <div className="flex justify-between items-center">
-                  <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-200">
-                    <FileText className="h-6 w-6 text-purple-500 dark:text-purple-400" />
-                    <span>문제</span>
-                  </CardTitle>
-                  <div className="flex gap-2">
-                    {problemData?.subConcepts?.map((concept, index) => (
-                      <Badge
-                        key={index}
-                        variant="secondary"
-                        className="bg-purple-400 dark:bg-purple-600 text-white font-bold rounded-full px-3 py-1"
-                      >
-                        {concept}
-                      </Badge>
-                    ))}
-                  </div>
+            <Card className="border-0 shadow-2xl rounded-2xl bg-white dark:bg-gray-800">
+              <CardHeader className="bg-blue-50/60 dark:bg-gray-700/60 border-b-0 rounded-t-2xl p-4">
+                <div className="flex items-center gap-2 text-blue-700 dark:text-blue-200">
+                  <FileText className="h-6 w-6 text-purple-500 dark:text-purple-400" />
+                  <span className="text-2xl font-semibold leading-none tracking-tight">문제</span>
                 </div>
               </CardHeader>
+              <div className="px-6 py-3 bg-blue-50/60 dark:bg-gray-700/60 border-t border-blue-100 dark:border-gray-600">
+                <div className="flex flex-wrap gap-2">
+                  {problemData?.subConcepts?.map((concept, index) => (
+                    <Badge
+                      key={index}
+                      variant="secondary"
+                      className="bg-purple-400 dark:bg-purple-600 text-white font-bold rounded-lg px-3 py-1 hover:bg-purple-400 dark:hover:bg-purple-600"
+                    >
+                      {concept}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
               <CardContent className="pt-7 space-y-4">
                 {/* 문제 이미지 표시 추가 */}
                 {(previewImage || problemData?.imageUrl) && (
@@ -650,7 +650,7 @@ export default function ProblemUploaderPage() {
 
             {/* 유사 문제 검색 후에는 해설 카드 표시 */}
             {showExplanationCard && (
-              <Card className="border-0 shadow-2xl rounded-2xl bg-gradient-to-r from-blue-100 via-purple-100 to-pink-100 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800 w-full">
+              <Card className="border-0 shadow-2xl rounded-2xl bg-white dark:bg-gray-800 w-full">
                 <CardHeader className="bg-blue-50/60 dark:bg-gray-700/60 border-b-0 rounded-t-2xl">
                   <div className="flex justify-between items-center">
                     <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-200">
