@@ -42,7 +42,16 @@ export default function SettingsPage() {
   const { educationLevel, grade } = userProfile;
 
   const [level, setLevel] = useState<EducationLevel>(educationLevel);
-  const [selectedGrade, setSelectedGrade] = useState<Grade>(grade);
+  const [selectedGrade, setSelectedGrade] = useState<Grade>(() => {
+    // localStorage에서 grade를 우선 읽고, 없으면 userProfile.grade 사용
+    if (typeof window !== "undefined") {
+      const storedGrade = localStorage.getItem("grade");
+      if (storedGrade === "1" || storedGrade === "2" || storedGrade === "3") {
+        return storedGrade as Grade;
+      }
+    }
+    return grade;
+  });
   const { theme, setTheme } = useTheme();
   const [darkMode, setDarkMode] = useState(false);
   const [imageUrl, setImageUrl] = useState(userProfile.profileUrl || "");
@@ -70,6 +79,17 @@ useEffect(() => {
   // 다크 모드 상태 설정
   setDarkMode(theme === 'dark');
 }, [theme, userProfile.profileUrl]);
+
+useEffect(() => {
+  if (typeof window !== "undefined") {
+    const storedGrade = localStorage.getItem("grade");
+    if (storedGrade === "1" || storedGrade === "2" || storedGrade === "3") {
+      setSelectedGrade(storedGrade as Grade);
+    } else {
+      setSelectedGrade(grade);
+    }
+  }
+}, [grade]);
 
   const handleSaveProfile = async () => {
     try {

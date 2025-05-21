@@ -43,7 +43,7 @@ export function SideNavigation() {
       icon: <Notebook className="h-5 w-5" />,
     },
     {
-      name: "개념 모음",
+      name: "개념 학습",
       path: "/concept-browser",
       value: "concept-browser",
       icon: <BookOpen className="h-5 w-5" />,
