@@ -566,7 +566,7 @@ export default function ProblemUploaderPage() {
                     ref={questionTextareaRef}
                     value={editableQuestionText}
                     onChange={handleQuestionTextChange}
-                    className="w-full min-h-[100px] text-gray-700 dark:text-gray-200 p-3 border border-purple-200 dark:border-purple-600 rounded-lg focus:ring-2 focus:ring-purple-400 dark:focus:ring-purple-500 focus:border-purple-400 dark:focus:border-purple-500 bg-white/90 dark:bg-gray-800/90 shadow-sm resize-none overflow-hidden"
+                    className="w-full min-h-[100px] text-gray-700 dark:text-gray-100 p-3 border border-purple-200 dark:border-purple-600 rounded-lg focus:ring-2 focus:ring-purple-400 dark:focus:ring-purple-500 focus:border-purple-400 dark:focus:border-purple-500 bg-white/90 dark:bg-gray-800/90 shadow-sm resize-none overflow-hidden"
                     placeholder="문제 텍스트를 확인하고 수정할 수 있습니다."
                   />
                   
@@ -574,7 +574,7 @@ export default function ProblemUploaderPage() {
                     ref={modificationTextareaRef}
                     value={modificationExplanation}
                     onChange={handleModificationExplanationChange}
-                    className="w-full min-h-[80px] text-gray-700 dark:text-gray-200 p-3 border border-purple-200 dark:border-purple-600 rounded-lg focus:ring-2 focus:ring-purple-400 dark:focus:ring-purple-500 focus:border-purple-400 dark:focus:border-purple-500 bg-white/90 dark:bg-gray-800/90 shadow-sm mt-3 resize-none overflow-hidden"
+                    className="w-full min-h-[80px] text-gray-700 dark:text-gray-100 p-3 border border-purple-200 dark:border-purple-600 rounded-lg focus:ring-2 focus:ring-purple-400 dark:focus:ring-purple-500 focus:border-purple-400 dark:focus:border-purple-500 bg-white/90 dark:bg-gray-800/90 shadow-sm mt-3 resize-none overflow-hidden"
                     placeholder="고쳐야 할 부분 설명해 주세요"
                   />
                   
@@ -620,7 +620,7 @@ export default function ProblemUploaderPage() {
                 {/* 정답 표시 */}
                 <div className="mt-6 p-4 bg-blue-50 dark:bg-gray-800/50 border border-blue-100 dark:border-gray-700 rounded-lg">
                   <h3 className="font-bold text-blue-700 dark:text-blue-300 mb-2">정답</h3>
-                  <p className="text-gray-700 dark:text-gray-300 font-medium">
+                  <p className="text-gray-700 dark:text-gray-100 font-medium">
                     {problemData?.answer}
                   </p>
                 </div>
@@ -729,7 +729,7 @@ export default function ProblemUploaderPage() {
                           </TabsList>
                           <TabsContent value="step-by-step">
                             <div className="bg-white/70 dark:bg-gray-800/70 rounded-lg p-4">
-                              <p className="text-gray-700 dark:text-gray-200">
+                              <p className="text-gray-700 dark:text-gray-100">
                                 {problemData?.questionSolution?.[currentStep]}
                               </p>
                             </div>
@@ -745,7 +745,7 @@ export default function ProblemUploaderPage() {
                                     <h4 className="font-medium text-blue-700 dark:text-blue-300 mb-1">
                                       단계 {index + 1}
                                     </h4>
-                                    <p className="text-gray-700 dark:text-gray-200">{step}</p>
+                                    <p className="text-gray-700 dark:text-gray-100">{step}</p>
                                   </div>
                                 )
                               )}
