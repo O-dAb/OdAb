@@ -46,11 +46,11 @@
 
 ### 🖼️아키텍쳐 설계
 
-<img src="/docs/아키텍처.png" alt="아키텍처" width="200px" height="150px">
+<img src="/docs/아키텍처.png" alt="아키텍처" width="700px" height="500px">
 
 ### 💾데이터베이스 모델링(ERD)
 
-<img src="/docs/ERD.png" alt="ERD" width="200px" height="150px">
+<img src="/docs/ERD.png" alt="ERD" width="700px" height="500px">
 
 ### 📝요구사항 명세서
 
@@ -279,17 +279,17 @@ project/
     </tr>
     <tr>
       <td align="center">
-        <img src="/docs/dongyoung.jpg" alt="동영 프로필 이미지" width="200px" height="150px">
+        <img src="/docs/dongyoung.png" alt="동영 프로필 이미지" width="200px" height="150px">
         <br>
         <a href="https://github.com/dongschiken">이동영</a> 🦫
       </td>
       <td align="center">
-        <img src="/docs/jongsu.jpg" alt="종수 프로필 이미지" width="200px" height="150px">
+        <img src="/docs/jongsu.png" alt="종수 프로필 이미지" width="200px" height="150px">
         <br>
         <a href="https://github.com/doros508">진종수</a> 🦊
       </td>
       <td align="center">
-        <img src="/docs/donggun.jpg" alt="동건 프로필 이미지" width="200px" height="150px">
+        <img src="/docs/donggun.png" alt="동건 프로필 이미지" width="200px" height="150px">
         <br>
         <a href="https://github.com/hamdonggun">함동건</a> 🐯
       </td>
@@ -339,17 +339,17 @@ project/
     </tr>
     <tr>
       <td align="center">
-        <img src="/docs/hanjin.jpg" alt="한진 프로필 이미지" width="200px" height="150px">
+        <img src="/docs/hanjin.png" alt="한진 프로필 이미지" width="200px" height="150px">
         <br>
         <a href="https://github.com/baebaebaeh">배한진</a> 🐼
       </td>
       <td align="center">
-        <img src="/docs/seungho.jpg" alt="승호 프로필 이미지" width="200px" height="150px">
+        <img src="/docs/seungho.png" alt="승호 프로필 이미지" width="200px" height="150px">
         <br>
         <a href="https://github.com/YooSeungHo0124">유승호</a> 🦁
       </td>
       <td align="center">
-        <img src="/docs/dayoung.jpg" alt="다영 프로필 이미지" width="200px" height="150px">
+        <img src="/docs/dayoung.png" alt="다영 프로필 이미지" width="200px" height="150px">
         <br>
         <a href="https://github.com/solveDayLee">이다영</a> 🦄
       </td>
