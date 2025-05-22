@@ -1,11 +1,11 @@
 
-# 수학 학습 AI 서비스
+# O! 답 - 수학 학습 AI 서비스 
 
 ## 1. 프로젝트 개요
 
 ### 📋 서비스 개요
 - 단계별 풀이를 통해 논리적인 추론과정을 배울 수 있는 수학 학습 AI
-- 프로젝트 기간: 2025/04/14 ~ 2025/05/22 (총 40일간)
+- 프로젝트 기간: 2025/04/14 ~ 2025/05/22 (총 38일간)
 
 ### 💰 서비스 특징
 1. 수학 문제 이미지 인식 및 분석
@@ -17,11 +17,11 @@
 
 | 이름           | 역할 및 구현 기능                    |
 | -------------- | ------------------------------------ |
-| 🟥이동영(팀장) | **FullStack**<br>- 프론트엔드 아키텍처 설계<br>- 문제 업로더 컴포넌트 개발<br>- AI 연동 인터페이스 구현 |
-| 🟧진종수(팀원) | **Backend**<br>- AI 모델 서버 구축<br>- 문제 분석 API 개발<br>- 데이터베이스 설계 |
-| 🟩함동건(팀원) | **Backend**<br>- 사용자 인증 시스템<br>- 문제 관리 API<br>- 성능 최적화 |
-| 🟦배한진(팀원) | **FullStack**<br>- UI/UX 디자인<br>- 반응형 레이아웃<br>- 상태 관리 구현 |
-| 🟥유승호(팀원) | **FullStack**<br>- 문제 풀이 인터페이스<br>- 해설 표시 컴포넌트<br>- 성능 모니터링 |
+| 🟥이동영(팀장) | **개발**<br>- 개발<br>- 개발<br>- 개발 |
+| 🟧진종수(팀원) | **개발**<br>- 개발<br>- 개발<br>- 개발 |
+| 🟩함동건(팀원) | **개발**<br>- 개발<br>- 개발<br>- 개발 |
+| 🟦배한진(팀원) | **개발**<br>- 개발<br>- 개발<br>- 개발 |
+| 🟥유승호(팀원) | **개발**<br>- 개발<br>- 개발<br>- 개발 |
 | 🟨이다영(팀원) | **Infra**<br>- CI/CD 파이프라인 구축<br>- Docker 컨테이너화<br>- AWS 배포 관리<br>- 풀스택 및 랜딩페이지 |
 
 ## 2. 기획 배경
@@ -46,19 +46,19 @@
 
 ### 🖼️아키텍쳐 설계
 
-[아키텍처 설계도 이미지]
+<img src="/docs/아키텍처.png" alt="아키텍처" width="200px" height="150px">
 
 ### 💾데이터베이스 모델링(ERD)
 
-[ERD 이미지]
+<img src="/docs/ERD.png" alt="ERD" width="200px" height="150px">
 
-### 📝기능명세서
+### 📝요구사항 명세서
 
-[Notion 링크]
+https://beneficial-cheese-641.notion.site/1e526951ec2780febd49f5dd299f3714?v=1e526951ec2781108a74000cd4620949&pvs=4
 
 ### 📄API명세서
 
-[Notion 링크]
+https://beneficial-cheese-641.notion.site/API-1e526951ec2780adae1be21a16134169?pvs=4
 
 ### 🗂️프로젝트 폴더 구조
 
@@ -346,7 +346,7 @@ project/
       <td align="center">
         <img src="/docs/seungho.jpg" alt="승호 프로필 이미지" width="200px" height="150px">
         <br>
-        <a href="https://github.com/seungho-dev">유승호</a> 🦁
+        <a href="https://github.com/YooSeungHo0124">유승호</a> 🦁
       </td>
       <td align="center">
         <img src="/docs/dayoung.jpg" alt="다영 프로필 이미지" width="200px" height="150px">
@@ -392,86 +392,50 @@ project/
 </div>
 
 
-# Git 브랜치 전략 가이드
+# 📋 Git 브랜치 전략
 
-## 브랜치 구조
-
+## 🌳 브랜치 구조
 ```
 master
   └── develop
-       ├── front
-       │    └── fe/feature/19-login
-       └── back
-            └── be/feature/18-login
+       ├── frontend-dev
+       │    └── fe/[타입]/[작업명]
+       └── backend-dev
+            └── be/[타입]/[작업명]
 ```
 
-## 브랜치 명명 규칙
+## 📝 브랜치 명명 규칙
+**형식**: `[팀]/[타입]/[작업명]`
 
-브랜치 이름은 작업 타입과 내용을 명확히 표현해야 합니다:
-
-- `[팀]/[타입]/[이슈번호]-[작업명]`
-  - 예: `fe/feature/19-login`, `be/fix/32-signup-validation`
-
-### 브랜치 타입
+### 🏷️ 타입
 - `feature`: 새로운 기능 개발
+- `style`: UI/UX 변경
+- `bug`: 에러 해결  
+- `refactoring`: 코드 수정
+
+**예시**: `fe/feature/user-login`, `be/bug/api-fix`
+
+## 💬 커밋 메시지 규칙
+**형식**: `[타입]: 작업 내용`
+
+### 🏷️ 타입
+- `feat`: 새로운 기능
 - `fix`: 버그 수정
 - `style`: UI/UX 변경
 - `refactor`: 코드 리팩토링
-- `docs`: 문서 작업
-- `hotfix`: develop 브랜치에서 발생한 긴급 버그 수정
+- `hotfix`: 긴급 수정
+- `docs`: 문서 수정
+- `chore`: 기타 작업
 
-## 작업 흐름
+**예시**: `feat: 로그인 기능 구현`, `fix: 회원가입 오류 수정`
 
-1. **브랜치 생성 전 확인**
-   ```bash
-   git checkout develop
-   git pull origin develop
-   git checkout -b [브랜치명]
-   ```
+## 🔄 작업 흐름
+1. `develop`에서 브랜치 생성
+2. 작업 완료 후 PR 생성
+3. 코드 리뷰 후 병합
+4. 브랜치 삭제
 
-2. **작업 및 커밋**
-   - 규칙에 맞는 커밋 메시지 작성
-   - 작은 단위로 자주 커밋하기
-
-3. **원격 저장소와 동기화**
-   ```bash
-   git pull origin develop
-   # 충돌 발생 시
-   git stash push
-   git pull origin develop
-   git stash apply
-   ```
-
-4. **Pull Request 및 Merge**
-   - 작업 완료 후 PR 생성
-   - 코드 리뷰 후 승인받은 PR만 merge
-   - merge 후 해당 브랜치는 삭제
-
-## 커밋 메시지 규칙
-
-```
-[타입] 제목
-
-본문
-
-- 타입: feat, fix, docs, style, refactor, test, chore
-- 제목: 50자 이내로 작성
-- 본문: 선택사항, 변경사항 상세 설명
-```
-
-## 주의사항
-
-1. **브랜치 확인**
-   - 작업 시작 전 현재 브랜치 확인
-   - 다른 브랜치 작업 내용과 충돌 확인
-
-2. **Merge 정책**
-   - feature, fix, style 브랜치는 merge 후 삭제
-   - master, develop, front, back 브랜치는 유지
-
-3. **Master 브랜치 보호**
-   - master 브랜치는 PR을 통해서만 코드 반영
-   - develop 브랜치에서 충분한 테스트 진행 후 merge
-
-
-
+## ⚠️ 주요 규칙
+- `master`, `develop` 직접 push 금지 (긴급시 예외)
+- PR을 통한 코드 리뷰 필수
+- 하나의 브랜치에서 하나의 작업만
