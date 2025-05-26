@@ -237,7 +237,16 @@ project/
 ## 5. 기능 상세 설명
 
 ### 1. 문제 업로드 및 분석
-<img src="/docs/problem-upload.gif" alt="문제 업로드" />
+<img src="/docs/문제업로드1.gif" alt="문제 업로드1" />
+<img src="/docs/문제업로드2.gif" alt="문제 업로드2" />
+<img src="/docs/개념학습.gif" alt="개념학습" />
+<img src="/docs/다시풀기.gif" alt="다시풀기" />
+<img src="/docs/다크모드.gif" alt="다크모드" />
+<img src="/docs/랜딩페이지.gif" alt="랜딩페이지" />
+<img src="/docs/로그인.gif" alt="로그인" />
+<img src="/docs/메인페이지.gif" alt="메인페이지" />
+<img src="/docs/설정페이지.gif" alt="설정페이지" />
+<img src="/docs/오답노트.gif" alt="오답노트" />
 
 - 이미지 기반 수학 문제 인식
 - OCR 기술을 활용한 텍스트 추출
