@@ -371,7 +371,7 @@ project/
       <td align="center">
         <img src="/docs/donggun.png" alt="동건 프로필 이미지" width="200px" height="150px">
         <br>
-        <a href="https://github.com/hamdonggun">함동건</a> 🐯
+        <a href="https://github.com/hamdonggeon">함동건</a> 🐯
       </td>
     </tr>
     <tr>
