@@ -138,14 +138,14 @@ export default function DashboardPage() {
               </Button>
             </Link>
 
-            {/* <Link href="/review-schedule" className="w-full"> */}
-              {/* <Button className="h-auto py-4 bg-green-100 hover:bg-green-200 dark:bg-green-600/70 dark:hover:bg-green-500/70 w-full rounded-xl text-lg shadow-md text-green-700 dark:text-white">
+             <Link href="/review-schedule" className="w-full"> 
+               <Button className="h-auto py-4 bg-green-100 hover:bg-green-200 dark:bg-green-600/70 dark:hover:bg-green-500/70 w-full rounded-xl text-lg shadow-md text-green-700 dark:text-white">
                 <div className="flex flex-col items-center gap-2">
                   <Clock className="h-6 w-6" />
                   <span>복습하기</span>
                 </div>
-              </Button> */}
-            {/* </Link> */}
+              </Button>
+             </Link> 
           </CardContent>
         </Card>
       </div>
