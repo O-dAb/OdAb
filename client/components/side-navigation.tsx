@@ -48,12 +48,12 @@ export function SideNavigation() {
       value: "concept-browser",
       icon: <BookOpen className="h-5 w-5" />,
     },
-    // {
-    //   name: "복습 일정",
-    //   path: "/review-schedule",
-    //   value: "review-schedule",
-    //   icon: <Calendar className="h-5 w-5" />,
-    // },
+    {
+      name: "복습 일정",
+      path: "/review-schedule",
+      value: "review-schedule",
+      icon: <Calendar className="h-5 w-5" />,
+    },
     {
       name: "설정",
       path: "/settings-page",
