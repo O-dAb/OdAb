@@ -17,7 +17,7 @@
 <!-- 5. **망각 곡선 기반 반복 학습 시스템** -->
 5. **태블릿 펜 기능 지원 (메모, 그리기)**
 
-### ��팀원 정보 및 업무 분담 내역
+### 👥 팀원 정보 및 업무 분담 내역
 
 | 이름           | 역할 및 구현 기능                    |
 | -------------- | ------------------------------------ |
@@ -124,9 +124,13 @@
 ![Notion](https://img.shields.io/badge/Notion-%23000000.svg?style=for-the-badge&logo=notion&logoColor=white)
 ![jira](https://img.shields.io/badge/jira-2580f5.svg?style=for-the-badge&logo=jira&logoColor=white)
 
-### 🖼️아키텍쳐 설계
+### 🖼️서비스 아키텍처
 
 <img src="/docs/아키텍처.png" alt="아키텍처" width="700px" height="500px">
+
+**📋 인프라 구성 및 배포 환경**
+> 자세한 인프라 구성 및 CI/CD 파이프라인에 대한 내용은 [INFRA 문서](./docs/INFRA/README.md)를 참고해주세요.
+<br>
 
 ### 💾데이터베이스 모델링(ERD)
 
@@ -134,229 +138,112 @@
 
 ### 📝요구사항 명세서
 
-https://beneficial-cheese-641.notion.site/1e526951ec2780febd49f5dd299f3714?v=1e526951ec2781108a74000cd4620949&pvs=4
+> 상세한 기능 요구사항 및 유저 스토리는 [요구사항 명세서](https://beneficial-cheese-641.notion.site/1e526951ec2780febd49f5dd299f3714?v=1e526951ec2781108a74000cd4620949&pvs=4)를 참고해주세요.
 
 ### 📄API명세서
 
-https://beneficial-cheese-641.notion.site/API-1e526951ec2780adae1be21a16134169?pvs=4
-
-### 🗂️프로젝트 폴더 구조
-
-```
-project/
-├── client/ # 프론트엔드 (Next.js)
-│ ├── app/ # Next.js 14 App Router
-│ │ ├── problem-uploader/ # 문제 업로드 페이지
-│ │ ├── dashboard/ # 대시보드 페이지
-│ │ ├── settings-page/ # 설정 페이지
-│ │ ├── study/ # 학습 페이지
-│ │ ├── problem-solver/ # 문제 풀이 페이지
-│ │ ├── login/ # 로그인 페이지
-│ │ ├── concept-browser/ # 개념 브라우저
-│ │ ├── review/ # 복습 페이지
-│ │ ├── mistake-tracker/ # 오답 노트
-│ │ ├── question/ # 문제 페이지
-│ │ ├── review-schedule/ # 복습 일정
-│ │ ├── page.tsx # 메인 페이지
-│ │ ├── layout.tsx # 레이아웃 컴포넌트
-│ │ ├── loading.tsx # 로딩 컴포넌트
-│ │ └── not-found.tsx # 404 페이지
-│ ├── components/ # 재사용 가능한 컴포넌트
-│ ├── hooks/ # 커스텀 훅
-│ ├── lib/ # 유틸리티 함수
-│ ├── public/ # 정적 파일
-│ ├── styles/ # 전역 스타일
-│ ├── types/ # TypeScript 타입 정의
-│ ├── contexts/ # Context API
-│ ├── package.json # 의존성 관리
-│ ├── next.config.js # Next.js 설정
-│ ├── tailwind.config.ts # Tailwind CSS 설정
-│ └── tsconfig.json # TypeScript 설정
-│
-├── server/ # 백엔드 (Spring Boot)
-│ ├── src/
-│ │ ├── main/
-│ │ │ ├── java/
-│ │ │ │ └── com/
-│ │ │ │ └── ssafy/
-│ │ │ │ └── odab/
-│ │ │ │ ├── mcpLLM/ # LLM 관련 코드
-│ │ │ │ │ ├── service/ # LLM 서비스 로직
-│ │ │ │ │ ├── dto/ # LLM 데이터 전송 객체
-│ │ │ │ │ ├── controller/ # LLM API 컨트롤러
-│ │ │ │ │ ├── rag/ # RAG(Retrieval-Augmented Generation) 구현
-│ │ │ │ │ ├── mcpServer/ # MCP 서버 관련 코드
-│ │ │ │ │ ├── toolFactory/# 도구 생성 팩토리
-│ │ │ │ │ ├── config/ # LLM 설정
-│ │ │ │ │ └── image/ # 이미지 처리 관련
-│ │ │ │ │
-│ │ │ │ ├── domain/ # 도메인 모델
-│ │ │ │ │ ├── user/ # 사용자 도메인
-│ │ │ │ │ ├── question_result/# 문제 결과 도메인
-│ │ │ │ │ ├── question/ # 문제 도메인
-│ │ │ │ │ ├── learning/ # 학습 도메인
-│ │ │ │ │ ├── main/ # 메인 도메인
-│ │ │ │ │ ├── concept/ # 개념 도메인
-│ │ │ │ │ └── image/ # 이미지 도메인
-│ │ │ │ │
-│ │ │ │ ├── common/ # 공통 코드
-│ │ │ │ │ ├── service/ # 공통 서비스
-│ │ │ │ │ ├── config/ # 공통 설정
-│ │ │ │ │ ├── controller/ # 공통 컨트롤러
-│ │ │ │ │ ├── dto/ # 공통 DTO
-│ │ │ │ │ └── repository/ # 공통 레포지토리
-│ │ │ │ │
-│ │ │ │ └── Test/ # 테스트 코드
-│ │ │ └── resources/
-│ │ └── test/
-│ ├── build.gradle # Gradle 빌드 설정
-│ └── Dockerfile # 백엔드 도커파일
-│
-├── python-server/ # AI 모델 서버
-│ ├── app/
-│ │ ├── models/ # AI 모델 관련 코드
-│ │ ├── routers/ # API 라우터
-│ │ ├── main.py # 메인 애플리케이션
-│ │ ├── faiss_server.py # 벡터 검색 서버
-│ │ └── build_index.py # 인덱스 빌드 스크립트
-│ ├── requirements.txt # Python 의존성
-│ └── Dockerfile # Python 서버 도커파일
-│
-├── nginx/ # Nginx 설정
-│ ├── conf.d/ # Nginx 설정 파일
-│ └── Dockerfile # Nginx 도커파일
-│
-├── exec/ # 산출물
-│
-├── docker-compose.yml # 메인 도커 컴포즈
-├── docker-compose.canary.yml # 카나리 배포용 컴포즈
-└── docker-compose.nginx.yml # Nginx 설정용 컴포즈
-```
-
+> 전체 API 엔드포인트 및 요청/응답 스펙은 [API 명세서](https://beneficial-cheese-641.notion.site/API-1e526951ec2780adae1be21a16134169?pvs=4)를 참고해주세요.
 
 ## 5. 기능 상세 설명
 
-### 1. 문제 업로드 및 분석
+### 📸 1. 문제 업로드 및 분석
+#### 이미지 기반 문제 인식 시스템
 <img src="/docs/문제업로드1.gif" alt="문제 업로드1" />
-<img src="/docs/문제업로드2.gif" alt="문제 업로드2" />
-<img src="/docs/개념학습.gif" alt="개념학습" />
-<img src="/docs/다시풀기.gif" alt="다시풀기" />
-<img src="/docs/다크모드.gif" alt="다크모드" />
-<img src="/docs/랜딩페이지.gif" alt="랜딩페이지" />
-<img src="/docs/로그인.gif" alt="로그인" />
-<img src="/docs/메인페이지.gif" alt="메인페이지" />
-<img src="/docs/설정페이지.gif" alt="설정페이지" />
-<img src="/docs/오답노트.gif" alt="오답노트" />
 
+> **카메라 촬영 및 갤러리 업로드**: 태블릿 카메라로 직접 촬영하거나 갤러리에서 문제 이미지를 업로드할 수 있습니다.
+
+<img src="/docs/문제업로드2.gif" alt="문제 업로드2" />
+
+> **AI 문제 분석**: 업로드된 이미지를 OCR 기술로 텍스트 추출 후, AI가 자동으로 문제 유형을 분류하고 단계별 해설을 생성합니다.
+
+**주요 기능:**
 - 이미지 기반 수학 문제 인식
 - OCR 기술을 활용한 텍스트 추출
 - AI 모델을 통한 문제 유형 분류
 - 단계별 해설 자동 생성
 
-### 2. 단계별 해설 제공
+---
+
+### 🧠 2. 단계별 해설 제공
+#### Sequential Thinking 기반 문제 해결
 <img src="/docs/solution-step.gif" alt="단계별 해설" />
 
+> **점진적 학습**: "다음 단계만 보기" 기능으로 한 단계씩 학습하거나, "전체 풀이 보기"로 전체 과정을 한번에 확인할 수 있습니다.
+
+**주요 기능:**
 - 문제 풀이 과정의 단계별 상세 설명
 - 수식 및 그래프 시각화
 - 핵심 개념 설명 및 관련 공식 제시
-- 오답 노트 기능
+- 논리적 사고 과정 중심의 해설
 
-### 3. 유사 문제 추천
+---
+
+### 📚 3. 개념 학습 및 복습 관리
+#### 개인 맞춤형 학습 시스템
+<img src="/docs/개념학습.gif" alt="개념학습" />
+
+> **개념별 체계적 학습**: 문제와 연관된 수학 개념을 체계적으로 학습하고, 개념 이해도를 확인할 수 있습니다.
+
+<img src="/docs/다시풀기.gif" alt="다시풀기" />
+
+> **반복 학습**: 틀린 문제나 어려웠던 문제를 다시 풀어보며 완전한 이해를 도모합니다.
+
+---
+
+### 🔍 4. 유사 문제 추천
+#### AI 기반 맞춤형 문제 추천
 <img src="/docs/similar-problems.gif" alt="유사 문제 추천" />
 
+> **지능형 문제 추천**: 현재 풀고 있는 문제와 유사한 유형의 문제들을 AI가 자동으로 추천하여 반복 학습을 돕습니다.
+
+**주요 기능:**
 - AI 기반 유사 문제 검색
 - 난이도별 문제 추천
 - 학습 진도에 따른 맞춤형 문제 제공
 - 오답 유형별 연습 문제 추천
 
-### 4. 문제 커스터마이징
-<img src="/docs/customize-problem.gif" alt="문제 커스터마이징" />
+---
 
-- 문제 수정 및 저장 기능
-- 개인별 문제집 생성
-- 문제 난이도 조정
-- 커스텀 해설 작성
+### 📝 5. 오답 노트 및 복습 관리
+#### 개인화된 학습 관리 시스템
+<img src="/docs/오답노트.gif" alt="오답노트" />
 
-# Front-End
+> **스마트 오답 노트**: 틀린 문제들을 자동으로 분류하고, 약점 유형별로 정리하여 효율적인 복습이 가능합니다.
 
-## ✅ 문제 업로더
+**주요 기능:**
+- 개인별 오답 패턴 분석
+- 약점 유형별 문제 분류
+- 복습 일정 자동 생성
+- 학습 진도 시각화
 
-### 1️⃣ 이미지 업로드 컴포넌트
-- **React State Management**
-  - `useState`를 활용한 이미지 미리보기 관리
-  - 드래그 앤 드롭 기능 구현
-  - 이미지 크기 최적화
+---
 
-### 2️⃣ 문제 분석 결과 표시
-- **컴포넌트 구조**
-  - 문제 텍스트 표시
-  - 수식 렌더링
-  - 단계별 해설 UI
+### 🎨 6. 사용자 경험 최적화
+#### 직관적이고 편리한 인터페이스
 
-## ✅ 문제 풀이 인터페이스
+<img src="/docs/다크모드.gif" alt="다크모드" />
 
-### 1️⃣ 단계별 해설 표시
-- **상태 관리**
-  - 현재 단계 추적
-  - 해설 표시/숨김 토글
-  - 진행 상태 저장
+> **다크모드 지원**: 사용자 선호에 따라 라이트/다크 모드를 선택할 수 있어 장시간 학습에도 눈의 피로를 줄입니다.
 
-### 2️⃣ 유사 문제 추천
-- **데이터 페칭**
-  - React Query를 활용한 데이터 관리
-  - 무한 스크롤 구현
-  - 캐싱 전략
+<img src="/docs/랜딩페이지.gif" alt="랜딩페이지" />
 
-# Back-End
+> **직관적인 랜딩 페이지**: 서비스의 핵심 기능을 한눈에 파악할 수 있는 사용자 친화적인 인터페이스를 제공합니다.
 
-## ✅ AI 모델 서버
+<img src="/docs/로그인.gif" alt="로그인" />
 
-### 1️⃣ 문제 분석 API
-- **Claude API 연동**
-  - 이미지 기반 문제 인식
-  - 수식 추출 및 변환
-  - 해설 생성
+> **간편 로그인**: 카카오 OAuth를 통한 소셜 로그인으로 번거로운 회원가입 과정 없이 빠르게 서비스를 이용할 수 있습니다.
 
-### 2️⃣ 유사 문제 검색
-- **벡터 데이터베이스**
-  - 문제 유사도 계산
-  - 실시간 검색 최적화
-  - 캐시 전략
+<img src="/docs/메인페이지.gif" alt="메인페이지" />
 
-## ✅ 사용자 관리
+> **통합 대시보드**: 학습 현황, 최근 문제, 추천 문제 등을 한 화면에서 확인할 수 있는 개인화된 메인 페이지를 제공합니다.
 
-### 1️⃣ 인증 시스템
-- **Spring Security**
-  - JWT 기반 인증
-  - OAuth2 소셜 로그인
-  - 권한 관리
+<img src="/docs/설정페이지.gif" alt="설정페이지" />
 
-# Infra
+> **개인화 설정**: 사용자 프로필, 학습 목표, 알림 설정 등을 개인의 학습 스타일에 맞게 조정할 수 있습니다.
+>
+<br>
 
-## ✅ 배포 환경 구축 (담당: 이다영)
-
-### 1️⃣ 웹서버
-- **NGINX**를 사용한 블루/그린 무중단 배포
-- HTTPS 적용 및 라우팅 설정
-- 정적 파일 서빙 최적화
-
-### 2️⃣ CI/CD 파이프라인
-- **Docker & Docker-compose**
-  - 마이크로서비스 아키텍처
-  - 컨테이너 오케스트레이션
-  - 환경별 설정 관리
-
-- **Jenkins**
-  - 자동화된 빌드 및 배포
-  - 테스트 자동화
-  - 배포 모니터링
-
-- **Mattermost 알림**
-  - 배포 상태 실시간 알림
-  - 에러 로그 모니터링
-  - 팀 협업 효율화
-
-# 6. 팀원 소개
+# 5. 팀원 소개
 
 <div align="center">
   <!-- 첫 번째 줄 - 3명 -->
