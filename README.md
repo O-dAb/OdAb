@@ -229,7 +229,7 @@
   <!-- 첫 번째 줄 - 3명 -->
   <table style="width: 100%; table-layout: fixed;">
     <tr>
-      <th align="center" width="33.33%">FullStack</th>
+      <th align="center" width="33.33%">Backend</th>
       <th align="center" width="33.33%">Backend</th>
       <th align="center" width="33.33%">Backend</th>
     </tr>
